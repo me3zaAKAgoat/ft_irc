@@ -62,6 +62,8 @@ int main() {
 	while (1)
 	{
 		int bytesReceived = recv(clientSocket, message, sizeof(message), 0);
+		message[bytesReceived] = '\0';
+		std::cout << message << std::endl;
 		if (bytesReceived == -1)
 			perror("recv failed");
 		else if (bytesReceived == 0)
@@ -70,13 +72,16 @@ int main() {
 			break;
 		}
 		
-		message[bytesReceived] = '\0';
 		if (!strcmp(message, "\0"))
 			continue;
 		else 
 		{
-			std::cout << "this message is recieved with success" << std::endl;
-			std::cout << message << std::endl;
+			char response[100];
+			strcpy(response, "Server: the message [");
+        	strcat(response, message);
+        	strcat(response, "] is recieved from client with success\n");
+			if (send(clientSocket, response, strlen(response), 0) == -1)
+            	perror("send failed");
 		}
 	}
 

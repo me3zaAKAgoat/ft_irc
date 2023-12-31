@@ -19,19 +19,27 @@ int main() {
 
     connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
     std::cout << "Connected to the server" << std::endl;
-    char message[10];
+    char message[100];
     while (1)
     {
-        std::cout << std::endl << "type message to server..." << std::endl << std::endl;
+        std::cout << std::endl << "type message to server : -> ";
         std::cin.getline(message, sizeof(message));
-        message[9] = '\0';
         if (!strcmp(message, "exit"))
         {
             std::cout << "client exit" << std::endl;
             break;
         }
-        if (send(clientSocket, message, sizeof(message), 0) == -1)
+        char msg[100];
+        strcpy(msg, "Client: ");
+        strcat(msg, message);
+        if (send(clientSocket, msg, strlen(msg), 0) == -1)
             perror("send failed");
+        char response[100];
+        int bytesReceived = recv(clientSocket, response, sizeof(response), 0);
+		if (bytesReceived == -1)
+			perror("recv failed");
+		response[bytesReceived] = '\0';
+        std::cout << response << std::endl;
     }
     // Close the socket when done
     close(clientSocket);
