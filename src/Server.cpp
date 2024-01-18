@@ -60,7 +60,7 @@ void Server::parseCommands(const std::vector<string> commands, Client &newClient
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{
-		cmd = split(commands[i], " ");
+		cmd = ft_split(commands[i], " ");
 		if (cmd[0] == "PASS")
 			PASS(cmd, newClient);
 		else if (cmd[0] == "NICK")
@@ -101,7 +101,7 @@ bool isValidPort(const std::string port)
 }
 
 // what if there is multiple spaces mtab3ine
-std::vector<std::string> split(const std::string &input, const std::string &separator)
+std::vector<std::string> ft_split(const std::string &input, const std::string &separator)
 {
 	std::vector<std::string> result;
 	std::size_t start = 0;

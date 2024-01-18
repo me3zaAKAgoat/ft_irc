@@ -2,14 +2,14 @@
 
 int main(int argc, const char *argv[])
 {
-	std::vector<string>	commands;
-	std::vector<string>	cmd;
-	string				message;
+	std::vector<string> commands;
+	std::vector<string> cmd;
+	string message;
 
 	if (!isValidArgs(argc, argv))
 		return (EXIT_FAILURE);
 	Server::setPassword(argv[1]);
-	Server::setPort(std::stoi(argv[2]));
+	Server::setPort(std::atoi(argv[2]));
 
 	setupSocket();
 
@@ -20,7 +20,7 @@ int main(int argc, const char *argv[])
 			break;
 		std::cout << "========== NEW MSG ==========" << std::endl;
 		std::cout << message << std::endl;
-		commands = split(message, "\r\n");
+		commands = ft_split(message, "\r\n");
 		Server::parseCommands(commands, newClient);
 		if (Server::getPassword() != newClient.getPassword() && newClient.getNickName() != "")
 		{
@@ -33,5 +33,5 @@ int main(int argc, const char *argv[])
 
 	cleanupResources();
 
-    return (EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }
