@@ -10,10 +10,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-
-// typedef
-// typedef std::string string;
-
 // Forward declaration
 class Client;
 class Server;
