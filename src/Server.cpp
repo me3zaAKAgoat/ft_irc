@@ -119,6 +119,8 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 
 void setupSocket(void)
 {
+	int	acceptRet;
+
 	// 1. Creating socket file descriptor
 	Server::setServerSocket(socket(AF_INET, SOCK_STREAM, 0));
 	if (Server::getServerSocket() < 0)
@@ -166,9 +168,15 @@ void setupSocket(void)
 	std::cout << "Waiting for a connection..." << std::endl;
 
 	// 5.  accept
-	// check if the accept method is fails or not 
-	Server::setClientSocket(accept(Server::getServerSocket(), nullptr, nullptr));
-	std::cout << "Connection established with a client" << std::endl;
+	// check if the accept method is fails or not
+	acceptRet = accept(Server::getServerSocket(), nullptr, nullptr);
+	if (acceptRet == -1)
+		std::cout << "accept system-call failed" << std::endl; // try to check the errno
+	else
+	{
+		Server::setClientSocket(acceptRet);
+		std::cout << "Connection established with a client" << std::endl;
+	}
 }
 
 void werror(const std::string msgError)
