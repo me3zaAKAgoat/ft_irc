@@ -4,7 +4,7 @@ int Server::port = 0;
 std::vector<Client>	Server::x;
 int Server::serverSocket = 0;
 int Server::clientSocket = 0;
-string Server::password = "";
+std::string Server::password = "";
 
 void	cleanupResources(void)
 {
@@ -14,9 +14,9 @@ void	cleanupResources(void)
     close(Server::getServerSocket());
 }
 
-string	joinStrs(std::vector<string>::iterator itBegin, std::vector<string>::iterator itEnd, string separator = "")
+std::string	joinStrs(std::vector<std::string>::iterator itBegin, std::vector<std::string>::iterator itEnd, std::string separator = "")
 {
-	string result;
+	std::string result;
 
 	if (itBegin == itEnd)
 		return (*itBegin);
@@ -36,7 +36,7 @@ void	Server::addClient(Client &newClient)
 		Server::x.push_back(newClient);
 }
 
-bool	Server::ReceiveRequest(string &message)
+bool	Server::ReceiveRequest(std::string &message)
 {
 	char	msg[100];
 
@@ -54,9 +54,9 @@ bool	Server::ReceiveRequest(string &message)
 	return (true);
 }
 
-void Server::parseCommands(const std::vector<string> commands, Client &newClient)
+void Server::parseCommands(const std::vector<std::string> commands, Client &newClient)
 {
-	std::vector<string> cmd;
+	std::vector<std::string> cmd;
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{
@@ -171,7 +171,7 @@ void setupSocket(void)
 	std::cout << "Connection established with a client" << std::endl;
 }
 
-void werror(const string msgError)
+void werror(const std::string msgError)
 {
 	std::cerr << msgError;
 }
@@ -191,7 +191,7 @@ int Server::getClientSocket(void)
 	return (Server::clientSocket);
 }
 
-string Server::getPassword(void)
+std::string Server::getPassword(void)
 {
 	return (Server::password);
 }
@@ -211,13 +211,13 @@ void Server::setClientSocket(const int clientSocket)
 	Server::clientSocket = clientSocket;
 }
 
-void Server::setPassword(const string password)
+void Server::setPassword(const std::string password)
 {
 	Server::password = password;
 }
 
 
-void	Server::responseMsg(const string message)
+void	Server::responseMsg(const std::string message)
 {
 	char msg[100];
 

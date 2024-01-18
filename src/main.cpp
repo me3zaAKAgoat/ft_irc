@@ -2,9 +2,9 @@
 
 int main(int argc, const char *argv[])
 {
-	std::vector<string> commands;
-	std::vector<string> cmd;
-	string message;
+	std::vector<std::string> commands;
+	std::vector<std::string> cmd;
+	std::string message;
 
 	if (!isValidArgs(argc, argv))
 		return (EXIT_FAILURE);
@@ -24,7 +24,7 @@ int main(int argc, const char *argv[])
 		Server::parseCommands(commands, newClient);
 		if (Server::getPassword() != newClient.getPassword() && newClient.getNickName() != "")
 		{
-			string message = ": 464 " + newClient.getNickName() + " :Password incorrect\r\n";
+			message = ": 464 " + newClient.getNickName() + " :Password incorrect\r\n";
 			Server::responseMsg(message);
 		}
 		else if (newClient.getNickName() != "" && newClient.getLoginName() != "" && newClient.getRealName() != "")

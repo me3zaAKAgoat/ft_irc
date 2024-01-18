@@ -12,7 +12,7 @@
 
 
 // typedef
-typedef std::string string;
+// typedef std::string string;
 
 // Forward declaration
 class Client;

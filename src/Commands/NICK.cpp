@@ -1,6 +1,6 @@
 #include "Commands.hpp"
 
-void	NICK(std::vector<string> cmd, Client &newClient)
+void	NICK(std::vector<std::string> cmd, Client &newClient)
 {
 	// check if the nickname is alredy used
 	if (cmd.size() > 2)

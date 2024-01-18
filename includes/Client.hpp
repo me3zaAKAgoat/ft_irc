@@ -12,22 +12,22 @@ public:
 	// ~Client();
 
 	// setters:
-	void	setPassword(const string Password);
-	void	setNickName(const string NickName);
-	void	setLoginName(const string LoginName);
-	void	setRealName(const string RealName);
+	void	setPassword(const std::string Password);
+	void	setNickName(const std::string NickName);
+	void	setLoginName(const std::string LoginName);
+	void	setRealName(const std::string RealName);
 
 	// getters:
-	string	getPassword(void);
-	string	getNickName(void);
-	string	getLoginName(void);
-	string	getRealName(void);
+	std::string	getPassword(void);
+	std::string	getNickName(void);
+	std::string	getLoginName(void);
+	std::string	getRealName(void);
 
 private:
-	string nickName;
-	string password;
-	string loginName;
-	string realName;
+	std::string nickName;
+	std::string password;
+	std::string loginName;
+	std::string realName;
 };
 
 #endif

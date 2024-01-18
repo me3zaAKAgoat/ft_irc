@@ -9,43 +9,43 @@ Client::Client()
 }
 
 // setters:
-void Client::setPassword(const string password)
+void Client::setPassword(const std::string password)
 {
 	this->password = password;
 }
 
-void Client::setNickName(const string nickName)
+void Client::setNickName(const std::string nickName)
 {
 	this->nickName = nickName;
 }
 
-void Client::setLoginName(const string loginName)
+void Client::setLoginName(const std::string loginName)
 {
 	this->loginName = loginName;
 }
 
-void Client::setRealName(const string realName)
+void Client::setRealName(const std::string realName)
 {
 	this->realName = realName;
 }
 
 // getters:
-string Client::getPassword(void)
+std::string Client::getPassword(void)
 {
 	return (this->password);
 }
 
-string Client::getNickName(void)
+std::string Client::getNickName(void)
 {
 	return (this->nickName);
 }
 
-string Client::getLoginName(void)
+std::string Client::getLoginName(void)
 {
 	return (this->loginName);
 }
 
-string Client::getRealName(void)
+std::string Client::getRealName(void)
 {
 	return (this->realName);
 }
