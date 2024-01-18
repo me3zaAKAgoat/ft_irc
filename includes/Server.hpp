@@ -7,7 +7,7 @@
 bool						isValidArgs(const int argc, const char *argv[]);
 bool						isValidPort(const string port);
 bool						isValidPassword(const std::string password);
-std::vector<string>			split(const string& input, const string& separator);
+std::vector<string>			ft_split(const string& input, const string& separator);
 string						joinStrs(std::vector<string>::iterator itBegin, std::vector<string>::iterator itEnd, string separator);
 void						werror(const string msgError);
 
