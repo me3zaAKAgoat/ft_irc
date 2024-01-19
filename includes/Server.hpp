@@ -22,7 +22,7 @@ class Server
 		// Server(const server& copy);
 		// Server& operator=(const server& rhs);
 		// ~Server();
-
+		static void	setupSocket(void);
 		static void parseCommands(const std::vector<std::string> commands, Client &newClient);
 		static bool	ReceiveRequest(std::string &message);
 		static void	responseMsg(const std::string message);
@@ -40,15 +40,18 @@ class Server
 		static void			setClientSocket(const int clientSocket);
 		static void			setPassword(const std::string password);
 
-
+		// manage fds pollfd
+		static void			initializeFds(void);
+		static void			pushBackFds(const int fd);
+		static size_t		size_fds(void);
 
 	private:
-		static int					port;
-		static int					serverSocket;
-		static int					clientSocket;
-		static std::string				password;
-		static std::vector<Client>	x;
-
+		static int							port;
+		static int							serverSocket;
+		static int							clientSocket;
+		static std::string					password;
+		static std::vector<Client>			x;
+		static struct pollfd				*fds;
 };
 
 #endif

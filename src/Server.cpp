@@ -117,17 +117,16 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 	return (result);
 }
 
-void setupSocket(void)
+void Server::setupSocket(void)
 {
 	int	acceptRet;
 
 	// 1. Creating socket file descriptor
 	Server::setServerSocket(socket(AF_INET, SOCK_STREAM, 0));
 	if (Server::getServerSocket() < 0)
-	{
-		perror("socket failed");
-		exit(EXIT_FAILURE);
-	}
+		return (perror("socket failed"), exit(EXIT_FAILURE));
+
+	Server::initializeFds();
 
 	// 2. Forcefully attaching socket to the port 8080
 
@@ -166,7 +165,7 @@ void setupSocket(void)
 		exit(EXIT_FAILURE);
 	}
 	std::cout << "Waiting for a connection..." << std::endl;
-
+	// poll(Server::fds, Server::fds.size(), -1);
 	// 5.  accept
 	// check if the accept method is fails or not
 	acceptRet = accept(Server::getServerSocket(), nullptr, nullptr);
@@ -241,4 +240,40 @@ void	Server::responseMsg(const std::string message)
 		perror("send failed");
 	else
 		std::cout << "response sent" << std::endl;
+}
+
+void	Server::pushBackFds(const int fd)
+{
+	struct pollfd	*newFds;
+
+	newFds = new struct pollfd[Server::size_fds() + 1];
+	size_t i = 0;
+	while (i < Server::size_fds() - 1)
+	{
+		newFds[i].fd = Server::fds[i].fd;
+		i++;
+	}
+	if (fd < 0)
+		std::cout << "pushBackFds failed: " << fd << std::endl;
+	else
+		newFds[i++].fd = fd;
+	newFds[i].fd = -1;
+	delete (Server::fds);
+
+
+}
+
+size_t	Server::size_fds(void)
+{
+	size_t i = 0;
+	while (Server::fds[i].fd != -1)
+		i++;
+	return (i + 1); // the (+1) for the last element (fd = -1)
+}
+
+void	Server::initializeFds(void)
+{
+	Server::fds = new struct pollfd;
+	Server::fds[0].fd = -1;
+	Server::pushBackFds(Server::getServerSocket());
 }
