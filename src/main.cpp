@@ -11,7 +11,7 @@ int main(int argc, const char *argv[])
 	Server::setPassword(argv[1]);
 	Server::setPort(std::atoi(argv[2]));
 
-	setupSocket();
+	setupServerSocket();
 
 	Client newClient;
 	while (1)

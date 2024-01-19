@@ -34,7 +34,7 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 	return (result);
 }
 
-void setupSocket(int &serverSocket, int &clientSocket, const std::string port)
+void setupServerSocket(int &serverSocket, int &clientSocket, const std::string port)
 {
 	// 1. Creating socket file descriptor
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -118,7 +118,7 @@ int main(int argc, const char *argv[])
 	std::string port = argv[2];
 	if (!isValidPort(port))
 		return (EXIT_FAILURE);
-	setupSocket(serverSocket, clientSocket, port);
+	setupServerSocket(serverSocket, clientSocket, port);
 
 	char msg[100];
 	std::string message;

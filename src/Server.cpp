@@ -1,20 +1,20 @@
 #include "Server.hpp"
 
 int Server::port = 0;
-std::vector<Client>	Server::x;
+std::vector<Client> Server::x;
 int Server::serverSocket = 0;
 int Server::clientSocket = 0;
 std::string Server::password = "";
 
-void	cleanupResources(void)
+void cleanupResources(void)
 {
-    // Close the sockets when done
+	// Close the sockets when done
 	// the order of closing affect smt or not?
-    close(Server::getClientSocket());
-    close(Server::getServerSocket());
+	close(Server::getClientSocket());
+	close(Server::getServerSocket());
 }
 
-std::string	joinStrs(std::vector<std::string>::iterator itBegin, std::vector<std::string>::iterator itEnd, std::string separator = "")
+std::string joinStrs(std::vector<std::string>::iterator itBegin, std::vector<std::string>::iterator itEnd, std::string separator = "")
 {
 	std::string result;
 
@@ -30,15 +30,15 @@ std::string	joinStrs(std::vector<std::string>::iterator itBegin, std::vector<std
 	return (result);
 }
 
-void	Server::addClient(Client &newClient)
+void Server::addClient(Client &newClient)
 {
-		std::cout << "password is correct - client added" << std::endl;
-		Server::x.push_back(newClient);
+	std::cout << "password is correct - client added" << std::endl;
+	Server::x.push_back(newClient);
 }
 
-bool	Server::ReceiveRequest(std::string &message)
+bool Server::ReceiveRequest(std::string &message)
 {
-	char	msg[100];
+	char msg[100];
 
 	int bytesReceived = recv(Server::getClientSocket(), msg, sizeof(msg), 0);
 	if (bytesReceived == -1)
@@ -117,9 +117,9 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 	return (result);
 }
 
-void Server::setupSocket(void)
+void Server::setupServerSocket(void)
 {
-	int	acceptRet;
+	int acceptRet;
 
 	// 1. Creating socket file descriptor
 	Server::setServerSocket(socket(AF_INET, SOCK_STREAM, 0));
@@ -223,8 +223,7 @@ void Server::setPassword(const std::string password)
 	Server::password = password;
 }
 
-
-void	Server::responseMsg(const std::string message)
+void Server::responseMsg(const std::string message)
 {
 	char msg[100];
 
@@ -242,9 +241,9 @@ void	Server::responseMsg(const std::string message)
 		std::cout << "response sent" << std::endl;
 }
 
-void	Server::pushBackFds(const int fd)
+void Server::pushBackFds(const int fd)
 {
-	struct pollfd	*newFds;
+	struct pollfd *newFds;
 
 	newFds = new struct pollfd[Server::size_fds() + 1];
 	size_t i = 0;
@@ -259,11 +258,9 @@ void	Server::pushBackFds(const int fd)
 		newFds[i++].fd = fd;
 	newFds[i].fd = -1;
 	delete (Server::fds);
-
-
 }
 
-size_t	Server::size_fds(void)
+size_t Server::size_fds(void)
 {
 	size_t i = 0;
 	while (Server::fds[i].fd != -1)
@@ -271,7 +268,7 @@ size_t	Server::size_fds(void)
 	return (i + 1); // the (+1) for the last element (fd = -1)
 }
 
-void	Server::initializeFds(void)
+void Server::initializeFds(void)
 {
 	Server::fds = new struct pollfd;
 	Server::fds[0].fd = -1;
