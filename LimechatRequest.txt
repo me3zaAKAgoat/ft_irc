@@ -1,0 +1,9 @@
+PASS <password>
+NICK <nick name>
+USER <login name/user name> 0 * :<real name>
+
+
+PASS 1111
+NICK ekenane
+USER elmehdi10 0 * :elmehdi kenane
+
