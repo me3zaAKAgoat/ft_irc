@@ -216,14 +216,11 @@ void	Server::process(void)
 {
 	int	pollRet;
 	int	EventOccurence;
-	// int	i = 0;
 
 	while (1)
 	{
-		// std::cout << "polling... " << std::endl;
 		Server::fds[0].revents = 0;
 		pollRet = poll(Server::fds, Server::size_fds, -1);
-		// pollRet = poll(Server::fds, Server::size_fds, 30000);
 		if (pollRet == 0)
 		{
 			std::cout << "timeOut" << std::endl;
@@ -253,7 +250,6 @@ void	Server::process(void)
 				Server::detectEventInClientsFds();
 			}
 		}
-		// i++;
 	}
 	std::cout << "process finished" << std::endl;
 }
@@ -322,11 +318,6 @@ int Server::getServerSocket(void)
 	return (Server::serverSocket);
 }
 
-// int Server::getClientSocket(void)
-// {
-// 	return (Server::clientSocket);
-// }
-
 std::string Server::getPassword(void)
 {
 	return (Server::password);
@@ -341,11 +332,6 @@ void Server::setServerSocket(const int serverSocket)
 {
 	Server::serverSocket = serverSocket;
 }
-
-// void Server::setClientSocket(const int clientSocket)
-// {
-// 	Server::clientSocket = clientSocket;
-// }
 
 void Server::setPassword(const std::string password)
 {
@@ -363,11 +349,8 @@ void Server::responseMsg(const std::string message, unsigned int fdClient)
 		i++;
 	}
 	msg[i] = '\0';
-	// std::cout << "the msg will be send is: "<< msg << std::endl;
 	if (send(fdClient, msg, strlen(msg), 0) == -1)
 		perror("send failed");
-	// else
-	// 	std::cout << "response sent" << std::endl;
 }
 
 void Server::pushBackFds(const int fd)
@@ -385,8 +368,6 @@ void Server::pushBackFds(const int fd)
 		std::cout << "pushBackFds failed: " << fd << std::endl;
 	else
 	{
-		std::cout << "index in pushFd: " << i << std::endl;
-		std::cout << "fd in pushFd: " << fd << std::endl;
 		newFds[i].fd = fd;
 		newFds[i].events = POLLIN;
 	}
@@ -400,7 +381,6 @@ void	Server::removeFdClient(const int fd)
 {
 	struct pollfd *newFds;
 
-	std::cout << "================================ REMOVE ================================" << std::endl;
 	newFds = new struct pollfd[Server::size_fds - 1];
 	size_t i = 0;
 	size_t j = 0;
@@ -419,17 +399,3 @@ void	Server::removeFdClient(const int fd)
 	Server::size_fds--;
 	Server::fds = newFds;
 }
-
-// size_t Server::size_fds(void)
-// {
-// 	size_t i = 0;
-// 	while (Server::fds[i].fd != -1)
-// 		i++;
-// 	return (i + 1); // the (+1) for the last element (fd = -1)
-// }
-
-// void Server::initializeFds(void)
-// {
-// 	Server::fds = new struct pollfd;
-// 	Server::pushBackFds(Server::getServerSocket());
-// }
