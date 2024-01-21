@@ -1,16 +1,18 @@
 #include "Server.hpp"
 
-int Server::port = 0;
-std::vector<Client> Server::x;
-int Server::serverSocket = 0;
-int Server::clientSocket = 0;
-std::string Server::password = "";
+int					Server::port = 0;
+std::vector<Client>	Server::x;
+int					Server::serverSocket = -1;
+int					Server::clientSocket = -1;
+std::string			Server::password = "";
+size_t				Server::size_fds = 0;
+struct pollfd		*Server::fds = NULL; // struct pollfd		Server::*fds = NULL;
 
-void cleanupResources(void)
+void Server::cleanupResources(void)
 {
 	// Close the sockets when done
 	// the order of closing affect smt or not?
-	close(Server::getClientSocket());
+	// close(Server::getClientSocket()); // close all fd-socket-clients
 	close(Server::getServerSocket());
 }
 
@@ -36,11 +38,11 @@ void Server::addClient(Client &newClient)
 	Server::x.push_back(newClient);
 }
 
-bool Server::ReceiveRequest(std::string &message)
+bool Server::ReceiveRequest(std::string &message, const int fd)
 {
 	char msg[100];
 
-	int bytesReceived = recv(Server::getClientSocket(), msg, sizeof(msg), 0);
+	int bytesReceived = recv(fd, msg, sizeof(msg), 0);
 	if (bytesReceived == -1)
 		return (perror("recv failed"), false);
 	else if (bytesReceived == 0)
@@ -54,19 +56,22 @@ bool Server::ReceiveRequest(std::string &message)
 	return (true);
 }
 
-void Server::parseCommands(const std::vector<std::string> commands, Client &newClient)
+void Server::parseCommands(const std::vector<std::string> commands, unsigned int clientIndex)
 {
 	std::vector<std::string> cmd;
-
+	std::vector<Client>::iterator client = Server::x.begin() + clientIndex;
+	std::cout << "msg from client: " << clientIndex + 1 << std::endl;
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		cmd = ft_split(commands[i], " ");
 		if (cmd[0] == "PASS")
-			PASS(cmd, newClient);
+			PASS(cmd, (*client));
 		else if (cmd[0] == "NICK")
-			NICK(cmd, newClient);
+			NICK(cmd, (*client));
 		else if (cmd[0] == "USER")
-			USER(cmd, newClient);
+			USER(cmd, (*client));
+		else
+			std::cout << "invalid command" << std::endl;
 	}
 }
 
@@ -84,13 +89,15 @@ bool isValidArgs(const int argc, const char *argv[])
 bool isValidPassword(const std::string password)
 {
 	if (password == "")
-		return (false);
+		return (std::cout << "Error: password-argument empty!" << std::endl, false);
 	return (true);
 }
 
 bool isValidPort(const std::string port)
 {
 	int i = 0;
+	if (port == "")
+		return (std::cout << "Error: port-argument empty!" << std::endl, false);
 	while (port[i])
 	{
 		if (!isdigit(port[i]))
@@ -106,10 +113,18 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 	std::vector<std::string> result;
 	std::size_t start = 0;
 	std::size_t found = input.find(separator);
+	if (found == std::string::npos)
+	{
+		if (separator != " ")
+			std::cout << "separator doesn't found" << std::endl;
+		result.push_back(input);
+		return (result);
+	}
 	while (found != std::string::npos)
 	{
-		result.push_back(input.substr(start, found - start));
-		start = found + separator.size(); // Move past the separator
+		if (input.substr(start, found - start) != "")
+			result.push_back(input.substr(start, found - start));
+			start = found + separator.size(); // Move past the separator
 		found = input.find(separator, start);
 	}
 	if (input.substr(start) != "")
@@ -117,17 +132,142 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 	return (result);
 }
 
+// Return Value: 
+//		(0) –> event occurs only at the fd-server
+//		(1) –> event occurs at the fd-server and other fd-client(s)
+//		(2) –> event occurs only at fd-client(s)
+//		(-1) –> Error (if all is normal shouldn't be returned)
+int	Server::isEventInServerOrClientsFDs(unsigned int pollRet)
+{
+	if (pollRet == 1 && Server::fds[0].revents)
+		return (0);
+	else if (pollRet > 1 && Server::fds[0].revents & POLLIN)
+		return (1);
+	else if (pollRet > 1 && !(Server::fds[0].revents & POLLIN))
+		return (2);
+	std::cout << "return poll: " << pollRet << std::endl;
+	std::cout << "Server::fds[0].revents: " << Server::fds[0].revents << std::endl;
+	return (-1);
+}
+
+void	Server::acceptNewConnection(void)
+{
+	Client	newClient;
+	int		acceptRet;
+
+	acceptRet = accept(Server::getServerSocket(), nullptr, nullptr);
+	if (acceptRet == -1)
+		perror("accept system-call failed"); // try to check the errno
+	else
+	{
+		Server::pushBackFds(acceptRet);
+		newClient.setFd(acceptRet);
+		Server::x.push_back(newClient);
+		std::cout << "Connection established with a client: " << acceptRet << std::endl;
+		Server::responseMsg("Start...\n", newClient.getFd());
+		Server::responseMsg("––> type a message: ", newClient.getFd());
+	}
+}
+
+
+void	Server::detectEventInClientsFds(void)
+{
+POLLERR;
+POLLHUP;
+POLLIN;
+POLLNVAL;
+POLLOUT;
+POLLPRI;
+POLLRDBAND;
+POLLRDNORM;
+POLLWRBAND;
+POLLWRNORM;
+	std::vector<std::string>	commands;
+
+	// std::cout << "search an event in size: " << Server::size_fds << std::endl;
+	for (size_t i = 1; i < Server::size_fds; i++)
+	{
+		// std::cout << "try to detect event at fd: " << Server::fds[i].fd << std::endl;
+		if (Server::fds[i].revents & POLLIN)
+		{
+			// std::cout << "HELLO" << std::endl;
+			std::string msg;
+			if (!Server::ReceiveRequest(msg, fds[i].fd))
+			{
+				// if (Server::fds[i].fd != Server::getServerSocket())
+				// {
+					Server::x.pop_back();
+					Server::removeFdClient(Server::fds[i].fd);
+					continue;
+				// }
+			}
+			std::cout << "========== NEW MSG ========== : " << msg << std::endl;
+			commands = ft_split(msg, "\r\n"); // add \r if using lime chat
+			Server::parseCommands(commands, i - 1);
+			std::cout << std::endl << "========== ======= ==========" << std::endl;
+			Server::responseMsg("––> type a message: ", Server::fds[i].fd);
+		}
+		// else
+		// 	std::cout << "event does not occurs at client: " << Server::fds[i].fd << std::endl;
+	}
+}
+
+void	Server::process(void)
+{
+	int	pollRet;
+	int	EventOccurence;
+	// int	i = 0;
+
+	while (1)
+	{
+		// std::cout << "polling... " << std::endl;
+		Server::fds[0].revents = 0;
+		pollRet = poll(Server::fds, Server::size_fds, -1);
+		// pollRet = poll(Server::fds, Server::size_fds, 30000);
+		if (pollRet == 0)
+		{
+			std::cout << "timeOut" << std::endl;
+			continue;
+		}
+		else if (pollRet == -1)
+			perror("poll system-call failed");
+		else
+		{
+			EventOccurence = Server::isEventInServerOrClientsFDs(pollRet);
+			if (EventOccurence == 0 && (Server::fds[0].revents & POLLIN))
+			{
+				std::cout << "new connection" << std::endl;
+				Server::acceptNewConnection();
+			}
+			// else if (EventOccurence == 0 && Server::fds[0].revents & POLLNVAL)
+			// 	std::cout << "smt happens " << Server::fds[0].revents << std::endl;
+			else if (EventOccurence == 1)
+			{
+				std::cout << "new connection and new msg(s)" << std::endl;
+				Server::acceptNewConnection();
+				Server::detectEventInClientsFds();
+			}
+			else if (EventOccurence == 2)
+			{
+				std::cout << "new msg(s)" << std::endl;
+				Server::detectEventInClientsFds();
+			}
+		}
+		// i++;
+	}
+	std::cout << "process finished" << std::endl;
+}
+
 void Server::setupServerSocket(void)
 {
-	int acceptRet;
+	int socketRet;
 
 	// 1. Creating socket file descriptor
-	Server::setServerSocket(socket(AF_INET, SOCK_STREAM, 0));
-	if (Server::getServerSocket() < 0)
+	socketRet = socket(AF_INET, SOCK_STREAM, 0);
+	if (socketRet < 0)
 		return (perror("socket failed"), exit(EXIT_FAILURE));
-
-	Server::initializeFds();
-
+	Server::setServerSocket(socketRet);
+	Server::pushBackFds(Server::getServerSocket());
 	// 2. Forcefully attaching socket to the port 8080
 
 	// SOL_SOCKET flag:
@@ -165,17 +305,6 @@ void Server::setupServerSocket(void)
 		exit(EXIT_FAILURE);
 	}
 	std::cout << "Waiting for a connection..." << std::endl;
-	// poll(Server::fds, Server::fds.size(), -1);
-	// 5.  accept
-	// check if the accept method is fails or not
-	acceptRet = accept(Server::getServerSocket(), nullptr, nullptr);
-	if (acceptRet == -1)
-		std::cout << "accept system-call failed" << std::endl; // try to check the errno
-	else
-	{
-		Server::setClientSocket(acceptRet);
-		std::cout << "Connection established with a client" << std::endl;
-	}
 }
 
 void werror(const std::string msgError)
@@ -193,10 +322,10 @@ int Server::getServerSocket(void)
 	return (Server::serverSocket);
 }
 
-int Server::getClientSocket(void)
-{
-	return (Server::clientSocket);
-}
+// int Server::getClientSocket(void)
+// {
+// 	return (Server::clientSocket);
+// }
 
 std::string Server::getPassword(void)
 {
@@ -213,17 +342,17 @@ void Server::setServerSocket(const int serverSocket)
 	Server::serverSocket = serverSocket;
 }
 
-void Server::setClientSocket(const int clientSocket)
-{
-	Server::clientSocket = clientSocket;
-}
+// void Server::setClientSocket(const int clientSocket)
+// {
+// 	Server::clientSocket = clientSocket;
+// }
 
 void Server::setPassword(const std::string password)
 {
 	Server::password = password;
 }
 
-void Server::responseMsg(const std::string message)
+void Server::responseMsg(const std::string message, unsigned int fdClient)
 {
 	char msg[100];
 
@@ -235,19 +364,19 @@ void Server::responseMsg(const std::string message)
 	}
 	msg[i] = '\0';
 	// std::cout << "the msg will be send is: "<< msg << std::endl;
-	if (send(Server::getClientSocket(), msg, strlen(msg), 0) == -1)
+	if (send(fdClient, msg, strlen(msg), 0) == -1)
 		perror("send failed");
-	else
-		std::cout << "response sent" << std::endl;
+	// else
+	// 	std::cout << "response sent" << std::endl;
 }
 
 void Server::pushBackFds(const int fd)
 {
 	struct pollfd *newFds;
 
-	newFds = new struct pollfd[Server::size_fds() + 1];
+	newFds = new struct pollfd[Server::size_fds + 1];
 	size_t i = 0;
-	while (i < Server::size_fds() - 1)
+	while (i < Server::size_fds)
 	{
 		newFds[i].fd = Server::fds[i].fd;
 		i++;
@@ -255,22 +384,52 @@ void Server::pushBackFds(const int fd)
 	if (fd < 0)
 		std::cout << "pushBackFds failed: " << fd << std::endl;
 	else
-		newFds[i++].fd = fd;
-	newFds[i].fd = -1;
-	delete (Server::fds);
+	{
+		std::cout << "index in pushFd: " << i << std::endl;
+		std::cout << "fd in pushFd: " << fd << std::endl;
+		newFds[i].fd = fd;
+		newFds[i].events = POLLIN;
+	}
+	if (Server::size_fds > 0)
+		delete[] (Server::fds);
+	Server::size_fds++;
+	Server::fds = newFds;
 }
 
-size_t Server::size_fds(void)
+void	Server::removeFdClient(const int fd)
 {
+	struct pollfd *newFds;
+
+	std::cout << "================================ REMOVE ================================" << std::endl;
+	newFds = new struct pollfd[Server::size_fds - 1];
 	size_t i = 0;
-	while (Server::fds[i].fd != -1)
+	size_t j = 0;
+	while (i < Server::size_fds)
+	{
+		if (Server::fds[i].fd != fd)
+		{
+			newFds[j].fd = Server::fds[i].fd;
+			newFds[j++].events = POLLIN;
+		}
 		i++;
-	return (i + 1); // the (+1) for the last element (fd = -1)
+	}
+	std::cout << "remove fd: " << fd << std::endl;
+	close(fd);
+	delete[] (Server::fds);
+	Server::size_fds--;
+	Server::fds = newFds;
 }
 
-void Server::initializeFds(void)
-{
-	Server::fds = new struct pollfd;
-	Server::fds[0].fd = -1;
-	Server::pushBackFds(Server::getServerSocket());
-}
+// size_t Server::size_fds(void)
+// {
+// 	size_t i = 0;
+// 	while (Server::fds[i].fd != -1)
+// 		i++;
+// 	return (i + 1); // the (+1) for the last element (fd = -1)
+// }
+
+// void Server::initializeFds(void)
+// {
+// 	Server::fds = new struct pollfd;
+// 	Server::pushBackFds(Server::getServerSocket());
+// }
