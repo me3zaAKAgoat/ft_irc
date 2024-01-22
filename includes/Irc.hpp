@@ -1,5 +1,4 @@
-#ifndef IRC_HPP
-#define IRC_HPP
+#pragma once
 
 #include <iostream>
 #include <unistd.h>
@@ -18,5 +17,3 @@ class Server;
 #include "Client.hpp"
 #include "Server.hpp"
 #include "Commands.hpp"
-
-#endif

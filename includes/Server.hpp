@@ -1,5 +1,4 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#pragma once
 
 #include "Irc.hpp"
 
@@ -52,5 +51,3 @@ class Server
 		static struct pollfd		*fds;
 		static size_t				size_fds;
 };
-
-#endif

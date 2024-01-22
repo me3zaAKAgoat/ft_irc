@@ -1,5 +1,4 @@
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#pragma once
 
 #include "Irc.hpp"
 
@@ -42,5 +41,3 @@ class Client
 		std::string		loginName;
 		std::string		realName;
 };
-
-#endif
