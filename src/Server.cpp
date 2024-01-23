@@ -56,23 +56,39 @@ bool Server::ReceiveRequest(std::string &message, const int fd)
 	return (true);
 }
 
+void handleRegistrationCommand(const std::string commands, Client &client)
+{
+	std::vector<std::string> cmdSplit;
+
+	cmdSplit = ft_split(commands, " ");
+	if (cmdSplit[0] == "PASS")
+		PASS(commands, client, cmdSplit.size());
+	else if (cmdSplit[0] == "NICK")
+		NICK(cmdSplit, client);
+	else if (cmdSplit[0] == "USER")
+		USER(cmdSplit, client);
+}
+
+bool isRegistrationCommand(std::string cmd)
+{
+	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER")
+		return (true);
+	return (false);
+}
+
 void Server::parseCommands(const std::vector<std::string> commands, unsigned int clientIndex)
 {
 	std::vector<std::string> cmd;
 	std::vector<Client>::iterator client = Server::x.begin() + clientIndex;
-	std::cout << "msg from client: " << clientIndex + 1 << std::endl;
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		cmd = ft_split(commands[i], " ");
-		if (cmd[0] == "PASS")
-			PASS(cmd, (*client));
-		else if (cmd[0] == "NICK")
-			NICK(cmd, (*client));
-		else if (cmd[0] == "USER")
-			USER(cmd, (*client));
+		if (isRegistrationCommand(cmd[0]))
+			handleRegistrationCommand(commands[i], (*client));
 		else
 			std::cout << "invalid command" << std::endl;
 	}
+	std::cout << "msg from client-" << clientIndex + 1 << "-" << Server::x[clientIndex].getNickName() << std::endl;
 }
 
 bool isValidArgs(const int argc, const char *argv[])
@@ -143,7 +159,7 @@ int	Server::isEventInServerOrClientsFDs(unsigned int pollRet)
 		return (0);
 	else if (pollRet > 1 && Server::fds[0].revents & POLLIN)
 		return (1);
-	else if (pollRet > 1 && !(Server::fds[0].revents & POLLIN))
+	else if (pollRet >= 1 && !(Server::fds[0].revents & POLLIN))
 		return (2);
 	std::cout << "return poll: " << pollRet << std::endl;
 	std::cout << "Server::fds[0].revents: " << Server::fds[0].revents << std::endl;
@@ -163,7 +179,7 @@ void	Server::acceptNewConnection(void)
 		Server::pushBackFds(acceptRet);
 		newClient.setFd(acceptRet);
 		Server::x.push_back(newClient);
-		std::cout << "Connection established with a client: " << acceptRet << std::endl;
+		std::cout << "Connection established with a client: " << acceptRet - 3 << std::endl;
 		Server::responseMsg("Start...\n", newClient.getFd());
 		Server::responseMsg("––> type a message: ", newClient.getFd());
 	}
@@ -184,13 +200,10 @@ POLLWRBAND;
 POLLWRNORM;
 	std::vector<std::string>	commands;
 
-	// std::cout << "search an event in size: " << Server::size_fds << std::endl;
 	for (size_t i = 1; i < Server::size_fds; i++)
 	{
-		// std::cout << "try to detect event at fd: " << Server::fds[i].fd << std::endl;
 		if (Server::fds[i].revents & POLLIN)
 		{
-			// std::cout << "HELLO" << std::endl;
 			std::string msg;
 			if (!Server::ReceiveRequest(msg, fds[i].fd))
 			{
@@ -202,7 +215,7 @@ POLLWRNORM;
 				// }
 			}
 			std::cout << "========== NEW MSG ========== : " << msg << std::endl;
-			commands = ft_split(msg, "\r\n"); // add \r if using lime chat
+			commands = ft_split(msg, "\n"); // add \r if using lime chat
 			Server::parseCommands(commands, i - 1);
 			std::cout << std::endl << "========== ======= ==========" << std::endl;
 			Server::responseMsg("––> type a message: ", Server::fds[i].fd);
@@ -221,12 +234,7 @@ void	Server::process(void)
 	{
 		Server::fds[0].revents = 0;
 		pollRet = poll(Server::fds, Server::size_fds, -1);
-		if (pollRet == 0)
-		{
-			std::cout << "timeOut" << std::endl;
-			continue;
-		}
-		else if (pollRet == -1)
+		if (pollRet == -1)
 			perror("poll system-call failed");
 		else
 		{
@@ -236,8 +244,6 @@ void	Server::process(void)
 				std::cout << "new connection" << std::endl;
 				Server::acceptNewConnection();
 			}
-			// else if (EventOccurence == 0 && Server::fds[0].revents & POLLNVAL)
-			// 	std::cout << "smt happens " << Server::fds[0].revents << std::endl;
 			else if (EventOccurence == 1)
 			{
 				std::cout << "new connection and new msg(s)" << std::endl;
@@ -245,13 +251,9 @@ void	Server::process(void)
 				Server::detectEventInClientsFds();
 			}
 			else if (EventOccurence == 2)
-			{
-				std::cout << "new msg(s)" << std::endl;
 				Server::detectEventInClientsFds();
-			}
 		}
 	}
-	std::cout << "process finished" << std::endl;
 }
 
 void Server::setupServerSocket(void)
@@ -362,6 +364,7 @@ void Server::pushBackFds(const int fd)
 	while (i < Server::size_fds)
 	{
 		newFds[i].fd = Server::fds[i].fd;
+		newFds[i].events = Server::fds[i].events;
 		i++;
 	}
 	if (fd < 0)
@@ -389,7 +392,8 @@ void	Server::removeFdClient(const int fd)
 		if (Server::fds[i].fd != fd)
 		{
 			newFds[j].fd = Server::fds[i].fd;
-			newFds[j++].events = POLLIN;
+			newFds[j].events = POLLIN;
+			j++;
 		}
 		i++;
 	}
