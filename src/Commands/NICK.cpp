@@ -44,10 +44,7 @@ void	NICK(std::vector<std::string> cmd, Client &client)
 		return ;
 	}
 	else if (!isValidNickName(cmd, client) || isAlreadyUsed(cmd, client))
-	{
-		Server::responseMsg("invalid nickname OR already used\r\n", client.getFd());
 		return ;
-	}
 	if (client.isNickNameSet())
 		Server::responseMsg("; " + client.getNickName() + " changed his nickname to " + cmd[1] + ".\r\n", client.getFd()); // does not appears in lime chat (needs to modify)
 	std::cout << client.getNickName() << " new NickName: " << cmd[1] << std::endl;
