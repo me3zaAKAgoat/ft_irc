@@ -3,9 +3,14 @@
 void	USER(std::vector<std::string> cmd, Client &client)
 {
 	// password and nickname should be set first
-	if (!client.isNickNameSet() || !client.isAuthenticate())
+	if (!client.isNickNameSet())
 	{
-		Server::responseMsg("Password or Nickname not set yet\r\n", client.getFd());
+		Server::responseMsg("Nickname not set yet\r\n", client.getFd());
+		return ;
+	}
+	if (!client.isAuthenticate())
+	{
+		Server::responseMsg("Password not set yet\r\n", client.getFd());
 		return ;
 	}
 	else if (cmd.size() < 5)
@@ -27,6 +32,7 @@ void	USER(std::vector<std::string> cmd, Client &client)
 	// if (cmd.size() - 4 >= 2)
 	// 	cmd[4] = cmd[4].erase(0, 1);  // if the login-name may contains spaces -> remove the (:) (this behavior occurs in lime chat client)
 	client.setUserName(cmd[1], joinStrs((cmd.begin() + 4), cmd.end(), " "));
+	Server::responseMsg(": 001 " + client.getNickName() + " :Welcome to the ftIrc Network\r\n", client.getFd());
 	std::cout << "LoginName: " << client.getLoginName() << std::endl;
 	std::cout << "RealName: " << client.getRealName() << std::endl;
 }
