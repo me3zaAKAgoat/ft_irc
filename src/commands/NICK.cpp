@@ -34,7 +34,7 @@ bool	isAlreadyUsed(std::vector<std::string> cmd, Client &client)
 	return (Server::responseMsg(": 433 " + client.getNickName() + " <nick> :Nickname is already in use\r\n", client.getFd()), true);
 }
 
-void	NICK(std::vector<std::string> cmd, Client &client)
+void	nick(std::vector<std::string> cmd, Client &client)
 {
 	if (!client.isAuthenticate())
 		return ;

@@ -21,7 +21,7 @@ class Server
 		void parseCommands(const std::vector<std::string> commands, unsigned int clientIndex);
 		bool ReceiveRequest(std::string &message, const int fd);
 		static	void responseMsg(const std::string message, unsigned int fdClient);
-		void	acceptNewConnection(void);
+		void	handleNewClient(void);
 		void	detectEventInClientsFds(void);
 		void	addClient(Client &newClient);
 

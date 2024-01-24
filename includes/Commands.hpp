@@ -3,6 +3,6 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 
-void	NICK(std::vector<std::string> cmd, Client &client);
-void	PASS(Server& server, std::string cmd, Client &client, size_t numArgs);
-void	USER(std::vector<std::string> cmd, Client &client);
+void	nick(std::vector<std::string> cmd, Client &client);
+void	pass(Server& server, std::string cmd, Client &client, size_t numArgs);
+void	user(std::vector<std::string> cmd, Client &client);

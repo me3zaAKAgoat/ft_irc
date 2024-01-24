@@ -36,12 +36,7 @@ std::string joinStrs(std::vector<std::string>::iterator itBegin, std::vector<std
 	return (result);
 }
 
-void Server::addClient(Client &newClient)
-{
-	std::cout << "password is correct - client added" << std::endl;
-	this->_clients.push_back(newClient);
-}
-
+// remove the 100 message cap this function is so ass need full rehaul
 bool Server::ReceiveRequest(std::string &message, const int fd)
 {
 	char msg[100];
@@ -66,30 +61,29 @@ void handleRegistrationCommand(Server& server, const std::string commands, Clien
 
 	cmdSplit = split(commands, " ");
 	if (cmdSplit[0] == "PASS")
-		PASS(server, commands, client, cmdSplit.size());
+		pass(server, commands, client, cmdSplit.size());
 	else if (cmdSplit[0] == "NICK")
-		NICK(cmdSplit, client);
+		nick(cmdSplit, client);
 	else if (cmdSplit[0] == "USER")
-		USER(cmdSplit, client);
+		user(cmdSplit, client);
 }
 
 bool isRegistrationCommand(std::string cmd)
 {
-	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER")
-		return (true);
-	return (false);
+	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER");
 }
 
 void Server::parseCommands(const std::vector<std::string> commands, unsigned int clientIndex)
 {
 	std::vector<std::string> cmd;
-	std::vector<Client>::iterator client = this->_clients.begin() + clientIndex;
+	std::vector<Client>::iterator client = this->_clients.begin() + clientIndex; // why not have a simple [] accessor?
+
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		cmd = split(commands[i], " ");
 		if (isRegistrationCommand(cmd[0]))
-			handleRegistrationCommand(*this, commands[i], (*client));
-		else
+			handleRegistrationCommand(*this, commands[i], (*client)); // this->_clients[clientIndex]
+		else // testing should be removed later
 			std::cout << "invalid command" << std::endl;
 	}
 	std::cout << "msg from client-" << clientIndex + 1 << "-" << this->_clients[clientIndex].getNickName() << std::endl;
@@ -120,7 +114,7 @@ std::vector<std::string> split(const std::string &input, const std::string &sepa
 	return (result);
 }
 
-void	Server::acceptNewConnection(void)
+void	Server::handleNewClient(void)
 {
 	int		clientSocket;
 
@@ -188,12 +182,13 @@ void	Server::coreProcess(void)
 		if (numOfEventsOccured == -1)
 			perror("poll system-call failed"); // not sure whether this should crash the server or not
 		if (numOfEventsOccured >= 1 && (this->fds[0].revents & POLLIN)) // this could cause a bug because of the first rehaul of this code
-			Server::acceptNewConnection();
+			Server::handleNewClient();
 		if (numOfEventsOccured > 1 && (this->fds[0].revents & POLLIN))
 			Server::detectEventInClientsFds();
 	}
 }
 
+// too many comments that should be removed later
 int Server::setupServerSocket(void)
 {
 	int server_socket;
@@ -234,32 +229,32 @@ int Server::setupServerSocket(void)
 
 int Server::getPort(void)
 {
-	return (Server::_port);
+	return (this->_port);
 }
 
 int Server::getServerSocket(void)
 {
-	return (Server::_socket);
+	return (this->_socket);
 }
 
 std::string Server::getPassword(void)
 {
-	return (Server::_password);
+	return (this->_password);
 }
 
 void Server::setPort(const int port)
 {
-	Server::_port = port;
+	this->_port = port;
 }
 
 void Server::setServerSocket(const int serverSocket)
 {
-	Server::_socket = serverSocket;
+	this->_socket = serverSocket;
 }
 
 void Server::setPassword(const std::string password)
 {
-	Server::_password = password;
+	this->_password = password;
 }
 
 // probably should be removed
