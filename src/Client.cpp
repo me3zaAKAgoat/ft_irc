@@ -12,6 +12,11 @@ Client::Client()
 	this->realname = "realnameEmpty";
 }
 
+Client::~Client()
+{
+	close(this->fd);
+}
+
 Client::Client(unsigned int fd) : fd(fd)
 {
 	this->isAuthenticated = false;

@@ -9,7 +9,7 @@ class Client
 		Client(unsigned int fd);
 		// Client(const Client& copy);
 		// Client& operator=(const Client& rhs);
-		// ~Client();
+		~Client();
 
 		// setters:
 		void	authenticate(void);

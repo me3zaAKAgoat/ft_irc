@@ -1,6 +1,8 @@
 #include "Server.hpp"
 #include "Commands.hpp"
 
+const int Server::recvBufferSize = 1000;
+
 Server::Server()
 {
 }
@@ -22,25 +24,34 @@ Server::~Server(void)
 }
 
 // remove the 100 message cap this function is so ass need full rehaul
-bool Server::ReceiveRequest(std::string &message, const int fd)
+int Server::receiveRequest(std::string &message, const int fd)
 {
-	char msg[100];
+	char buf[this->recvBufferSize];
+	// char buf[Server::recvBufferSize];
 
-	int bytesReceived = recv(fd, msg, sizeof(msg), 0);
+	int bytesReceived = recv(fd, buf, this->recvBufferSize, 0);
 	if (bytesReceived == -1)
-		return (perror("recv failed"), false);
+		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
 		perror("the remote side has closed the connection on you!"); // ur program is not talking to anyone it just facilitating communication between clients
-		return (false);
+		return (-1);
 	}
-	message.clear();
-	msg[bytesReceived] = '\0';
-	message = msg;
-	return (true);
+	else
+	{
+		message.append(buf);
+		while (bytesReceived)
+		{
+			bytesReceived = recv(fd, buf, this->recvBufferSize, 0);
+			if (bytesReceived == -1)
+				return (perror("recv failed"), 0);
+			message.append(buf);
+		}
+	}
+	return (0);
 }
 
-void handleRegistrationCommand(Server& server, const std::string commands, Client &client)
+void handleRegistrationCommand(Server &server, const std::string commands, Client &client)
 {
 	std::vector<std::string> cmdSplit;
 
@@ -68,15 +79,15 @@ void Server::parseCommands(const std::vector<std::string> commands, unsigned int
 		cmd = split(commands[i], " ");
 		if (isRegistrationCommand(cmd[0]))
 			handleRegistrationCommand(*this, commands[i], (*client)); // this->_clients[clientIndex]
-		else // testing should be removed later
+		else														  // testing should be removed later
 			std::cout << "invalid command" << std::endl;
 	}
 	std::cout << "msg from client-" << clientIndex + 1 << "-" << this->_clients[clientIndex].getNickname() << std::endl;
 }
 
-void	Server::handleNewClient(void)
+void Server::handleNewClient(void)
 {
-	int		clientSocket;
+	int clientSocket;
 
 	clientSocket = accept(this->_socket, NULL, NULL);
 	if (clientSocket == -1)
@@ -84,16 +95,19 @@ void	Server::handleNewClient(void)
 	else
 	{
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
-		Client	newClient(clientSocket);
+		Client newClient(clientSocket);
 		this->_clients.push_back(newClient);
-		// std::cout << "Connection established with a client: " << clientSocket - 3 << std::endl;
-		Server::responseMsg("Start...\n", newClient.getFd());
-		Server::responseMsg("––> type a message: ", newClient.getFd());
+		Server::responseMsg("Start...\n", newClient.getFd());			// debug
+		Server::responseMsg("––> type a message: ", newClient.getFd()); // debug
 	}
 }
 
+void Server::closeConnection(int fd)
+{
+	delete this->_clients[fd];
+}
 
-void	Server::handleEstablishedClientEvents(void)
+void Server::handleEstablishedClientEvents(void)
 {
 	// POLLERR;
 	// POLLHUP;
@@ -105,44 +119,43 @@ void	Server::handleEstablishedClientEvents(void)
 	// POLLRDNORM;
 	// POLLWRBAND;
 	// POLLWRNORM;
-	std::vector<std::string>	commands;
+	std::vector<std::string> commands;
 
 	for (size_t i = 1; i < this->pfds.size(); i++)
 	{
 		if (this->pfds[i].revents & POLLIN)
 		{
 			std::string msg;
-			// if (!Server::ReceiveRequest(msg, this->pfds[i].fd))
-			// {
-			// 	// if (Server::pfds[i].fd != Server::getServerSocket())
-			// 	// {
-			// 		this->_clients.pop_back();
-			// 		Server::removeFdClient(this->pfds[i].fd);
-			// 		continue;
-			// 	// }
-			// }
+			if (Server::receiveRequest(msg, this->pfds[i].fd) == -1)
+			{
+					Server::closeConnection(this->pfds[i].fd);
+					continue;
+			}
 			std::cout << "========== NEW MSG ========== : " << msg << std::endl;
 			commands = split(msg, "\n"); // add \r if using lime chat
 			Server::parseCommands(commands, i - 1);
-			std::cout << std::endl << "========== ======= ==========" << std::endl;
+			std::cout << std::endl
+					  << "========== ======= ==========" << std::endl;
 			Server::responseMsg("––> type a message: ", this->pfds[i].fd);
 		}
 	}
 }
 
-void	Server::coreProcess(void)
+void Server::coreProcess(void)
 {
-	int	numOfEventsOccured;
+	int numOfEventsOccured;
 
 	while (1)
 	{
 		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
 		if (numOfEventsOccured == -1)
 			perror("poll system-call failed"); // not sure whether this should crash the server or not
-		if (numOfEventsOccured >= 1 && (this->pfds[0].revents & POLLIN)) // this could cause a bug because of the first rehaul of this code
-			Server::handleNewClient();
-		if (numOfEventsOccured > 1 && (this->pfds[0].revents & POLLIN))
+		if (numOfEventsOccured >= 1)
+		{
+			if ((this->pfds[0].revents & POLLIN))
+				Server::handleNewClient();
 			Server::handleEstablishedClientEvents();
+		}
 	}
 }
 
