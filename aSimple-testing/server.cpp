@@ -19,7 +19,7 @@ bool isValidPort(const std::string port)
 	return (true);
 }
 
-std::vector<std::string> ft_split(const std::string &input, const std::string &separator)
+std::vector<std::string> split(const std::string &input, const std::string &separator)
 {
 	std::vector<std::string> result;
 	std::size_t start = 0;
@@ -83,7 +83,7 @@ void setupServerSocket(int &serverSocket, int &clientSocket, const std::string p
 	std::cout << "Waiting for a connection..." << std::endl;
 
 	// 5.  accept
-	clientSocket = accept(serverSocket, nullptr, nullptr);
+	clientSocket = accept(serverSocket, NULL, NULL);
 	std::cout << "Connection established with a client" << std::endl;
 }
 
@@ -136,12 +136,12 @@ int main(int argc, const char *argv[])
 		std::cout << "========== NEW MSG ==========" << std::endl;
 		std::cout << message << std::endl;
 		// PASS hello\r\nNICK elmehdi\r\n
-		std::vector<std::string> commands = ft_split(message, "\r\n");
+		std::vector<std::string> commands = split(message, "\r\n");
 		std::vector<std::string> cmd;
 		size_t i = 0;
 		while (i < commands.size())
 		{
-			cmd = ft_split(commands[i++], " ");
+			cmd = split(commands[i++], " ");
 			parseCommand(cmd);
 		}
 	}

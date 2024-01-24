@@ -6,6 +6,7 @@ class Client
 {
 	public:
 		Client();
+		Client(unsigned int fd);
 		// Client(const Client& copy);
 		// Client& operator=(const Client& rhs);
 		// ~Client();
@@ -29,8 +30,8 @@ class Client
 
 	private:
 
-		void	setLoginName(const std::string LoginName);
-		void	setRealName(const std::string RealName);
+		void			setLoginName(const std::string LoginName);
+		void			setRealName(const std::string RealName);
 
 		unsigned int	fd;
 		bool			isAuthenticated;

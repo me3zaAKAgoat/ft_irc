@@ -2,6 +2,7 @@
 
 Client::Client()
 {
+	// all this should be deleted it makes no sense
 	this->fd = -1;
 	this->isAuthenticated = false;
 	this->nickNameIsSet = false;
@@ -9,6 +10,12 @@ Client::Client()
 	this->nickName = "nicknameEmpty";
 	this->loginName = "loginnameEmpty";
 	this->realName = "realnameEmpty";
+}
+
+Client::Client(unsigned int fd) : fd(fd)
+{
+	this->isAuthenticated = false;
+	this->nickNameIsSet = false;
 }
 
 // setters:

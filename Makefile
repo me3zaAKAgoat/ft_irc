@@ -1,25 +1,27 @@
 CPP = c++
-CPP_FLAGS = -Wall -Werror -Wextra -std=c++98 -fsanitize=address -g
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g
+NAME = ircserv 
 
-NAME = ircserv
-
-SRC = src/main.cpp src/Server.cpp src/Client.cpp \
-	  src/Commands/NICK.cpp src/Commands/PASS.cpp src/Commands/USER.cpp
-OBJ = $(SRC:.cpp=.o)
 HEADERS = includes/Server.hpp includes/Client.hpp includes/Irc.hpp includes/Commands.hpp
+SRCS = src/main.cpp src/Server.cpp src/Client.cpp \
+	src/commands/NICK.cpp src/commands/PASS.cpp src/commands/USER.cpp
+OBJECTS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CPP) $(CPP_FLAGS) $(OBJ) -o $@
+$(NAME) : $(OBJECTS)
+	$(CPP) $(CPPFLAGS) -o $@ $(OBJECTS)
 
 %.o : %.cpp $(HEADERS)
-	$(CPP) -I./includes $(CPP_FLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) -I./includes -c $< -o $@
 
-clean:
-	rm -rf $(OBJ)
+clean :
+	rm -rf $(OBJECTS)
 
-fclean: clean
+fclean :
+	rm -rf $(OBJECTS)
 	rm -rf $(NAME)
 
-re: fclean all
+re : fclean all
+
+.PHONY : fclean re clean all

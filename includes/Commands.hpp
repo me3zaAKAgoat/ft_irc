@@ -4,5 +4,5 @@
 #include "Client.hpp"
 
 void	NICK(std::vector<std::string> cmd, Client &client);
-void	PASS(std::string cmd, Client &client, size_t numArgs);
+void	PASS(Server& server, std::string cmd, Client &client, size_t numArgs);
 void	USER(std::vector<std::string> cmd, Client &client);

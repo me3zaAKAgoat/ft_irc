@@ -24,7 +24,7 @@ std::string extractPassword(std::string cmd)
 	return (result);
 }
 
-void PASS(std::string cmd, Client &client, size_t numArgs)
+void PASS(Server& server, std::string cmd, Client &client, size_t numArgs)
 {
 	// // if (cmd.size() > 2)
 	// 	cmd[1] = cmd[1].erase(0, 1); // if the password contains spaces -> remove the (:) (this behavior occurs in lime chat client)
@@ -32,7 +32,7 @@ void PASS(std::string cmd, Client &client, size_t numArgs)
 		Server::responseMsg(": 461 " + client.getNickName() + " PASS :Not enough parameters\r\n", client.getFd());
 	else if (client.isAuthenticate() && client.isNickNameSet())
 		Server::responseMsg(": 462 " + client.getNickName() + " :You may not reregister\r\n", client.getFd());
-	else if (extractPassword(cmd) != Server::getPassword())
+	else if (extractPassword(cmd) != server.getPassword())
 	{
 		std::cout << "password recieve from client: '" << extractPassword(cmd) << "'" << std::endl;
 		Server::responseMsg(": 464 " + client.getNickName() + " :Password incorrect\r\n", client.getFd());
