@@ -5,17 +5,17 @@ Client::Client()
 	// all this should be deleted it makes no sense
 	this->fd = -1;
 	this->isAuthenticated = false;
-	this->nickNameIsSet = false;
+	this->nicknameIsSet = false;
 	this->password = "passwordEmpty";
-	this->nickName = "nicknameEmpty";
-	this->loginName = "loginnameEmpty";
-	this->realName = "realnameEmpty";
+	this->nickname = "nicknameEmpty";
+	this->username = "loginnameEmpty";
+	this->realname = "realnameEmpty";
 }
 
 Client::Client(unsigned int fd) : fd(fd)
 {
 	this->isAuthenticated = false;
-	this->nickNameIsSet = false;
+	this->nicknameIsSet = false;
 }
 
 // setters:
@@ -33,27 +33,27 @@ void Client::setPassword(const std::string password)
 	this->password = password;
 }
 
-void Client::setNickName(const std::string nickName)
+void Client::setNickname(const std::string nickname)
 {
-	this->nickName = nickName;
-	this->nickNameIsSet = true;
+	this->nickname = nickname;
+	this->nicknameIsSet = true;
 }
 
-void Client::setLoginName(const std::string loginName)
+void Client::setUsername(const std::string username)
 {
-	this->loginName = loginName;
+	this->username = username;
 }
 
-void Client::setRealName(const std::string realName)
+void Client::setRealname(const std::string realname)
 {
-	this->realName = realName;
+	this->realname = realname;
 }
 
-void	Client::setUserName(const std::string LoginName, const std::string RealName)
+void	Client::setUserName(const std::string Username, const std::string Realname)
 {
-	this->setLoginName(LoginName);
-	this->setRealName(RealName);
-	this->userNameIsSet = true;
+	this->setUsername(Username);
+	this->setRealname(Realname);
+	this->usernameIsSet = true;
 }
 
 // getters:
@@ -67,24 +67,24 @@ std::string Client::getPassword(void)
 	return (this->password);
 }
 
-std::string Client::getNickName(void)
+std::string Client::getNickname(void)
 {
-	return (this->nickName);
+	return (this->nickname);
 }
 
-std::string Client::getLoginName(void)
+std::string Client::getUsername(void)
 {
-	return (this->loginName);
+	return (this->username);
 }
 
-std::string Client::getRealName(void)
+std::string Client::getRealname(void)
 {
-	return (this->realName);
+	return (this->realname);
 }
 
 bool	Client::isUserNameSet(void)
 {
-	return (this->userNameIsSet);
+	return (this->usernameIsSet);
 }
 
 bool	Client::isAuthenticate(void)
@@ -92,7 +92,7 @@ bool	Client::isAuthenticate(void)
 	return (this->isAuthenticated);
 }
 
-bool	Client::isNickNameSet(void)
+bool	Client::isNicknameSet(void)
 {
-	return (this->nickNameIsSet);
+	return (this->nicknameIsSet);
 }

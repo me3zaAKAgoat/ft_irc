@@ -9,7 +9,7 @@ Server::Server(const int port, const std::string password)
 {
 	this->_port = port;
 	this->_password = password;
-	this->_socket = setupServerSocket();
+	this->_socket = setupServerSocket();	
 }
 
 Server::~Server(void)
@@ -18,22 +18,6 @@ Server::~Server(void)
 	// the order of closing affect smt or not?
 	// close(Server::getClientSocket()); // close all fd-socket-clients
 	close(this->_socket);
-}
-
-std::string joinStrs(std::vector<std::string>::iterator itBegin, std::vector<std::string>::iterator itEnd, std::string separator = "")
-{
-	std::string result;
-
-	if (itBegin == itEnd)
-		return (*itBegin);
-	while (itBegin != itEnd)
-	{
-		result += *itBegin;
-		if ((itBegin + 1) != itEnd)
-			result += separator;
-		itBegin++;
-	}
-	return (result);
 }
 
 // remove the 100 message cap this function is so ass need full rehaul
@@ -46,7 +30,7 @@ bool Server::ReceiveRequest(std::string &message, const int fd)
 		return (perror("recv failed"), false);
 	else if (bytesReceived == 0)
 	{
-		perror("the remote side has closed the connection on you!");
+		perror("the remote side has closed the connection on you!"); // ur program is not talking to anyone it just facilitating communication between clients
 		return (false);
 	}
 	message.clear();
@@ -86,32 +70,7 @@ void Server::parseCommands(const std::vector<std::string> commands, unsigned int
 		else // testing should be removed later
 			std::cout << "invalid command" << std::endl;
 	}
-	std::cout << "msg from client-" << clientIndex + 1 << "-" << this->_clients[clientIndex].getNickName() << std::endl;
-}
-
-// what if there is multiple spaces mtab3ine
-// this function is really vulnerable its not done yet
-std::vector<std::string> split(const std::string &input, const std::string &separator)
-{
-	std::vector<std::string> result;
-	std::size_t start = 0;
-	std::size_t found = input.find(separator);
-	if (found == std::string::npos)
-	{
-		if (separator != " ")
-			std::cout << "separator doesn't found" << std::endl;
-		result.push_back(input);
-		return (result);
-	}
-	while (found != std::string::npos)
-	{
-		result.push_back(input.substr(start, found - start));
-		start = found + separator.size(); // Move past the separator
-		found = input.find(separator, start);
-	}
-	if (input.substr(start) != "")
-		result.push_back(input.substr(start));
-	return (result);
+	std::cout << "msg from client-" << clientIndex + 1 << "-" << this->_clients[clientIndex].getNickname() << std::endl;
 }
 
 void	Server::handleNewClient(void)
@@ -133,7 +92,7 @@ void	Server::handleNewClient(void)
 }
 
 
-void	Server::detectEventInClientsFds(void)
+void	Server::handleEstablishedClientEvents(void)
 {
 	// POLLERR;
 	// POLLHUP;
@@ -147,17 +106,17 @@ void	Server::detectEventInClientsFds(void)
 	// POLLWRNORM;
 	std::vector<std::string>	commands;
 
-	for (size_t i = 1; i < Server::sizeFds; i++)
+	for (size_t i = 1; i < this->sizePfds; i++)
 	{
-		if (Server::fds[i].revents & POLLIN)
+		if (this->pfds[i].revents & POLLIN)
 		{
 			std::string msg;
-			if (!Server::ReceiveRequest(msg, fds[i].fd))
+			if (!Server::ReceiveRequest(msg, this->pfds[i].fd))
 			{
-				// if (Server::fds[i].fd != Server::getServerSocket())
+				// if (Server::pfds[i].fd != Server::getServerSocket())
 				// {
 					this->_clients.pop_back();
-					Server::removeFdClient(Server::fds[i].fd);
+					Server::removeFdClient(this->pfds[i].fd);
 					continue;
 				// }
 			}
@@ -165,10 +124,8 @@ void	Server::detectEventInClientsFds(void)
 			commands = split(msg, "\n"); // add \r if using lime chat
 			Server::parseCommands(commands, i - 1);
 			std::cout << std::endl << "========== ======= ==========" << std::endl;
-			Server::responseMsg("––> type a message: ", Server::fds[i].fd);
+			Server::responseMsg("––> type a message: ", this->pfds[i].fd);
 		}
-		// else
-		// 	std::cout << "event does not occurs at client: " << Server::fds[i].fd << std::endl;
 	}
 }
 
@@ -178,13 +135,13 @@ void	Server::coreProcess(void)
 
 	while (1)
 	{
-		numOfEventsOccured = poll(this->fds, this->sizeFds, -1);
+		numOfEventsOccured = poll(this->pfds, this->sizePfds, -1);
 		if (numOfEventsOccured == -1)
 			perror("poll system-call failed"); // not sure whether this should crash the server or not
-		if (numOfEventsOccured >= 1 && (this->fds[0].revents & POLLIN)) // this could cause a bug because of the first rehaul of this code
+		if (numOfEventsOccured >= 1 && (this->pfds[0].revents & POLLIN)) // this could cause a bug because of the first rehaul of this code
 			Server::handleNewClient();
-		if (numOfEventsOccured > 1 && (this->fds[0].revents & POLLIN))
-			Server::detectEventInClientsFds();
+		if (numOfEventsOccured > 1 && (this->pfds[0].revents & POLLIN))
+			Server::handleEstablishedClientEvents();
 	}
 }
 
@@ -268,12 +225,12 @@ void Server::pushBackFds(const int fd)
 {
 	struct pollfd *newFds;
 
-	newFds = new struct pollfd[Server::sizeFds + 1];
+	newFds = new struct pollfd[Server::sizePfds + 1];
 	size_t i = 0;
-	while (i < Server::sizeFds)
+	while (i < Server::sizePfds)
 	{
-		newFds[i].fd = Server::fds[i].fd;
-		newFds[i].events = Server::fds[i].events;
+		newFds[i].fd = Server::pfds[i].fd;
+		newFds[i].events = Server::pfds[i].events;
 		i++;
 	}
 	if (fd < 0)
@@ -283,24 +240,24 @@ void Server::pushBackFds(const int fd)
 		newFds[i].fd = fd;
 		newFds[i].events = POLLIN;
 	}
-	if (Server::sizeFds > 0)
-		delete[] (Server::fds);
-	Server::sizeFds++;
-	Server::fds = newFds;
+	if (Server::sizePfds > 0)
+		delete[] (Server::pfds);
+	Server::sizePfds++;
+	Server::pfds = newFds;
 }
 
 void	Server::removeFdClient(const int fd)
 {
 	struct pollfd *newFds;
 
-	newFds = new struct pollfd[Server::sizeFds - 1];
+	newFds = new struct pollfd[Server::sizePfds - 1];
 	size_t i = 0;
 	size_t j = 0;
-	while (i < Server::sizeFds)
+	while (i < Server::sizePfds)
 	{
-		if (Server::fds[i].fd != fd)
+		if (Server::pfds[i].fd != fd)
 		{
-			newFds[j].fd = Server::fds[i].fd;
+			newFds[j].fd = Server::pfds[i].fd;
 			newFds[j].events = POLLIN;
 			j++;
 		}
@@ -308,7 +265,7 @@ void	Server::removeFdClient(const int fd)
 	}
 	std::cout << "remove fd: " << fd << std::endl;
 	close(fd);
-	delete[] (Server::fds);
-	Server::sizeFds--;
-	Server::fds = newFds;
+	delete[] (Server::pfds);
+	Server::sizePfds--;
+	Server::pfds = newFds;
 }

@@ -3,7 +3,7 @@
 void	user(std::vector<std::string> cmd, Client &client)
 {
 	// password and nickname should be set first
-	if (!client.isNickNameSet())
+	if (!client.isNicknameSet())
 	{
 		Server::responseMsg("Nickname not set yet\r\n", client.getFd());
 		return ;
@@ -15,12 +15,12 @@ void	user(std::vector<std::string> cmd, Client &client)
 	}
 	else if (cmd.size() < 5)
 	{
-		Server::responseMsg(": 461 " + client.getNickName() + " USER :Not enough parameters\r\n", client.getFd());
+		Server::responseMsg(": 461 " + client.getNickname() + " USER :Not enough parameters\r\n", client.getFd());
 		return ;
 	}
 	else if (client.isUserNameSet())
 	{
-		Server::responseMsg(": 462 " + client.getNickName() + " :You may not reregister\r\n", client.getFd());
+		Server::responseMsg(": 462 " + client.getNickname() + " :You may not reregister\r\n", client.getFd());
 		return ;
 	}
 	// the login/user name should be one word
@@ -31,8 +31,8 @@ void	user(std::vector<std::string> cmd, Client &client)
 	}
 	// if (cmd.size() - 4 >= 2)
 	// 	cmd[4] = cmd[4].erase(0, 1);  // if the login-name may contains spaces -> remove the (:) (this behavior occurs in lime chat client)
-	client.setUserName(cmd[1], joinStrs((cmd.begin() + 4), cmd.end(), " "));
-	Server::responseMsg(": 001 " + client.getNickName() + " :Welcome to the ftIrc Network\r\n", client.getFd());
-	std::cout << "LoginName: " << client.getLoginName() << std::endl;
-	std::cout << "RealName: " << client.getRealName() << std::endl;
+	client.setUserName(cmd[1], join((cmd.begin() + 4), cmd.end(), " "));
+	Server::responseMsg(": 001 " + client.getNickname() + " :Welcome to the ftIrc Network\r\n", client.getFd());
+	std::cout << "Username: " << client.getUsername() << std::endl;
+	std::cout << "Realname: " << client.getRealname() << std::endl;
 }
