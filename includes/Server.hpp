@@ -20,9 +20,9 @@ class Server
 		void			handleEstablishedClientEvents(void);
 
 		// getters:
-		int 			getPort(void);
-		int 			getServerSocket(void);
-		std::string 	getPassword(void);
+		int getPort(void);
+		int getServerSocket(void);
+		std::string getPassword(void);
 
 		// setters:
 		void 			setPort(const int port);
@@ -35,11 +35,10 @@ class Server
 
 	private:
 		int						_port;
-		unsigned int			_socket;
+		int						_socket;
 		std::string				_password;
 		std::vector<Client>		_clients;
 
 		/* these two will be removed in favour of a vector, when passing to poll just call fds.data() and fds.size()*/
-		struct pollfd			*pfds;
-		size_t					sizePfds;
+		std::vector<struct pollfd>			pfds;
 };

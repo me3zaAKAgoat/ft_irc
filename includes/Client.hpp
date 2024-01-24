@@ -33,7 +33,7 @@ class Client
 		void			setUsername(const std::string username);
 		void			setRealname(const std::string realname);
 
-		unsigned int	fd;
+		int	fd;
 
 		bool			isAuthenticated;
 		bool			nicknameIsSet;

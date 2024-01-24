@@ -9,7 +9,8 @@ Server::Server(const int port, const std::string password)
 {
 	this->_port = port;
 	this->_password = password;
-	this->_socket = setupServerSocket();	
+	this->_socket = setupServerSocket();
+	this->pfds.push_back((struct pollfd){this->_socket, POLLIN, 0});
 }
 
 Server::~Server(void)
@@ -82,7 +83,7 @@ void	Server::handleNewClient(void)
 		perror("accept system-call failed"); // try to check the errno
 	else
 	{
-		Server::pushBackFds(clientSocket);
+		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
 		Client	newClient(clientSocket);
 		this->_clients.push_back(newClient);
 		// std::cout << "Connection established with a client: " << clientSocket - 3 << std::endl;
@@ -106,20 +107,20 @@ void	Server::handleEstablishedClientEvents(void)
 	// POLLWRNORM;
 	std::vector<std::string>	commands;
 
-	for (size_t i = 1; i < this->sizePfds; i++)
+	for (size_t i = 1; i < this->pfds.size(); i++)
 	{
 		if (this->pfds[i].revents & POLLIN)
 		{
 			std::string msg;
-			if (!Server::ReceiveRequest(msg, this->pfds[i].fd))
-			{
-				// if (Server::pfds[i].fd != Server::getServerSocket())
-				// {
-					this->_clients.pop_back();
-					Server::removeFdClient(this->pfds[i].fd);
-					continue;
-				// }
-			}
+			// if (!Server::ReceiveRequest(msg, this->pfds[i].fd))
+			// {
+			// 	// if (Server::pfds[i].fd != Server::getServerSocket())
+			// 	// {
+			// 		this->_clients.pop_back();
+			// 		Server::removeFdClient(this->pfds[i].fd);
+			// 		continue;
+			// 	// }
+			// }
 			std::cout << "========== NEW MSG ========== : " << msg << std::endl;
 			commands = split(msg, "\n"); // add \r if using lime chat
 			Server::parseCommands(commands, i - 1);
@@ -135,7 +136,7 @@ void	Server::coreProcess(void)
 
 	while (1)
 	{
-		numOfEventsOccured = poll(this->pfds, this->sizePfds, -1);
+		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
 		if (numOfEventsOccured == -1)
 			perror("poll system-call failed"); // not sure whether this should crash the server or not
 		if (numOfEventsOccured >= 1 && (this->pfds[0].revents & POLLIN)) // this could cause a bug because of the first rehaul of this code
@@ -219,53 +220,4 @@ void Server::responseMsg(const std::string message, unsigned int fdClient)
 {
 	if (send(fdClient, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send failed");
-}
-
-void Server::pushBackFds(const int fd)
-{
-	struct pollfd *newFds;
-
-	newFds = new struct pollfd[Server::sizePfds + 1];
-	size_t i = 0;
-	while (i < Server::sizePfds)
-	{
-		newFds[i].fd = Server::pfds[i].fd;
-		newFds[i].events = Server::pfds[i].events;
-		i++;
-	}
-	if (fd < 0)
-		std::cout << "pushBackFds failed: " << fd << std::endl;
-	else
-	{
-		newFds[i].fd = fd;
-		newFds[i].events = POLLIN;
-	}
-	if (Server::sizePfds > 0)
-		delete[] (Server::pfds);
-	Server::sizePfds++;
-	Server::pfds = newFds;
-}
-
-void	Server::removeFdClient(const int fd)
-{
-	struct pollfd *newFds;
-
-	newFds = new struct pollfd[Server::sizePfds - 1];
-	size_t i = 0;
-	size_t j = 0;
-	while (i < Server::sizePfds)
-	{
-		if (Server::pfds[i].fd != fd)
-		{
-			newFds[j].fd = Server::pfds[i].fd;
-			newFds[j].events = POLLIN;
-			j++;
-		}
-		i++;
-	}
-	std::cout << "remove fd: " << fd << std::endl;
-	close(fd);
-	delete[] (Server::pfds);
-	Server::sizePfds--;
-	Server::pfds = newFds;
 }
