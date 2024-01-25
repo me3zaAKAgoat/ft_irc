@@ -2,22 +2,29 @@
 
 bool isValidPassword(const std::string password)
 {
-	if (password == "")
+	if (password.empty())
 		return (std::cerr << "Error: password argument empty!" << std::endl, false);
 	return (true);
 }
 
 bool isValidPort(const std::string port)
 {
-	int i = 0;
-	if (port == "")
+	if (port.empty())
 		return (std::cerr << "Error: port argument empty!" << std::endl, false);
+
+	int i = 0;
 	while (port[i])
 	{
 		if (!isdigit(port[i]))
-			return (perror("port should be a number\n"), false);
+			return (std::cerr << "Error: port should be a number" << std::endl, false);
 		i++;
 	}
+
+	int portNbr = std::atoi(port.c_str());
+
+	if (portNbr < 0 || portNbr > 65535)
+		return (std::cerr << "Error: Port out of valid range (0-65535)!" << std::endl, false);
+
 	return (true);
 }
 
@@ -34,22 +41,22 @@ bool isValidArgs(int ac, const char *av[])
 
 std::vector<std::string> split(const std::string &input, const std::string &separator)
 {
-    std::vector<std::string> result;
-    std::size_t start = 0;
-    std::size_t found = input.find(separator);
+	std::vector<std::string> result;
+	std::size_t start = 0;
+	std::size_t found = input.find(separator);
 
-    while (found != std::string::npos)
-    {
-        result.push_back(input.substr(start, found - start));
-        start = found + separator.size(); // Move past the separator
-        found = input.find(separator, start);
-    }
+	while (found != std::string::npos)
+	{
+		result.push_back(input.substr(start, found - start));
+		start = found + separator.size(); // Move past the separator
+		found = input.find(separator, start);
+	}
 
-    // Push the last part of the string if it's not empty
-    std::string lastPart = input.substr(start);
-    if (!lastPart.empty())
-        result.push_back(lastPart);
-    return result;
+	// Push the last part of the string if it's not empty
+	std::string lastPart = input.substr(start);
+	if (!lastPart.empty())
+		result.push_back(lastPart);
+	return result;
 }
 
 std::string join(StringVectorIterator itBegin, StringVectorIterator itEnd, const std::string& separator = "")
