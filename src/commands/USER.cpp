@@ -33,7 +33,7 @@ void	userCmd(std::vector<std::string> cmd, Client &client)
 	// 	cmd[4] = cmd[4].erase(0, 1);  // if the login-name may contains spaces -> remove the (:) (this behavior occurs in lime chat client)
 	client.setUsername(cmd[1]);
 	client.setRealname(join((cmd.begin() + 4), cmd.end(), " "));
-	Server::sendResponse(": 001 " + client.getNickname() + " :Welcome to the Irc Network\r\n", client.getFd());
+	Server::sendResponse(": 001 " + client.getNickname() + " :Welcome to the irc Network\r\n", client.getFd());
 	std::cout << "Username: " << client.getUsername() << std::endl;
 	std::cout << "Realname: " << client.getRealname() << std::endl;
 }

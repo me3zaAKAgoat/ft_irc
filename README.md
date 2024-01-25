@@ -41,3 +41,4 @@ WHOIS
 - read more about server socket setup functions
 - ask peers for all the commands that should be implemented (dont be a faggot and ask for the reference)
 - create a channel class
+- theres a buffering problem somewhere
