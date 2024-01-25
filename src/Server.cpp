@@ -20,6 +20,7 @@ Server::~Server(void)
 	// Close the sockets when done
 	// the order of closing affect smt or not?
 	// close(Server::getClientSocket()); // close all fd-socket-clients
+	
 	close(this->_socket);
 }
 

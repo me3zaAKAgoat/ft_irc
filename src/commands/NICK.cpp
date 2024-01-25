@@ -3,11 +3,8 @@
 bool	isValidCharNickname(char c)
 {
 	// check CHANTYPES also
-	if (isalpha(c) || isdigit(c) \
-			|| c == '[' || c == ']' \
-			|| c == '{' || c == '}' \
-			|| c == '\\' || c == '|' \
-			|| c == ':' || c == '#')
+	if (isalpha(c) || isdigit(c) || c == '[' || c == ']' || c == '\\' || c == '|'\
+			|| c == '{' || c == '}' || c == ':' || c == '#')
 		return (true);
 	return (false);
 }
