@@ -2,14 +2,7 @@
 
 Client::Client()
 {
-	// all this should be deleted it makes no sense
-	this->fd = -1;
-	this->isAuthenticated = false;
-	this->nicknameIsSet = false;
-	this->password = "passwordEmpty";
-	this->nickname = "nicknameEmpty";
-	this->username = "loginnameEmpty";
-	this->realname = "realnameEmpty";
+	this->_isAuthenticated = false;
 }
 
 Client::~Client()
@@ -17,10 +10,8 @@ Client::~Client()
 	close(this->fd);
 }
 
-Client::Client(unsigned int fd) : fd(fd)
+Client::Client(unsigned int fd) : fd(fd), _isAuthenticated(false) // emptiness of strings may be allowed in irc not sure !
 {
-	this->isAuthenticated = false;
-	this->nicknameIsSet = false;
 }
 
 // setters:
@@ -31,7 +22,7 @@ void Client::setFd(const unsigned int fd)
 
 void	Client::authenticate(void)
 {
-	this->isAuthenticated = true;
+	this->_isAuthenticated = true;
 }
 void Client::setPassword(const std::string password)
 {
@@ -41,7 +32,6 @@ void Client::setPassword(const std::string password)
 void Client::setNickname(const std::string nickname)
 {
 	this->nickname = nickname;
-	this->nicknameIsSet = true;
 }
 
 void Client::setUsername(const std::string username)
@@ -52,13 +42,6 @@ void Client::setUsername(const std::string username)
 void Client::setRealname(const std::string realname)
 {
 	this->realname = realname;
-}
-
-void	Client::setUserName(const std::string Username, const std::string Realname)
-{
-	this->setUsername(Username);
-	this->setRealname(Realname);
-	this->usernameIsSet = true;
 }
 
 // getters:
@@ -87,17 +70,7 @@ std::string Client::getRealname(void)
 	return (this->realname);
 }
 
-bool	Client::isUserNameSet(void)
+bool	Client::isAuthenticated(void)
 {
-	return (this->usernameIsSet);
-}
-
-bool	Client::isAuthenticate(void)
-{
-	return (this->isAuthenticated);
-}
-
-bool	Client::isNicknameSet(void)
-{
-	return (this->nicknameIsSet);
+	return (this->_isAuthenticated);
 }

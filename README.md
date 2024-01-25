@@ -46,3 +46,4 @@ NOTICE
 - rehaul client class
 - in client instead of isXdSet just check if Xd is null or not (initliaze all Xd's with null)
 - wtf are the join functions arguments
+- !!!!!!! CHECK ALL SYS CALL RETURNS ALL OF HTEM !!!!!

@@ -13,13 +13,13 @@ public:
 
 	int setupServerSocket(void);
 	void coreProcess(void);
-	void parseCommands(const std::vector<std::string> commands, unsigned int clientIndex);
-	int receiveRequest(std::string &message, const int fd);
-	static void responseMsg(const std::string message, unsigned int fdClient);
+	void parseCommands(const std::vector<std::string> commands, int clientFd);
+	int  readRequest(std::string &message, const int fd);
+	static void responseMsg(const std::string message, unsigned int clienFd);
 	void handleNewClient(void);
 	void handleEstablishedClientEvents(void);
 
-	void closeConnection(Client &client);
+	void closeConnection(int fd);
 
 	// getters:
 	int getPort(void);
@@ -31,17 +31,12 @@ public:
 	void setServerSocket(const int serverSocket);
 	void setPassword(const std::string password);
 
-	// manage fds pollfd
-	void pushBackFds(const int fd);
-	void removeFdClient(const int fd);
-
 private:
+	static const int recvBufferSize;
+
 	int _port;
 	int _socket;
 	std::string _password;
-	std::vector<Client> _clients;
-	static const int recvBufferSize;
-
-	/* these two will be removed in favour of a vector, when passing to poll just call fds.data() and fds.size()*/
+	std::map<int, Client *> _clients;
 	std::vector<struct pollfd> pfds;
 };

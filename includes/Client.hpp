@@ -16,30 +16,25 @@ class Client
 		void	setFd(const unsigned int fd);
 		void	setPassword(const std::string Password);
 		void	setNickname(const std::string Nickname);
-		void	setUserName(const std::string Username, const std::string Realname);
+		void	setUsername(const std::string username);
+		void	setRealname(const std::string realname);
 
 		// getters:
 		unsigned int	getFd(void);
-		bool			isAuthenticate(void);
-		bool			isNicknameSet(void);
+		bool			isAuthenticated(void);
 		std::string		getPassword(void);
 		std::string		getNickname(void);
-		bool			isUserNameSet(void);
 		std::string		getUsername(void);
 		std::string		getRealname(void);
 
 	private:
 
-		void			setUsername(const std::string username);
-		void			setRealname(const std::string realname);
 
-		int	fd;
+		int				fd;
 
-		bool			isAuthenticated;
-		bool			nicknameIsSet;
-		bool			usernameIsSet;
 		std::string		nickname;
 		std::string		password;
 		std::string		username;
 		std::string		realname;
+		bool			_isAuthenticated;
 };

@@ -36,7 +36,7 @@ bool	isAlreadyUsed(std::vector<std::string> cmd, Client &client)
 
 void	nick(std::vector<std::string> cmd, Client &client)
 {
-	if (!client.isAuthenticate())
+	if (!client.isAuthenticated())
 		return ;
 	if (cmd.size() < 2)
 	{
@@ -45,7 +45,7 @@ void	nick(std::vector<std::string> cmd, Client &client)
 	}
 	else if (!isValidNickname(cmd, client) || isAlreadyUsed(cmd, client))
 		return ;
-	if (client.isNicknameSet())
+	if (!client.getNickname().empty())
 		Server::responseMsg("; " + client.getNickname() + " changed his nickname to " + cmd[1] + ".\r\n", client.getFd()); // does not appears in lime chat (needs to modify)
 	std::cout << client.getNickname() << " new Nickname: " << cmd[1] << std::endl;
 	client.setNickname(cmd[1]);

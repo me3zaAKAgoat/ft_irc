@@ -30,7 +30,7 @@ void pass(Server& server, std::string cmd, Client &client, size_t numArgs)
 	// 	cmd[1] = cmd[1].erase(0, 1); // if the password contains spaces -> remove the (:) (this behavior occurs in lime chat client)
 	if (numArgs < 2)
 		Server::responseMsg(": 461 " + client.getNickname() + " PASS :Not enough parameters\r\n", client.getFd());
-	else if (client.isAuthenticate() && client.isNicknameSet())
+	else if (client.isAuthenticated() && !client.getNickname().empty())
 		Server::responseMsg(": 462 " + client.getNickname() + " :You may not reregister\r\n", client.getFd());
 	else if (extractPassword(cmd) != server.getPassword())
 	{

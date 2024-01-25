@@ -24,27 +24,32 @@ Server::~Server(void)
 }
 
 // remove the 100 message cap this function is so ass need full rehaul
-int Server::receiveRequest(std::string &message, const int fd)
+int Server::readRequest(std::string &message, const int fd)
 {
-	char buf[this->recvBufferSize];
-	// char buf[Server::recvBufferSize];
+	char buf[Server::recvBufferSize];
 
-	int bytesReceived = recv(fd, buf, this->recvBufferSize, 0);
+	int bytesReceived = recv(fd, buf, Server::recvBufferSize, 0);
 	if (bytesReceived == -1)
 		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
-		perror("the remote side has closed the connection on you!"); // ur program is not talking to anyone it just facilitating communication between clients
+		std::cout << "Fd: "<< fd << " connection closed." << std::endl;
 		return (-1);
 	}
 	else
 	{
+		buf[bytesReceived] = 0;
 		message.append(buf);
 		while (bytesReceived)
 		{
-			bytesReceived = recv(fd, buf, this->recvBufferSize, 0);
+			bytesReceived = recv(fd, buf, Server::recvBufferSize, 0);
 			if (bytesReceived == -1)
-				return (perror("recv failed"), 0);
+			{
+				if (errno != EWOULDBLOCK)
+					perror("recv failed");
+				return (0);
+			} 
+			buf[bytesReceived] = 0;
 			message.append(buf);
 		}
 	}
@@ -69,20 +74,19 @@ bool isRegistrationCommand(std::string cmd)
 	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER");
 }
 
-void Server::parseCommands(const std::vector<std::string> commands, unsigned int clientIndex)
+void Server::parseCommands(const std::vector<std::string> commands, int clientFd)
 {
 	std::vector<std::string> cmd;
-	std::vector<Client>::iterator client = this->_clients.begin() + clientIndex; // why not have a simple [] accessor?
+	Client *client = this->_clients[clientFd];
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		cmd = split(commands[i], " ");
 		if (isRegistrationCommand(cmd[0]))
-			handleRegistrationCommand(*this, commands[i], (*client)); // this->_clients[clientIndex]
-		else														  // testing should be removed later
-			std::cout << "invalid command" << std::endl;
+			handleRegistrationCommand(*this, commands[i], *client);
+		else
+			std::cerr << "Error: invalid command" << std::endl;
 	}
-	std::cout << "msg from client-" << clientIndex + 1 << "-" << this->_clients[clientIndex].getNickname() << std::endl;
 }
 
 void Server::handleNewClient(void)
@@ -90,21 +94,32 @@ void Server::handleNewClient(void)
 	int clientSocket;
 
 	clientSocket = accept(this->_socket, NULL, NULL);
-	if (clientSocket == -1)
-		perror("accept system-call failed"); // try to check the errno
+	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
+		perror("client accepting sys calls failed"); // try to check the errno
 	else
 	{
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
-		Client newClient(clientSocket);
-		this->_clients.push_back(newClient);
-		Server::responseMsg("Start...\n", newClient.getFd());			// debug
-		Server::responseMsg("––> type a message: ", newClient.getFd()); // debug
+		Client *newClient = new Client(clientSocket);
+		this->_clients[clientSocket] = newClient;
+		Server::responseMsg("Start...\n", newClient->getFd());			// debug
+		Server::responseMsg("––> type a message: ", newClient->getFd()); // debug
 	}
 }
 
 void Server::closeConnection(int fd)
 {
 	delete this->_clients[fd];
+	this->_clients.erase(fd);
+	std::vector<struct pollfd>::iterator it = this->pfds.begin(); 
+	while (it != this->pfds.end())
+	{
+		if (it->fd == fd)
+		{
+			this->pfds.erase(it);
+			break;
+		}
+		it++;
+	}
 }
 
 void Server::handleEstablishedClientEvents(void)
@@ -123,20 +138,23 @@ void Server::handleEstablishedClientEvents(void)
 
 	for (size_t i = 1; i < this->pfds.size(); i++)
 	{
+
 		if (this->pfds[i].revents & POLLIN)
 		{
 			std::string msg;
-			if (Server::receiveRequest(msg, this->pfds[i].fd) == -1)
+
+			if (Server::readRequest(msg, this->pfds[i].fd) == -1)
 			{
 					Server::closeConnection(this->pfds[i].fd);
 					continue;
 			}
-			std::cout << "========== NEW MSG ========== : " << msg << std::endl;
-			commands = split(msg, "\n"); // add \r if using lime chat
-			Server::parseCommands(commands, i - 1);
-			std::cout << std::endl
-					  << "========== ======= ==========" << std::endl;
+			/* debug */
+			std::cout << "========== NEW MSG ========== : " << msg << std::endl; // debug
+			commands = split(msg, "\r\n"); // add \r if using lime chat
+			Server::parseCommands(commands, this->pfds[i].fd);
+			std::cout << std::endl << "========== ======= ==========" << std::endl; // debug
 			Server::responseMsg("––> type a message: ", this->pfds[i].fd);
+			/*		*/
 		}
 	}
 }
@@ -150,23 +168,24 @@ void Server::coreProcess(void)
 		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
 		if (numOfEventsOccured == -1)
 			perror("poll system-call failed"); // not sure whether this should crash the server or not
-		if (numOfEventsOccured >= 1)
+		if ((this->pfds[0].revents & POLLIN))
 		{
-			if ((this->pfds[0].revents & POLLIN))
-				Server::handleNewClient();
-			Server::handleEstablishedClientEvents();
+			Server::handleNewClient();
+			numOfEventsOccured--;
 		}
+		if (numOfEventsOccured >= 1)
+			Server::handleEstablishedClientEvents();
 	}
 }
 
 // too many comments that should be removed later
 int Server::setupServerSocket(void)
 {
-	int server_socket;
+	int serverSocket;
 
 	// 1. Creating socket file descriptor
-	server_socket = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_socket < 0)
+	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (serverSocket == -1 || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1) // not sure if server socket should be non-blocking
 		throw std::runtime_error("socket creation failed");
 	// 2. Forcefully attaching socket to the port 8080
 
@@ -178,7 +197,7 @@ int Server::setupServerSocket(void)
 	// even if it's still in a TIME_WAIT state after the socket is closed.
 	// This is useful when restarting a server to bind to the same address without waiting for the TIME_WAIT period to expire.
 	int opt = 1;
-	if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
 		throw std::runtime_error("setsockopt failed");
 
 	// 3.0 struct sockaddr_in setup
@@ -188,14 +207,14 @@ int Server::setupServerSocket(void)
 	serverAddress.sin_port = htons(Server::getPort());
 
 	// 3.1 binding
-	if (bind(server_socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
+	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
 		throw std::runtime_error("bind failed");
 
 	// 4. listening
 	// SOMAXCONN : Socket Max Connection [128] (backlog)
-	if (listen(server_socket, SOMAXCONN) < 0)
+	if (listen(serverSocket, SOMAXCONN) < 0)
 		throw std::runtime_error("listen failed");
-	return (server_socket);
+	return (serverSocket);
 }
 
 int Server::getPort(void)
@@ -229,8 +248,8 @@ void Server::setPassword(const std::string password)
 }
 
 // probably should be removed
-void Server::responseMsg(const std::string message, unsigned int fdClient)
+void Server::responseMsg(const std::string message, unsigned int clienFd)
 {
-	if (send(fdClient, message.c_str(), strlen(message.c_str()), 0) == -1)
+	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send failed");
 }
