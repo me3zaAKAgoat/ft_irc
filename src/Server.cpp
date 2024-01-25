@@ -91,8 +91,7 @@ void Server::handleNewClient(void)
 	int clientSocket;
 
 	clientSocket = accept(this->_socket, NULL, NULL);
-	if (clientSocket == -1) 
-	// || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
+	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
 		perror("client accepting sys calls failed"); // try to check the errno
 	else
 	{
@@ -182,7 +181,8 @@ int Server::setupServerSocket(void)
 
 	// 1. Creating socket file descriptor
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (serverSocket == -1 || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1) // not sure if server socket should be non-blocking
+	if (serverSocket == -1)
+	// || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1) // not sure if server socket should be non-blocking
 		throw std::runtime_error("socket creation failed");
 	// 2. Forcefully attaching socket to the port 8080
 
