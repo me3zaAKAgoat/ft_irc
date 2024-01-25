@@ -15,13 +15,13 @@ bool	isValidCharNickname(char c)
 bool	isValidNickname(std::vector<std::string> cmd, Client &client)
 {
 	if (cmd.size() > 2)
-		return (Server::responseMsg(": 432 " + client.getNickname() + " <nick> :Erroneus nickname\r\n", client.getFd()), false);
+		return (Server::responseMsg(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
 	else if (isValidCharNickname(cmd[1][0]) && isdigit(cmd[1][0]))
-		return (Server::responseMsg(": 432 " + client.getNickname() + " <nick> :Erroneus nickname\r\n", client.getFd()), false);
+		return (Server::responseMsg(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
 	for (size_t i = 1; i < cmd[1].size(); i++)
 	{
 		if (!isValidCharNickname(cmd[1][i]))
-			return (Server::responseMsg(": 432 " + client.getNickname() + " <nick> :Erroneus nickname\r\n", client.getFd()), false);
+			return (Server::responseMsg(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
 	}
 	return (true);
 }
@@ -47,6 +47,6 @@ void	nick(std::vector<std::string> cmd, Client &client)
 		return ;
 	if (!client.getNickname().empty())
 		Server::responseMsg("; " + client.getNickname() + " changed his nickname to " + cmd[1] + ".\r\n", client.getFd()); // does not appears in lime chat (needs to modify)
-	std::cout << client.getNickname() << " new Nickname: " << cmd[1] << std::endl;
+	std::cout << client.getNickname() << " new Nickname: " << cmd[1] << std::endl; // debug
 	client.setNickname(cmd[1]);
 }
