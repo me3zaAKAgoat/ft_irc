@@ -21,6 +21,69 @@ Server::~Server(void)
 	close(this->_socket);
 }
 
+void Server::coreProcess(void)
+{
+	int numOfEventsOccured;
+
+	std::cout << "Server started on port: " << this->_port << std::endl;
+	while (1)
+	{
+		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
+		if (numOfEventsOccured == -1)
+			perror("poll system-call failed"); // not sure whether this should crash the server or not
+		if ((this->pfds[0].revents & POLLIN))
+		{
+			Server::handleNewClient();
+			numOfEventsOccured--;
+		}
+		if (numOfEventsOccured >= 1)
+			Server::handleEstablishedClientEvents();
+	}
+}
+
+void Server::handleNewClient(void)
+{
+	int clientSocket;
+
+	clientSocket = accept(this->_socket, NULL, NULL);
+	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
+		perror("client accepting sys calls failed"); // try to check the errno
+	else
+	{
+		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
+		Client *newClient = new Client(clientSocket);
+		this->_clients[clientSocket] = newClient;
+		Server::sendResponse("TCP connection established.\n", clientSocket);
+		Server::sendResponse("> ", clientSocket);
+	}
+}
+
+void Server::handleEstablishedClientEvents(void)
+{
+	std::vector<std::string> commands;
+
+	for (size_t i = 1; i < this->pfds.size(); i++)
+	{
+
+		if (this->pfds[i].revents & POLLIN)
+		{
+			std::string msg;
+
+			if (Server::readRequest(msg, this->pfds[i].fd) == -1)
+			{
+					Server::closeConnection(this->pfds[i].fd);
+					continue;
+			}
+			/* debug */
+			std::cout << this->pfds[i].fd << " sent the following message: '" << msg << "'" << std::endl;
+			commands = split(msg, "\r\n"); // add \r if using lime chat
+			Server::parseCommands(commands, this->pfds[i].fd);
+			Server::sendResponse("> ", this->pfds[i].fd);
+			/*		*/
+		}
+	}
+}
+
 int Server::readRequest(std::string &message, const int fd)
 {
 	char buf[Server::recvBufferSize];
@@ -53,24 +116,6 @@ int Server::readRequest(std::string &message, const int fd)
 	return (0);
 }
 
-void handleRegistrationCommand(Server &server, const std::string commands, Client &client)
-{
-	std::vector<std::string> cmdSplit;
-
-	cmdSplit = split(commands, " ");
-	if (cmdSplit[0] == "PASS")
-		pass(server, commands, client, cmdSplit.size());
-	else if (cmdSplit[0] == "NICK")
-		nick(cmdSplit, client);
-	else if (cmdSplit[0] == "USER")
-		user(cmdSplit, client);
-}
-
-bool isRegistrationCommand(std::string cmd)
-{
-	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER");
-}
-
 void Server::parseCommands(const std::vector<std::string> commands, int clientFd)
 {
 	std::vector<std::string> cmd;
@@ -79,27 +124,14 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		cmd = split(commands[i], " ");
-		if (isRegistrationCommand(cmd[0]))
-			handleRegistrationCommand(*this, commands[i], *client);
+		if (cmd.size() && cmd[0] == "PASS")
+			pass_cmd(*this, commands[i], *client, cmd.size());
+		else if (cmd.size() && cmd[0] == "NICK")
+			nick_cmd(cmd, *client);
+		else if (cmd.size() && cmd[0] == "USER")
+			user_cmd(cmd, *client);
 		else
-			std::cerr << "Error: invalid command" << std::endl;
-	}
-}
-
-void Server::handleNewClient(void)
-{
-	int clientSocket;
-
-	clientSocket = accept(this->_socket, NULL, NULL);
-	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
-		perror("client accepting sys calls failed"); // try to check the errno
-	else
-	{
-		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
-		Client *newClient = new Client(clientSocket);
-		this->_clients[clientSocket] = newClient;
-		Server::responseMsg("Start...\n", newClient->getFd());			// debug
-		Server::responseMsg("––> type a message: ", newClient->getFd()); // debug
+			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
 	}
 }
 
@@ -116,61 +148,6 @@ void Server::closeConnection(int fd)
 			break;
 		}
 		it++;
-	}
-}
-
-void Server::handleEstablishedClientEvents(void)
-{
-	// POLLERR;
-	// POLLHUP;
-	// POLLIN;
-	// POLLNVAL;
-	// POLLOUT;
-	// POLLPRI;
-	// POLLRDBAND;
-	// POLLRDNORM;
-	// POLLWRBAND;
-	// POLLWRNORM;
-	std::vector<std::string> commands;
-
-	for (size_t i = 1; i < this->pfds.size(); i++)
-	{
-
-		if (this->pfds[i].revents & POLLIN)
-		{
-			std::string msg;
-
-			if (Server::readRequest(msg, this->pfds[i].fd) == -1)
-			{
-					Server::closeConnection(this->pfds[i].fd);
-					continue;
-			}
-			/* debug */
-			std::cout << this->pfds[i].fd << " sent the following message: '" << msg << "'" << std::endl;
-			commands = split(msg, "\r\n"); // add \r if using lime chat
-			Server::parseCommands(commands, this->pfds[i].fd);
-			Server::responseMsg("> ", this->pfds[i].fd);
-			/*		*/
-		}
-	}
-}
-
-void Server::coreProcess(void)
-{
-	int numOfEventsOccured;
-
-	while (1)
-	{
-		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
-		if (numOfEventsOccured == -1)
-			perror("poll system-call failed"); // not sure whether this should crash the server or not
-		if ((this->pfds[0].revents & POLLIN))
-		{
-			Server::handleNewClient();
-			numOfEventsOccured--;
-		}
-		if (numOfEventsOccured >= 1)
-			Server::handleEstablishedClientEvents();
 	}
 }
 
@@ -214,6 +191,13 @@ int Server::setupServerSocket(void)
 	return (serverSocket);
 }
 
+// probably should be removed
+void Server::sendResponse(const std::string message, unsigned int clienFd)
+{
+	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
+		perror("send failed");
+}
+
 int Server::getPort(void)
 {
 	return (this->_port);
@@ -244,9 +228,3 @@ void Server::setPassword(const std::string password)
 	this->_password = password;
 }
 
-// probably should be removed
-void Server::responseMsg(const std::string message, unsigned int clienFd)
-{
-	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
-		perror("send failed");
-}

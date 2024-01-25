@@ -14,7 +14,7 @@ class Server
 		void		coreProcess(void);
 		void		parseCommands(const std::vector<std::string> commands, int clientFd);
 		int			readRequest(std::string &message, const int fd);
-		static void	responseMsg(const std::string message, unsigned int clienFd);
+		static void	sendResponse(const std::string message, unsigned int clienFd);
 		void		handleNewClient(void);
 		void		handleEstablishedClientEvents(void);
 		void		closeConnection(int fd);
