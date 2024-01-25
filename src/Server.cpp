@@ -125,11 +125,11 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	{
 		cmd = split(commands[i], " ");
 		if (cmd.size() && cmd[0] == "PASS")
-			pass_cmd(*this, commands[i], *client, cmd.size());
+			passCmd(*this, commands[i], *client, cmd.size());
 		else if (cmd.size() && cmd[0] == "NICK")
-			nick_cmd(cmd, *client);
+			nickCmd(cmd, *client);
 		else if (cmd.size() && cmd[0] == "USER")
-			user_cmd(cmd, *client);
+			userCmd(cmd, *client);
 		else
 			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
 	}

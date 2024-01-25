@@ -1,6 +1,6 @@
 #include "Commands.hpp"
 
-void	user_cmd(std::vector<std::string> cmd, Client &client)
+void	userCmd(std::vector<std::string> cmd, Client &client)
 {
 	// password and nickname should be set first
 	if (client.getNickname().empty())

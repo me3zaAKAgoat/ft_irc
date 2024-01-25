@@ -20,7 +20,7 @@ std::string extractPassword(std::string cmd)
 	return (result);
 }
 
-void pass_cmd(Server& server, std::string cmd, Client &client, size_t numArgs)
+void passCmd(Server& server, std::string cmd, Client &client, size_t numArgs)
 {
 	// // if (cmd.size() > 2)
 	// 	cmd[1] = cmd[1].erase(0, 1); // if the password contains spaces -> remove the (:) (this behavior occurs in lime chat client)
