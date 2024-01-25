@@ -1,10 +1,5 @@
 #include "Client.hpp"
 
-Client::Client()
-{
-	this->_isAuthenticated = false;
-}
-
 Client::~Client()
 {
 	close(this->fd);
@@ -44,7 +39,6 @@ void Client::setRealname(const std::string realname)
 	this->realname = realname;
 }
 
-// getters:
 unsigned int Client::getFd(void)
 {
 	return (this->fd);

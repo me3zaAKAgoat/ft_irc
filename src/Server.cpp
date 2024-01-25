@@ -3,10 +3,6 @@
 
 const int Server::recvBufferSize = 1000;
 
-Server::Server()
-{
-}
-
 Server::Server(const int port, const std::string password)
 {
 	this->_port = port;
@@ -17,14 +13,14 @@ Server::Server(const int port, const std::string password)
 
 Server::~Server(void)
 {
-	// Close the sockets when done
-	// the order of closing affect smt or not?
-	// close(Server::getClientSocket()); // close all fd-socket-clients
-	
+	for (std::map<int, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		delete it->second;
+		close(it->first);
+	}
 	close(this->_socket);
 }
 
-// remove the 100 message cap this function is so ass need full rehaul
 int Server::readRequest(std::string &message, const int fd)
 {
 	char buf[Server::recvBufferSize];
@@ -95,7 +91,8 @@ void Server::handleNewClient(void)
 	int clientSocket;
 
 	clientSocket = accept(this->_socket, NULL, NULL);
-	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
+	if (clientSocket == -1) 
+	// || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
 		perror("client accepting sys calls failed"); // try to check the errno
 	else
 	{
@@ -150,11 +147,10 @@ void Server::handleEstablishedClientEvents(void)
 					continue;
 			}
 			/* debug */
-			std::cout << "========== NEW MSG ========== : " << msg << std::endl; // debug
+			std::cout << this->pfds[i].fd << " sent the following message: '" << msg << "'" << std::endl;
 			commands = split(msg, "\r\n"); // add \r if using lime chat
 			Server::parseCommands(commands, this->pfds[i].fd);
-			std::cout << std::endl << "========== ======= ==========" << std::endl; // debug
-			Server::responseMsg("––> type a message: ", this->pfds[i].fd);
+			Server::responseMsg("> ", this->pfds[i].fd);
 			/*		*/
 		}
 	}

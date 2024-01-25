@@ -39,6 +39,7 @@ std::vector<std::string> split(const std::string &input, const std::string &sepa
 	std::vector<std::string> result;
 	std::size_t start = 0;
 	std::size_t found = input.find(separator);
+
 	if (found == std::string::npos)
 	{
 		if (separator != " ")

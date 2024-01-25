@@ -16,8 +16,6 @@
 #include <map>
 
 // Forward declaration
-class Client;
-class Server;
 
 #include "Client.hpp"
 #include "Server.hpp"
