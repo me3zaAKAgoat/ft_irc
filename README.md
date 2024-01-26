@@ -23,6 +23,8 @@ JOIN
 PART
 KICK
 MODE
+TOPIC
+INVITE
 PRIVMSG
 NOTICE
 PING
@@ -38,7 +40,7 @@ WHOIS
 - learn more about non blocking I/O
 - read more about server socket setup functions
 - ask peers for all the commands that should be implemented (dont be a faggot and ask for the reference)
-- theres a buffering problem somewhere
+- theres a buffering problem somewhere (setup client server connection and try to register)	
 - questions about cr lf (will we use both chars are delimiters)
 - will we use command prefixes? (most likely not)
 - command validity specification

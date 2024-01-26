@@ -15,3 +15,5 @@ commandData	parseCommand(const std::string &requestMessage);
 void		nickCmd(commandData& cmd, Server &server, Client& client);
 void		passCmd(commandData& cmd, Server& server, Client& client);
 void		userCmd(commandData& cmd, Client &client);
+void		joinCmd(commandData& cmd, Server& server, Client* client);
+void		partCmd(commandData& cmd, Server& server, Client* client);

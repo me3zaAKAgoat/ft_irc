@@ -18,8 +18,11 @@ class Server
 		void						handleNewClient(void);
 		void						handleEstablishedClientEvents(void);
 		void						closeConnection(int fd);
+		void						addChannel(Channel *channel);
+		void						removeChannel(Channel *channel);
 
 		std::map<int, Client *>		getClients(void);
+		std::vector<Channel *>		getChannels(void);
 		int							getPort(void);
 		int							getServerSocket(void);
 		std::string					getPassword(void);
@@ -35,5 +38,6 @@ class Server
 		int							_socket;
 		std::string					_password;
 		std::map<int, Client *>		_clients;
+		std::vector<Channel *>		_channels;
 		std::vector<struct pollfd>	pfds;
 };

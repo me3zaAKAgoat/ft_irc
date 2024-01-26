@@ -61,22 +61,20 @@ void Server::handleNewClient(void)
 void Server::handleEstablishedClientEvents(void)
 {
 	std::vector<std::string> commands;
+	std::string requestMessagae;
 
 	for (size_t i = 1; i < this->pfds.size(); i++)
 	{
-
 		if (this->pfds[i].revents & POLLIN)
 		{
-			std::string msg;
-
-			if (Server::readRequest(msg, this->pfds[i].fd) == -1)
+			if (Server::readRequest(requestMessagae, this->pfds[i].fd) == -1)
 			{
-					Server::closeConnection(this->pfds[i].fd);
-					continue;
+				Server::closeConnection(this->pfds[i].fd);
+				continue;
 			}
 			/* debug */
-			std::cout << this->pfds[i].fd << " sent the following message: '" << msg << "'" << std::endl;
-			commands = split(msg, "\r\n"); // add \r if using lime chat
+			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl;
+			commands = split(requestMessagae, COMMANDS_DELIMITER); // add \r if using lime chat
 			Server::parseCommands(commands, this->pfds[i].fd);
 			Server::sendResponse("> ", this->pfds[i].fd);
 			/*		*/
@@ -130,6 +128,10 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 			nickCmd(cmd, *this, *client);
 		else if (cmd.name == "USER")
 			userCmd(cmd, *client);
+		else if (cmd.name == "JOIN")
+			joinCmd(cmd, *this, client);
+		else if (cmd.name == "PART")
+			partCmd(cmd, *this, client);
 		else
 			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
 	}
@@ -198,9 +200,32 @@ void Server::sendResponse(const std::string message, unsigned int clienFd)
 		perror("send failed");
 }
 
+void	Server::addChannel(Channel *channel)
+{
+	this->_channels.push_back(channel);
+}
+
+void	Server::removeChannel(Channel *channel)
+{
+	for (size_t i = 0; i < this->_channels.size(); i++)
+	{
+		if (this->_channels[i] == channel)
+		{
+			delete this->_channels[i];
+			this->_channels.erase(this->_channels.begin() + i);
+			return ;
+		}
+	}
+}
+
 std::map<int, Client *>		Server::getClients(void)
 {
 	return (this->_clients);
+}
+
+std::vector<Channel *>		Server::getChannels(void)
+{
+	return (this->_channels);
 }
 
 int Server::getPort(void)
