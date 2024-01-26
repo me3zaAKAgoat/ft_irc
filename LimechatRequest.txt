@@ -1,9 +1,0 @@
-PASS <password>
-NICK <nick name>
-USER <login name/user name> 0 * :<real name>
-
-
-PASS haha
-NICK ekenane
-USER elmehdi10 0 * :elmehdi kenane
-

@@ -1,0 +1,3 @@
+PASS haha
+NICK ekenane
+USER elmehdi10 0 * :elmehdi kenane

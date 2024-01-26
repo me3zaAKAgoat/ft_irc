@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 
+#include "Channel.hpp"
 #include "Client.hpp"
 #include "Server.hpp"
 #include "Commands.hpp"

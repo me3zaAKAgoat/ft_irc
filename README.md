@@ -32,9 +32,7 @@ WHOIS
 
 - standarize the use of perror/throw runtime_error/std::cerr
 - use response message macros
-- parsing needs to be studied more
 - visit all network functions and code and check if theres anything that is missing (probably better to ignore until issues are met)
-- wtf are the join functions arguments
 - !!!!!!! CHECK ALL SYS CALL RETURNS ALL OF THEM !!!!!
 - finish join command
 - learn more about non blocking I/O
@@ -42,9 +40,8 @@ WHOIS
 - ask peers for all the commands that should be implemented (dont be a faggot and ask for the reference)
 - create a channel class
 - theres a buffering problem somewhere
-- questions about cr lf (will we use both)
+- questions about cr lf (will we use both chars are delimiters)
 - will we use command prefixes? (most likely not)
-- handle spaces containing arguments (args that start with the ":")
 - all commands should take the command struct as first parameter then whatever additional needed arguments afterwards
 - command validity specification
 ```
@@ -56,7 +53,6 @@ Colons will not appear within arguments or commands.
 Arguments will not begin with a space.
 ```
 - link the reply message reference in this document !!
-- when is a client authenticated, when all registaration commands are done? if so why change the boolean at pass command??
 
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14	
