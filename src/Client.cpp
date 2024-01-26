@@ -19,11 +19,6 @@ void	Client::authenticate(void)
 	this->_isAuthenticated = true;
 }
 
-void Client::setPassword(const std::string password)
-{
-	this->password = password;
-}
-
 void Client::setNickname(const std::string nickname)
 {
 	this->nickname = nickname;
@@ -42,11 +37,6 @@ void Client::setRealname(const std::string realname)
 unsigned int Client::getFd(void)
 {
 	return (this->fd);
-}
-
-std::string Client::getPassword(void)
-{
-	return (this->password);
 }
 
 std::string Client::getNickname(void)

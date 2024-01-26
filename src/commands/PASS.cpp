@@ -1,6 +1,6 @@
 #include "Commands.hpp"
 
-void passCmd(commandData& cmd, Client& client)
+void passCmd(commandData& cmd, Server& server, Client& client)
 {
 	if (!cmd.arguments.size())
 	{
@@ -12,6 +12,6 @@ void passCmd(commandData& cmd, Client& client)
 		Server::sendResponse(": 462 " + !client.getNickname().empty() ? client.getNickname() : std::string("*no nickname*") + " :You may not reregister\r\n", client.getFd());
 		return ;
 	}
-	client.setPassword(cmd.arguments[0]);
-	client.authenticate();
+	if (cmd.arguments[0] == server.getPassword())
+		client.authenticate();
 }

@@ -125,7 +125,7 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	{
 		commandData cmd = parseCommand(commands[i]);
 		if (cmd.name == "PASS")
-			passCmd(cmd, *client);
+			passCmd(cmd, *this, *client);
 		else if (cmd.name == "NICK")
 			nickCmd(cmd, *this, *client);
 		else if (cmd.name == "USER")
