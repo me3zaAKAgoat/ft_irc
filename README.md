@@ -42,3 +42,21 @@ WHOIS
 - ask peers for all the commands that should be implemented (dont be a faggot and ask for the reference)
 - create a channel class
 - theres a buffering problem somewhere
+- questions about cr lf (will we use both)
+- will we use command prefixes? (most likely not)
+- handle spaces containing arguments (args that start with the ":")
+- all commands should take the command struct as first parameter then whatever additional needed arguments afterwards
+- command validity specification
+```
+Raw messages will only contain printable ASCII characters (ordinals 32-126).
+Raw messages will start with a command, which will not contain any spaces.
+Any number of arguments may follow a command. Arguments are delimited by one or more spaces followed by a colon (<space>: and <space><space>: are both valid delimiters).
+	Any arguments that do not contain spaces may omit the colon from the delimiter so long as all previous arguments (if any) have omitted the colon.
+Colons will not appear within arguments or commands.
+Arguments will not begin with a space.
+```
+- link the reply message reference in this document !!
+- when is a client authenticated, when all registaration commands are done? if so why change the boolean at pass command??
+
+
+https://datatracker.ietf.org/doc/html/rfc1459#page-14	

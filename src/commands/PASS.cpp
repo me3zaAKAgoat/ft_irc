@@ -1,47 +1,17 @@
 #include "Commands.hpp"
 
-bool isWhiteSpace(char c)
+void passCmd(commandData& cmd, Client& client)
 {
-	if (c == 32 || (c >= 9 && c <= 11))
-		return (true);
-	return (false);
-}
-
-std::string extractPassword(std::string cmd)
-{
-	std::string result;
-	size_t i = 0;
-
-	cmd = cmd.substr(cmd.find("PASS") + strlen("PASS"));
-	while (isWhiteSpace(cmd[i]))
-		i++;
-	while (i < cmd.size())
-		result.push_back(cmd[i++]);
-	return (result);
-}
-
-void passCmd(Server& server, std::string cmd, Client &client, size_t numArgs)
-{
-	// // if (cmd.size() > 2)
-	// 	cmd[1] = cmd[1].erase(0, 1); // if the password contains spaces -> remove the (:) (this behavior occurs in lime chat client)
-	if (numArgs < 2)
+	if (!cmd.arguments.size())
+	{
 		Server::sendResponse(": 461 " + client.getNickname() + " PASS :Not enough parameters\r\n", client.getFd());
-	else if (client.isAuthenticated())
-	{
-		if (!client.getNickname().empty())
-			Server::sendResponse(": 462 " + client.getNickname() + " :You may not reregister\r\n", client.getFd());
-		else
-			Server::sendResponse(": 462 " + std::string("*no nickname*") + " :You may not reregister\r\n", client.getFd());
+		return ;
 	}
-	else if (extractPassword(cmd) != server.getPassword())
+	if (client.isAuthenticated())
 	{
-		std::cout << "password receive from client: '" << extractPassword(cmd) << "'" << std::endl;
-		Server::sendResponse(": 464 " + client.getNickname() + " :Password incorrect\r\n", client.getFd());
+		Server::sendResponse(": 462 " + !client.getNickname().empty() ? client.getNickname() : std::string("*no nickname*") + " :You may not reregister\r\n", client.getFd());
+		return ;
 	}
-	else
-	{
-		client.setPassword(extractPassword(cmd));
-		client.authenticate();
-		std::cout << "Password is correct: client: " << client.getFd() << std::endl;
-	}
+	client.setPassword(cmd.arguments[0]);
+	client.authenticate();
 }

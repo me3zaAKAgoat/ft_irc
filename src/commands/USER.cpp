@@ -1,6 +1,6 @@
 #include "Commands.hpp"
 
-void	userCmd(std::vector<std::string> cmd, Client &client)
+void		userCmd(commandData& cmd, Client &client)
 {
 	// password and nickname should be set first
 	if (client.getNickname().empty())
@@ -13,7 +13,7 @@ void	userCmd(std::vector<std::string> cmd, Client &client)
 		Server::sendResponse("Password not set yet\r\n", client.getFd());
 		return ;
 	}
-	else if (cmd.size() < 5)
+	if (cmd.arguments.size() < 5)
 	{
 		Server::sendResponse(": 461 " + client.getNickname() + " USER :Not enough parameters\r\n", client.getFd());
 		return ;
@@ -23,17 +23,12 @@ void	userCmd(std::vector<std::string> cmd, Client &client)
 		Server::sendResponse(": 462 " + client.getNickname() + " :You may not reregister\r\n", client.getFd());
 		return ;
 	}
-	// the login/user name should be one word
-	if (cmd[2] != "0" || cmd[3] != "*")
+	if (cmd.arguments[1] != "0" || cmd.arguments[2] != "*")
 	{
-		Server::sendResponse("Invalid arguments\n", client.getFd());
+		Server::sendResponse("Invalid arguments\n", client.getFd()); // what the fuck is this message
 		return ;
 	}
-	// if (cmd.size() - 4 >= 2)
-	// 	cmd[4] = cmd[4].erase(0, 1);  // if the login-name may contains spaces -> remove the (:) (this behavior occurs in lime chat client)
-	client.setUsername(cmd[1]);
-	client.setRealname(join((cmd.begin() + 4), cmd.end(), " "));
-	Server::sendResponse(": 001 " + client.getNickname() + " :Welcome to the irc Network\r\n", client.getFd());
-	std::cout << "Username: " << client.getUsername() << std::endl;
-	std::cout << "Realname: " << client.getRealname() << std::endl;
+	client.setUsername(cmd.arguments[0]);
+	client.setRealname(cmd.arguments[4]);
+	Server::sendResponse(": 001 " + client.getNickname() + " :Welcome to the Irc network.\r\n", client.getFd());
 }

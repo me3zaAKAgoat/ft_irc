@@ -18,6 +18,7 @@ void	Client::authenticate(void)
 {
 	this->_isAuthenticated = true;
 }
+
 void Client::setPassword(const std::string password)
 {
 	this->password = password;

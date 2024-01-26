@@ -1,10 +1,10 @@
 CPP = c++
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 NAME = ircserv 
 
 HEADERS = includes/Server.hpp includes/Client.hpp includes/Irc.hpp includes/Commands.hpp
-SRCS = src/main.cpp src/Server.cpp src/Client.cpp \
-	src/commands/NICK.cpp src/commands/PASS.cpp src/commands/USER.cpp
+SRCS = src/main.cpp src/Server.cpp src/Client.cpp src/util.cpp\
+	src/commands/NICK.cpp src/commands/PASS.cpp src/commands/USER.cpp src/commands/parser.cpp
 OBJECTS = $(SRCS:.cpp=.o)
 
 all: $(NAME)

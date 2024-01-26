@@ -123,12 +123,12 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{
-		cmd = split(commands[i], " ");
-		if (cmd.size() && cmd[0] == "PASS")
-			passCmd(*this, commands[i], *client, cmd.size());
-		else if (cmd.size() && cmd[0] == "NICK")
-			nickCmd(cmd, *client);
-		else if (cmd.size() && cmd[0] == "USER")
+		commandData cmd = parseCommand(commands[i]);
+		if (cmd.name == "PASS")
+			passCmd(cmd, *client);
+		else if (cmd.name == "NICK")
+			nickCmd(cmd, *this, *client);
+		else if (cmd.name == "USER")
 			userCmd(cmd, *client);
 		else
 			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
@@ -196,6 +196,11 @@ void Server::sendResponse(const std::string message, unsigned int clienFd)
 {
 	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send failed");
+}
+
+std::map<int, Client *>		Server::getClients(void)
+{
+	return (this->_clients);
 }
 
 int Server::getPort(void)

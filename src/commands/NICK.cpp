@@ -3,47 +3,53 @@
 bool	isValidCharNickname(char c)
 {
 	// check CHANTYPES also
-	if (isalpha(c) || isdigit(c) || c == '[' || c == ']' || c == '\\' || c == '|'\
-			|| c == '{' || c == '}' || c == ':' || c == '#')
-		return (true);
-	return (false);
+	return (isalpha(c) || isdigit(c) || c == '[' || c == ']' || c == '\\' || c == '|'\
+			|| c == '{' || c == '}' || c == ':' || c == '#');
 }
 
-bool	isValidNickname(std::vector<std::string> cmd, Client &client)
+bool	isValidNickname(commandData& cmd)
 {
-	if (cmd.size() > 2)
-		return (Server::sendResponse(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
-	else if (isValidCharNickname(cmd[1][0]) && isdigit(cmd[1][0]))
-		return (Server::sendResponse(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
-	for (size_t i = 1; i < cmd[1].size(); i++)
+	std::string nickname = cmd.arguments[0];
+	// if (isValidCharNickname(cmd[1][0]) && isdigit(cmd[1][0])) // whats the ref for this?
+	// 	return (Server::sendResponse(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
+	for (size_t i = 0; i < nickname.size(); i++)
 	{
-		if (!isValidCharNickname(cmd[1][i]))
-			return (Server::sendResponse(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd()), false);
+		if (!isValidCharNickname(nickname[i]))
+			return (false);
 	}
 	return (true);
 }
 
-bool	isAlreadyUsed(std::vector<std::string> cmd, Client &client)
+bool	isAlreadyUsed(commandData& cmd, Server& server)
 {
-	// doesn't works yet I needs to loop through the whole nicknames of clients and check
-	(void)cmd;
+	std::cout << cmd.arguments[0] << std::endl;
+	std::cout << server.getClients().begin()->second->getNickname() << std::endl;
+	for (std::map<int, Client *>::iterator it = server.getClients().begin(); it != server.getClients().end(); ++it)
+	{
+		if (it->second->getNickname() == cmd.arguments[0])
+			return (true);
+	}
 	return (false);
-	return (Server::sendResponse(": 433 " + client.getNickname() + " <nick> :Nickname is already in use\r\n", client.getFd()), true);
 }
 
-void	nickCmd(std::vector<std::string> cmd, Client &client)
+void	nickCmd(commandData& cmd, Server &server, Client& client)
 {
 	if (!client.isAuthenticated())
 		return ;
-	if (cmd.size() < 2)
+	if (!cmd.arguments.size())
 	{
 		Server::sendResponse(": 431 " + client.getNickname() + " :No nickname given\r\n", client.getFd());
 		return ;
 	}
-	else if (!isValidNickname(cmd, client) || isAlreadyUsed(cmd, client))
+	if (!isValidNickname(cmd))
+	{
+		Server::sendResponse(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd());
 		return ;
-	if (!client.getNickname().empty())
-		Server::sendResponse("; " + client.getNickname() + " changed his nickname to " + cmd[1] + ".\r\n", client.getFd()); // does not appears in lime chat (needs to modify)
-	std::cout << client.getNickname() << " new Nickname: " << cmd[1] << std::endl; // debug
-	client.setNickname(cmd[1]);
+	}
+	if (isAlreadyUsed(cmd, server))
+	{
+		Server::sendResponse(": 433 " + client.getNickname() + " <nick> :Nickname is already in use\r\n", client.getFd());
+		return ;
+	}
+	client.setNickname(cmd.arguments[0]);
 }

@@ -20,6 +20,6 @@
 #include "Server.hpp"
 #include "Commands.hpp"
 
-std::vector<std::string>	split(const std::string &input, const std::string &separator);
+std::vector<std::string>	split(const std::string &input, const std::string &separator = " ");
 typedef typename std::vector<std::string>::iterator StringVectorIterator;
 std::string					join(StringVectorIterator itBegin, StringVectorIterator itEnd, const std::string& separator);
