@@ -13,7 +13,7 @@ void		userCmd(commandData& cmd, Client &client)
 		Server::sendResponse("Password not set yet\r\n", client.getFd());
 		return ;
 	}
-	if (cmd.arguments.size() < 5)
+	if (cmd.arguments.size() < 4)
 	{
 		Server::sendResponse(": 461 " + client.getNickname() + " USER :Not enough parameters\r\n", client.getFd());
 		return ;
@@ -29,6 +29,6 @@ void		userCmd(commandData& cmd, Client &client)
 		return ;
 	}
 	client.setUsername(cmd.arguments[0]);
-	client.setRealname(cmd.arguments[4]);
+	client.setRealname(cmd.arguments[3]);
 	Server::sendResponse(": 001 " + client.getNickname() + " :Welcome to the Irc network.\r\n", client.getFd());
 }

@@ -22,9 +22,9 @@ bool	isValidNickname(commandData& cmd)
 
 bool	isAlreadyUsed(commandData& cmd, Server& server)
 {
-	std::cout << cmd.arguments[0] << std::endl;
-	std::cout << server.getClients().begin()->second->getNickname() << std::endl;
-	for (std::map<int, Client *>::iterator it = server.getClients().begin(); it != server.getClients().end(); ++it)
+	std::map<int, Client *> clients = server.getClients();
+
+	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
 	{
 		if (it->second->getNickname() == cmd.arguments[0])
 			return (true);
