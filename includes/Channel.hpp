@@ -2,6 +2,8 @@
 
 #include "Irc.hpp"
 
+class Client;
+
 typedef struct
 {
 	Client	*client;
@@ -18,7 +20,7 @@ class Channel
 
 		bool						isInviteOnly;
 		bool						channelTopicIsRestricted;
-		std::int16_t				limit; // -1 if no limit
+		int16_t						limit; // -1 if no limit
 
 		std::string					key;
 		std::string					name;
