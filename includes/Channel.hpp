@@ -18,10 +18,11 @@ class Channel
 
 		void							addMember(Client *client);
 		void							removeMember(Client *client);
-		void							addOperator(Client *client);
+		void							giveOperator(Client *client);
 		void							removeOperator(Client *client);
 		void							broadcastMessage(Client *sender, const std::string message);
 		bool							isMember(Client *client);
+		bool							isOperator(Client *client);
 
 		void							setName(const std::string name);
 		void							setTopic(const std::string t);

@@ -18,3 +18,4 @@ void		userCmd(commandData& cmd, Client &client);
 void		joinCmd(commandData& cmd, Server& server, Client* client);
 void		partCmd(commandData& cmd, Server& server, Client* client);
 void		privMsgCmd(commandData& cmd, Server& server, Client& client);
+void		quitCmd(commandData& cmd, Server& server, Client* client);

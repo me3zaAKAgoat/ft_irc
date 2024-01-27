@@ -1,5 +1,10 @@
 #include "Irc.hpp"
 
+
+/* 
+there's more stuff that hasnt been implemented yet 
+https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
+*/
 void	joinCmd(commandData& cmd, Server& server, Client* client)
 {
 	std::vector<Channel *> channels = server.getChannels();
@@ -24,6 +29,7 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 					break ;
 				}
 				channels[j]->addMember(client);
+				channels[j]->giveOperator(client);
 				break ;
 			}
 		}
@@ -31,6 +37,7 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 		{
 			Channel *newChannel = new Channel(cmd.arguments[i]);
 			newChannel->addMember(client);
+			newChannel->giveOperator(client);
 			server.addChannel(newChannel);
 		}
 	}

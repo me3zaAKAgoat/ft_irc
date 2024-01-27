@@ -30,7 +30,7 @@ void Channel::removeMember(Client *client)
 	}
 }
 
-void Channel::addOperator(Client *client)
+void Channel::giveOperator(Client *client)
 {
 	for (size_t i = 0; i < this->members.size(); i++)
 	{
@@ -135,6 +135,16 @@ bool	Channel::isMember(Client *client)
 	{
 		if (this->members[i]->client == client)
 			return true;
+	}
+	return false;
+}
+
+bool	Channel::isOperator(Client *client)
+{
+	for (size_t i = 0; i < this->members.size(); i++)
+	{
+		if (this->members[i]->client == client)
+			return this->members[i]->isOperator;
 	}
 	return false;
 }

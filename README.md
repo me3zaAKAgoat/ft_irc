@@ -1,34 +1,19 @@
 # COMMANDS
 
-NORMAL CLIENT:
-- PASS
-- NICK
-- USER usr O * :realname
-- JOIN
-- PRIVMSG
-- QUIT
-
-OP:
-- KICK
-- INVITE
-- TOPIC
-- MODE
-
-commands we should implement :
-PASS
-NICK
-USER
-QUIT
-JOIN
-PART
-KICK
-MODE
-TOPIC
-INVITE
-PRIVMSG
-NOTICE
-PING
-WHOIS
+- [x] PASS
+- [x] NICK
+- [x] USER
+- [x] QUIT
+- [x] JOIN
+- [x] PART
+- [] KICK - OPER
+- [] MODE - OPER
+- [] TOPIC - OPER
+- [] INVITE - OPER
+- [X] PRIVMSG
+- [] NOTICE
+- [] PING
+- [] WHOIS
 
 # NOTES / TASKS
 
@@ -50,5 +35,6 @@ Raw messages will only contain printable ASCII characters (ordinals 32-126).
 - link the reply message reference in this document !!
 - MODE -> PRIVMSG -> NOTICE
 - pass client to command functions by reference or by pointer?
+- quit command causes a certain send operation to fail!
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14	

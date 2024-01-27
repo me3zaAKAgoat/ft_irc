@@ -134,6 +134,8 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 			partCmd(cmd, *this, client);
 		else if (cmd.name == "PRIVMSG")
 			privMsgCmd(cmd, *this, *client);
+		else if (cmd.name == "QUIT")
+			quitCmd(cmd, *this, client);
 		else
 			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
 	}
@@ -143,15 +145,13 @@ void Server::closeConnection(int fd)
 {
 	delete this->_clients[fd];
 	this->_clients.erase(fd);
-	std::vector<struct pollfd>::iterator it = this->pfds.begin(); 
-	while (it != this->pfds.end())
+	for (std::vector<struct pollfd>::iterator it = this->pfds.begin(); it != this->pfds.end(); it++)
 	{
 		if (it->fd == fd)
 		{
 			this->pfds.erase(it);
 			break;
 		}
-		it++;
 	}
 }
 

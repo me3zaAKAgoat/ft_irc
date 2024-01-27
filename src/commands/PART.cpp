@@ -19,6 +19,8 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 			{
 				channelExists = true;
 				channels[j]->removeMember(client);
+				if (!channels[j]->getMembers().size())
+					server.removeChannel(channels[j]);
 				break ;
 			}
 		}
