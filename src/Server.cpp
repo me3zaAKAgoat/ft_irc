@@ -56,37 +56,53 @@ bool Server::ReceiveRequest(std::string &message, const int fd)
 	return (true);
 }
 
-void handleRegistrationCommand(const std::string commands, Client &client)
+void handleRegistrationCommand(const std::string command, Client &client)
 {
 	std::vector<std::string> cmdSplit;
 
-	cmdSplit = ft_split(commands, " ");
+	cmdSplit = ft_split(command, " ");
 	if (cmdSplit[0] == "PASS")
-		PASS(commands, client, cmdSplit.size());
+		PASS(command, client, cmdSplit.size());
 	else if (cmdSplit[0] == "NICK")
 		NICK(cmdSplit, client);
 	else if (cmdSplit[0] == "USER")
 		USER(cmdSplit, client);
 }
 
+bool isChannelOperationCommand(std::string cmd)
+{
+	return (cmd == "JOIN");
+}
+
 bool isRegistrationCommand(std::string cmd)
 {
-	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER")
-		return (true);
-	return (false);
+	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER");
+}
+
+void	handleChannelOperationCommand(const std::string command, Client &client)
+{
+	std::vector<std::string> cmdSplit;
+
+	std::cout << "Enter handleChannelOperationCommand" << std::endl;
+	cmdSplit = ft_split(command, " ");
+	// if (cmdSplit[0] == "JOIN")
+	// 	JOIN(cmdSplit, client);
 }
 
 void Server::parseCommands(const std::vector<std::string> commands, unsigned int clientIndex)
 {
 	std::vector<std::string> cmd;
 	std::vector<Client>::iterator client = Server::x.begin() + clientIndex;
+	std::cout << "size of commands: " << commands.size() << std::endl;
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		cmd = ft_split(commands[i], " ");
 		if (isRegistrationCommand(cmd[0]))
 			handleRegistrationCommand(commands[i], (*client));
+		// else if ( isChannelOperationCommand(cmd[0]))
+		// 	handleChannelOperationCommand(commands[i], (*client));
 		else
-			std::cout << "invalid command" << std::endl;
+			std::cout << cmd[0] << ": invalid command" << std::endl;
 	}
 	std::cout << "msg from client-" << clientIndex + 1 << "-" << Server::x[clientIndex].getNickName() << std::endl;
 }
@@ -127,12 +143,14 @@ bool isValidPort(const std::string port)
 std::vector<std::string> ft_split(const std::string &input, const std::string &separator)
 {
 	std::vector<std::string> result;
+	// std::cout << "input '" << input << "'" << std::endl;
+	// std::cout << "result '" << result[0] << "'" << std::endl;
+	// return (result);
 	std::size_t start = 0;
 	std::size_t found = input.find(separator);
 	if (found == std::string::npos)
 	{
-		if (separator != " ")
-			std::cout << "separator doesn't found" << std::endl;
+		std::cout << "separator '" << separator <<  "' not found in " << input << std::endl;
 		result.push_back(input);
 		return (result);
 	}
@@ -140,7 +158,7 @@ std::vector<std::string> ft_split(const std::string &input, const std::string &s
 	{
 		if (input.substr(start, found - start) != "")
 			result.push_back(input.substr(start, found - start));
-			start = found + separator.size(); // Move past the separator
+		start = found + separator.size(); // Move past the separator
 		found = input.find(separator, start);
 	}
 	if (input.substr(start) != "")
@@ -207,15 +225,13 @@ POLLWRNORM;
 			std::string msg;
 			if (!Server::ReceiveRequest(msg, fds[i].fd))
 			{
-				// if (Server::fds[i].fd != Server::getServerSocket())
-				// {
 					Server::x.pop_back();
 					Server::removeFdClient(Server::fds[i].fd);
 					continue;
-				// }
 			}
 			std::cout << "========== NEW MSG ========== : " << msg << std::endl;
-			commands = ft_split(msg, "\n"); // add \r if using lime chat
+			commands = ft_split(msg, "\r\n");
+			std::cout << "after: " << "'" << commands[0] << "'" << std::endl;
 			Server::parseCommands(commands, i - 1);
 			std::cout << std::endl << "========== ======= ==========" << std::endl;
 			Server::responseMsg("––> type a message: ", Server::fds[i].fd);
