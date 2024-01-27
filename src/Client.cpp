@@ -5,7 +5,7 @@ Client::~Client()
 	close(this->fd);
 }
 
-Client::Client(unsigned int fd) : fd(fd), _isAuthenticated(false) // emptiness of some strings may be allowed in irc not sure !
+Client::Client(unsigned int fd) : fd(fd), _isAuthenticated(false)
 {
 }
 

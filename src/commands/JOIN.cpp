@@ -29,7 +29,6 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 					break ;
 				}
 				channels[j]->addMember(client);
-				channels[j]->giveOperator(client);
 				break ;
 			}
 		}

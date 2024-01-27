@@ -72,10 +72,10 @@ void Server::handleEstablishedClientEvents(void)
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
+			commands = split(requestMessagae, COMMANDS_DELIMITER);
+			Server::parseCommands(commands, this->pfds[i].fd);
 			/* debug */
 			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl;
-			commands = split(requestMessagae, COMMANDS_DELIMITER); // add \r if using lime chat
-			Server::parseCommands(commands, this->pfds[i].fd);
 			Server::sendReply("> ", this->pfds[i].fd);
 			/*		*/
 		}

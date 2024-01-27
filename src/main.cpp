@@ -22,7 +22,7 @@ bool isValidPort(const std::string port)
 
 	int portNbr = std::atoi(port.c_str());
 
-	if (portNbr < 0 || portNbr > 65535)
+	if (portNbr < 0 || portNbr > 65535) // 65535 is the max port number in tcp/udp
 		return (std::cerr << "Error: Port out of valid range (0-65535)!" << std::endl, false);
 
 	return (true);
