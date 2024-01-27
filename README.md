@@ -48,5 +48,7 @@ WHOIS
 Raw messages will only contain printable ASCII characters (ordinals 32-126).
 ```
 - link the reply message reference in this document !!
+- MODE -> PRIVMSG -> NOTICE
+- pass client to command functions by reference or by pointer?
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14	

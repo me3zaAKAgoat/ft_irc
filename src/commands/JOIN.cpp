@@ -10,7 +10,7 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 		channelExists = false; 
 		if (cmd.arguments[i][0] != '#' && cmd.arguments[i][0] != '&')
 		{
-			Server::sendResponse(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
+			Server::sendReply(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
 			continue ;
 		}
 		for (size_t j = 0; j < channels.size(); j++)
@@ -18,6 +18,11 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 			if (channels[j]->getName() == cmd.arguments[i])
 			{
 				channelExists = true;
+				if (channels[j]->isMember(client))
+				{
+					Server::sendReply(": 443 " + client->getNickname() + " " + cmd.arguments[i] + " :is already on channel\r\n", client->getFd());
+					break ;
+				}
 				channels[j]->addMember(client);
 				break ;
 			}

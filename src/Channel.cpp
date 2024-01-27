@@ -108,3 +108,33 @@ std::vector<ChannelMember *> Channel::getMembers(void)
 {
 	return (this->members);
 }
+
+std::string Channel::getTopic(void)
+{
+	return (this->topic);
+}
+
+void Channel::setTopic(const std::string topic)
+{
+	this->topic = topic;
+}
+
+void Channel::broadcastMessage(Client *sender, const std::string message)
+{
+	for (size_t i = 0; i < this->members.size(); i++)
+	{
+		if (this->members[i]->client == sender)
+			continue ;
+		Server::sendReply(message, this->members[i]->client->getFd());
+	}
+}
+
+bool	Channel::isMember(Client *client)
+{
+	for (size_t i = 0; i < this->members.size(); i++)
+	{
+		if (this->members[i]->client == client)
+			return true;
+	}
+	return false;
+}

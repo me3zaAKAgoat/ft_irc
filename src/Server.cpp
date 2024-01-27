@@ -53,8 +53,8 @@ void Server::handleNewClient(void)
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
 		Client *newClient = new Client(clientSocket);
 		this->_clients[clientSocket] = newClient;
-		Server::sendResponse("TCP connection established.\n", clientSocket);
-		Server::sendResponse("> ", clientSocket);
+		Server::sendReply("TCP connection established.\n", clientSocket);
+		Server::sendReply("> ", clientSocket);
 	}
 }
 
@@ -76,7 +76,7 @@ void Server::handleEstablishedClientEvents(void)
 			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl;
 			commands = split(requestMessagae, COMMANDS_DELIMITER); // add \r if using lime chat
 			Server::parseCommands(commands, this->pfds[i].fd);
-			Server::sendResponse("> ", this->pfds[i].fd);
+			Server::sendReply("> ", this->pfds[i].fd);
 			/*		*/
 		}
 	}
@@ -132,6 +132,8 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 			joinCmd(cmd, *this, client);
 		else if (cmd.name == "PART")
 			partCmd(cmd, *this, client);
+		else if (cmd.name == "PRIVMSG")
+			privMsgCmd(cmd, *this, *client);
 		else
 			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
 	}
@@ -194,7 +196,7 @@ int Server::setupServerSocket(void)
 }
 
 // probably should be removed
-void Server::sendResponse(const std::string message, unsigned int clienFd)
+void Server::sendReply(const std::string message, unsigned int clienFd)
 {
 	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send failed");
@@ -256,5 +258,25 @@ void Server::setServerSocket(const int serverSocket)
 void Server::setPassword(const std::string password)
 {
 	this->_password = password;
+}
+
+Channel* Server::getChannelByName(const std::string name)
+{
+	for (size_t i = 0; i < this->_channels.size(); i++)
+	{
+		if (this->_channels[i]->getName() == name)
+			return (this->_channels[i]);
+	}
+	return (NULL);
+}
+
+Client*	Server::getClientByNickname(const std::string nickname)
+{
+	for (std::map<int, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second->getNickname() == nickname)
+			return (it->second);
+	}
+	return (NULL);
 }
 

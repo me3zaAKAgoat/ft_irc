@@ -20,9 +20,11 @@ class Channel
 		void							removeMember(Client *client);
 		void							addOperator(Client *client);
 		void							removeOperator(Client *client);
+		void							broadcastMessage(Client *sender, const std::string message);
+		bool							isMember(Client *client);
 
 		void							setName(const std::string name);
-		void							setTopic(void);
+		void							setTopic(const std::string t);
 		void							setKey(const std::string key);
 		void							setLimit(const int16_t limit);
 		void							setInviteOnly(const bool isInviteOnly);
@@ -35,6 +37,7 @@ class Channel
 		bool							getInviteOnly(void);
 		bool							getChannelTopicIsRestricted(void);
 		std::vector<ChannelMember *>	getMembers(void);
+
 
 	private:
 

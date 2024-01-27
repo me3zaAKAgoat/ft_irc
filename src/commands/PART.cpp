@@ -10,7 +10,7 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 		channelExists = false; 
 		if (cmd.arguments[i][0] != '#' && cmd.arguments[i][0] != '&')
 		{
-			Server::sendResponse(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
+			Server::sendReply(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
 			continue ;
 		}
 		for (size_t j = 0; j < channels.size(); j++)
@@ -23,6 +23,6 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 			}
 		}
 		if (!channelExists)
-			Server::sendResponse(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
+			Server::sendReply(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
 	}
 }

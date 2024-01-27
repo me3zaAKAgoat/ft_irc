@@ -14,7 +14,7 @@ class Server
 		void						coreProcess(void);
 		void						parseCommands(const std::vector<std::string> commands, int clientFd);
 		int							readRequest(std::string &message, const int fd);
-		static void					sendResponse(const std::string message, unsigned int clienFd);
+		static void					sendReply(const std::string message, unsigned int clienFd);
 		void						handleNewClient(void);
 		void						handleEstablishedClientEvents(void);
 		void						closeConnection(int fd);
@@ -23,6 +23,8 @@ class Server
 
 		std::map<int, Client *>		getClients(void);
 		std::vector<Channel *>		getChannels(void);
+		Channel*					getChannelByName(const std::string name);
+		Client*						getClientByNickname(const std::string nickname);
 		int							getPort(void);
 		int							getServerSocket(void);
 		std::string					getPassword(void);
