@@ -1,17 +1,14 @@
 #include "Client.hpp"
 
-Client::Client()
+Client::~Client()
 {
-	this->fd = -1;
-	this->isAuthenticated = false;
-	this->nickNameIsSet = false;
-	this->password = "passwordEmpty";
-	this->nickName = "nicknameEmpty";
-	this->loginName = "loginnameEmpty";
-	this->realName = "realnameEmpty";
+	close(this->fd);
 }
 
-// setters:
+Client::Client(unsigned int fd) : fd(fd), _isAuthenticated(false)
+{
+}
+
 void Client::setFd(const unsigned int fd)
 {
 	this->fd = fd;
@@ -19,73 +16,45 @@ void Client::setFd(const unsigned int fd)
 
 void	Client::authenticate(void)
 {
-	this->isAuthenticated = true;
-}
-void Client::setPassword(const std::string password)
-{
-	this->password = password;
+	this->_isAuthenticated = true;
 }
 
-void Client::setNickName(const std::string nickName)
+void Client::setNickname(const std::string nickname)
 {
-	this->nickName = nickName;
-	this->nickNameIsSet = true;
+	this->nickname = nickname;
 }
 
-void Client::setLoginName(const std::string loginName)
+void Client::setUsername(const std::string username)
 {
-	this->loginName = loginName;
+	this->username = username;
 }
 
-void Client::setRealName(const std::string realName)
+void Client::setRealname(const std::string realname)
 {
-	this->realName = realName;
+	this->realname = realname;
 }
 
-void	Client::setUserName(const std::string LoginName, const std::string RealName)
-{
-	this->setLoginName(LoginName);
-	this->setRealName(RealName);
-	this->userNameIsSet = true;
-}
-
-// getters:
 unsigned int Client::getFd(void)
 {
 	return (this->fd);
 }
 
-std::string Client::getPassword(void)
+std::string Client::getNickname(void)
 {
-	return (this->password);
+	return (this->nickname);
 }
 
-std::string Client::getNickName(void)
+std::string Client::getUsername(void)
 {
-	return (this->nickName);
+	return (this->username);
 }
 
-std::string Client::getLoginName(void)
+std::string Client::getRealname(void)
 {
-	return (this->loginName);
+	return (this->realname);
 }
 
-std::string Client::getRealName(void)
+bool	Client::isAuthenticated(void)
 {
-	return (this->realName);
-}
-
-bool	Client::isUserNameSet(void)
-{
-	return (this->userNameIsSet);
-}
-
-bool	Client::isAuthenticate(void)
-{
-	return (this->isAuthenticated);
-}
-
-bool	Client::isNickNameSet(void)
-{
-	return (this->nickNameIsSet);
+	return (this->_isAuthenticated);
 }

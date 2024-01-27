@@ -2,42 +2,31 @@
 
 #include "Irc.hpp"
 
+class Server;
+
 class Client
 {
 	public:
-		Client();
-		// Client(const Client& copy);
-		// Client& operator=(const Client& rhs);
-		// ~Client();
+		Client(unsigned int fd);
+		~Client();
 
-		// setters:
-		void	authenticate(void);
-		void	setFd(const unsigned int fd);
-		void	setPassword(const std::string Password);
-		void	setNickName(const std::string NickName);
-		void	setUserName(const std::string LoginName, const std::string RealName);
+		void			authenticate(void);
+		void			setFd(const unsigned int fd);
+		void			setNickname(const std::string Nickname);
+		void			setUsername(const std::string username);
+		void			setRealname(const std::string realname);
 
-		// getters:
 		unsigned int	getFd(void);
-		bool			isAuthenticate(void);
-		bool			isNickNameSet(void);
-		std::string		getPassword(void);
-		std::string		getNickName(void);
-		bool			isUserNameSet(void);
-		std::string		getLoginName(void);
-		std::string		getRealName(void);
+		bool			isAuthenticated(void);
+		std::string		getNickname(void);
+		std::string		getUsername(void);
+		std::string		getRealname(void);
 
 	private:
+		int				fd;
 
-		void	setLoginName(const std::string LoginName);
-		void	setRealName(const std::string RealName);
-
-		unsigned int	fd;
-		bool			isAuthenticated;
-		bool			nickNameIsSet;
-		bool			userNameIsSet;
-		std::string		nickName;
-		std::string		password;
-		std::string		loginName;
-		std::string		realName;
+		std::string		nickname;
+		std::string		username;
+		std::string		realname;
+		bool			_isAuthenticated;
 };
