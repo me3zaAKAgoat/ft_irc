@@ -53,8 +53,8 @@ void Server::handleNewClient(void)
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
 		Client *newClient = new Client(clientSocket);
 		this->_clients[clientSocket] = newClient;
-		Server::sendReply("TCP connection established.\n", clientSocket);
-		Server::sendReply("> ", clientSocket);
+		Server::sendReply("TCP connection established between you and the irc server.\n", clientSocket);
+		// Server::sendReply("> ", clientSocket);
 	}
 }
 
@@ -72,12 +72,10 @@ void Server::handleEstablishedClientEvents(void)
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
+			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
 			commands = split(requestMessagae, COMMANDS_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
-			/* debug */
-			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl;
-			Server::sendReply("> ", this->pfds[i].fd);
-			/*		*/
+			// Server::sendReply("> ", this->pfds[i].fd); //debug
 		}
 	}
 }

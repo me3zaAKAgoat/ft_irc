@@ -26,6 +26,11 @@ void privMsgCmd(commandData& cmd, Server& server, Client& client)
 		// 	Server::sendReply(": 401 " + client.getNickname() + " " + cmd.arguments[0] + " :No such nick/channel\r\n", client.getFd());
 		// 	return ;
 		// }
+		if (!channel->isMember(&client))
+		{
+			Server::sendReply(": 404 " + client.getNickname() + " " + cmd.arguments[0] + " :Cannot send to channel\r\n", client.getFd());
+			return ;
+		}
 		channel->broadcastMessage(&client, ":" + client.getNickname() + " PRIVMSG " + cmd.arguments[0] + " :" + cmd.arguments[1] + "\r\n");
 	}
 	else
