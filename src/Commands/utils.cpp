@@ -11,16 +11,16 @@ bool isExistChannel(Server &server, size_t &channelIndex, const std::string &cha
 	return (false);
 }
 
-bool isMemberOperator(Channel *channel, Client *client, const std::string &channelName)
+bool isMemberOperator(Channel *channel, Client *client)
 {
 	if (!channel->isMember(client))
 	{
-		Server::sendReply(ERR_NOTONCHANNEL(client->getNickname(), channelName), client->getFd());
+		Server::sendReply(ERR_NOTONCHANNEL(client->getNickname(), channel->getName()), client->getFd());
 		return (false);
 	}
 	if (!channel->getMembers()[client->getFd()]->isOperator)
 	{
-		Server::sendReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), channelName), client->getFd());
+		Server::sendReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), channel->getName()), client->getFd());
 		return (false);
 	}
 	return (true);

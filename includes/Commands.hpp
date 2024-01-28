@@ -26,5 +26,5 @@ void		topicCmd(commandData& cmd, Server& server, Client& client);
 void		inviteCmd(commandData &cmd, Server &server, Client *client);
 
 bool		isExistChannel(Server &server, size_t &channelIndex, const std::string &channelName);
-bool		isMemberOperator(Channel *channel, Client *client, const std::string &channelName);
+bool		isMemberOperator(Channel *channel, Client *client);
 bool		strIsDigits(const std::string str);

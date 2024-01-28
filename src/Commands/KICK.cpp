@@ -37,7 +37,7 @@ void	kickCmd(commandData& cmd, Server &server, Client* client)
 		size_t j = -1;
 		if (isExistChannel(server, j, paramChannels[i]))
 		{
-			if (!isMemberOperator(channels[j], client, paramChannels[i]))
+			if (!isMemberOperator(channels[j], client))
 				break;
 			kickMembers(server, paramUsers, paramChannels[i], channels[j]);
 		}
