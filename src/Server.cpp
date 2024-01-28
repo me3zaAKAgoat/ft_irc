@@ -73,7 +73,7 @@ void Server::handleEstablishedClientEvents(void)
 				continue;
 			}
 			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
-			commands = split(requestMessagae, COMMANDS_DELIMITER);
+			commands = split(requestMessagae, MESSAGE_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
 			// Server::sendReply("> ", this->pfds[i].fd); //debug
 		}

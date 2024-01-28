@@ -1,5 +1,6 @@
 #include "Irc.hpp"
 
+/* handle commas */
 void	partCmd(commandData& cmd, Server& server, Client* client)
 {
 	std::vector<Channel *> channels = server.getChannels();

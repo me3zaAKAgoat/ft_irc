@@ -9,7 +9,7 @@ typedef struct
 	std::vector<std::string>	arguments;
 } commandData;
 
-#define COMMANDS_DELIMITER "\r\n"
+#define MESSAGE_DELIMITER "\r\n"
 
 /* all commands should take a commandData as first argument then a server and a client if needed*/
 commandData	parseCommand(const std::string &requestMessage);
