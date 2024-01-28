@@ -7,13 +7,11 @@
 - [x] JOIN
 - [x] PART
 - [] KICK - OPER
-- [] MODE - OPER
-- [] TOPIC - OPER
-- [] INVITE - OPER
+- [] MODE itkol - OPER
+- [x] TOPIC - OPER
+- [x] INVITE - OPER
 - [X] PRIVMSG
 - [] NOTICE
-- [] PING
-- [] WHOIS
 
 # NOTES / TASKS
 

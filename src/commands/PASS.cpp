@@ -9,7 +9,10 @@ void passCmd(commandData& cmd, Server& server, Client& client)
 	}
 	if (client.isAuthenticated())
 	{
-		Server::sendReply(ERR_ALREADYREGISTERED(!client.getNickname().empty() ? client.getNickname() : std::string("*")), client.getFd());
+		if (!client.getNickname().empty())
+			Server::sendReply(ERR_ALREADYREGISTERED(client.getNickname()), client.getFd());
+		else
+			Server::sendReply(ERR_ALREADYREGISTERED(std::string("*")), client.getFd());
 		return ;
 	}
 	if (cmd.arguments[0] == server.getPassword())
