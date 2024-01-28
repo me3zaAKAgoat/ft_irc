@@ -125,11 +125,12 @@ void Channel::setTopic(const std::string topic)
 
 void Channel::broadcastMessage(Client *sender, const std::string message)
 {
-	for (size_t i = 0; i < this->members.size(); i++)
+	std::map<unsigned int, ChannelMember *>::iterator it;
+	for (it = this->members.begin(); it != this->members.begin(); it++)
 	{
-		if (this->members[i]->client == sender)
+		if (it->second->client == sender)
 			continue ;
-		Server::sendReply(message, this->members[i]->client->getFd());
+		Server::sendReply(message, it->second->client->getFd());
 	}
 }
 

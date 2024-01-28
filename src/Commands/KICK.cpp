@@ -10,9 +10,7 @@ void	kickMembers(Server &server, const std::vector<std::string> &paramUsers, con
 			if (!channel->isMember(user))
 				Server::sendReply(ERR_NOTONCHANNEL(user->getNickname(), channelName), user->getFd());
 			else
-			{
 				channel->removeMember(user);
-			}
 		}
 	}
 }
@@ -26,6 +24,21 @@ bool	isExistChannel(Server &server, size_t &channelIndex, const std::string &cha
 			return (true);
 	}
 	return (false);
+}
+
+bool	isMemberOperator(Channel *channel, Client *client, const std::string &channelName)
+{
+	if (!channel->isMember(client))
+	{
+		Server::sendReply(ERR_NOTONCHANNEL(client->getNickname(), channelName), client->getFd());
+		return (false);
+	}
+	if (!channel->getMembers()[client->getFd()]->isOperator)
+	{
+		Server::sendReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), channelName), client->getFd());
+		return (false);
+	}
+	return (true);
 }
 
 void	kickCmd(commandData& cmd, Server &server, Client* client)
@@ -50,19 +63,11 @@ void	kickCmd(commandData& cmd, Server &server, Client* client)
 		size_t j = -1;
 		if (isExistChannel(server, j, paramChannels[i]))
 		{
-			if (!channels[j]->isMember(client))
-			{
-				Server::sendReply(ERR_NOTONCHANNEL(client->getNickname(), paramChannels[i]), client->getFd());
+			if (!isMemberOperator(channels[j], client, paramChannels[i]))
 				break;
-			}
-			if (!channels[j]->getMembers()[client->getFd()]->isOperator)
-			{
-				Server::sendReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), paramChannels[i]), client->getFd());
-				break;
-			}
 			kickMembers(server, paramUsers, paramChannels[i], channels[j]);
 		}
 		else
-			Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), cmd.arguments[i]), client->getFd());
+			Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), paramChannels[i]), client->getFd());
 	}
 }
