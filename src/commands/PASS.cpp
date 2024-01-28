@@ -9,7 +9,7 @@ void passCmd(commandData& cmd, Server& server, Client& client)
 	}
 	if (client.isAuthenticated())
 	{
-		Server::sendReply(": 462 " + !client.getNickname().empty() ? client.getNickname() : std::string("*no nickname*")\
+		Server::sendReply(": 462 " + !client.getNickname().empty() ? client.getNickname() : std::string("*")\
 		+ " :You may not reregister\r\n", client.getFd());
 		return ;
 	}
