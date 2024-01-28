@@ -19,7 +19,12 @@ void		userCmd(commandData& cmd, Client &client);
 void		joinCmd(commandData& cmd, Server& server, Client* client);
 void		partCmd(commandData& cmd, Server& server, Client* client);
 void		kickCmd(commandData& cmd, Server &server, Client* client);
+void		modeCmd(commandData &cmd, Server &server, Client *client);
 void		privMsgCmd(commandData& cmd, Server& server, Client& client);
 void		quitCmd(commandData& cmd, Server& server, Client* client);
 void		topicCmd(commandData& cmd, Server& server, Client& client);
 void		inviteCmd(commandData &cmd, Server &server, Client *client);
+
+bool		isExistChannel(Server &server, size_t &channelIndex, const std::string &channelName);
+bool		isMemberOperator(Channel *channel, Client *client, const std::string &channelName);
+bool		strIsDigits(const std::string str);

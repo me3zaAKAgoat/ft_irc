@@ -4,9 +4,9 @@ NAME = ircserv
 
 HEADERS = includes/Server.hpp includes/Client.hpp includes/Irc.hpp includes/Commands.hpp
 SRCS = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/util.cpp\
-	src/commands/NICK.cpp src/commands/PASS.cpp src/commands/USER.cpp src/commands/JOIN.cpp\
+	src/commands/utils.cpp src/commands/NICK.cpp src/commands/PASS.cpp src/commands/USER.cpp src/commands/JOIN.cpp\
 	src/commands/PART.cpp src/commands/PRIVMSG.cpp src/commands/QUIT.cpp src/commands/INVITE.cpp\
-	src/commands/TOPIC.cpp src/commands/KICK.cpp\
+	src/commands/TOPIC.cpp src/commands/KICK.cpp src/commands/MODE.cpp\
 	src/commands/parser.cpp
 
 OBJECTS = $(SRCS:.cpp=.o)

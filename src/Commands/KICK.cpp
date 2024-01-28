@@ -15,32 +15,6 @@ void	kickMembers(Server &server, const std::vector<std::string> &paramUsers, con
 	}
 }
 
-bool	isExistChannel(Server &server, size_t &channelIndex, const std::string &channelName)
-{
-	std::vector<Channel *> channels = server.getChannels();
-	for (channelIndex = 0; channelIndex < channels.size(); channelIndex++)
-	{
-		if (channels[channelIndex]->getName() == channelName)
-			return (true);
-	}
-	return (false);
-}
-
-bool	isMemberOperator(Channel *channel, Client *client, const std::string &channelName)
-{
-	if (!channel->isMember(client))
-	{
-		Server::sendReply(ERR_NOTONCHANNEL(client->getNickname(), channelName), client->getFd());
-		return (false);
-	}
-	if (!channel->getMembers()[client->getFd()]->isOperator)
-	{
-		Server::sendReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), channelName), client->getFd());
-		return (false);
-	}
-	return (true);
-}
-
 void	kickCmd(commandData& cmd, Server &server, Client* client)
 {
 	if (cmd.arguments.size() < 2)
