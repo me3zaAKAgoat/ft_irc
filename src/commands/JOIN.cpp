@@ -7,13 +7,14 @@ there's more stuff that hasnt been implemented yet
 - send commands that the server receives which affect the channel
 - RPL_TOPIC
 - RPL_NAMREPLY
+- add channel limit management
 https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
 */
 void	joinCmd(commandData& cmd, Server& server, Client* client)
 {
 	if (!cmd.arguments.size())
 	{
-		Server::sendReply(": 461 " + client->getNickname() + " JOIN :Not enough parameters\r\n", client->getFd());
+		Server::sendReply(ERR_NEEDMOREPARAMS(client->getNickname(), cmd.name), client->getFd());
 		return ;
 	}
 	std::vector<Channel *> channels = server.getChannels();
@@ -28,7 +29,7 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 		channelExists = false; 
 		if (paramChannels[i][0] != '#' && paramChannels[i][0] != '&')
 		{
-			Server::sendReply(": 403 " + client->getNickname() + " " + paramChannels[i] + " :No such channel\r\n", client->getFd());
+			Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), paramChannels[i]), client->getFd());
 			continue ;
 		}
 		for (size_t j = 0; j < channels.size(); j++)
@@ -38,12 +39,12 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 				channelExists = true;
 				if (channels[j]->isMember(client))
 				{
-					Server::sendReply(": 443 " + client->getNickname() + " " + paramChannels[i] + " :is already on channel\r\n", client->getFd());
+					Server::sendReply(ERR_USERONCHANNEL(client->getNickname(), paramChannels[i]), client->getFd());
 					break ;
 				}
 				if (i < paramKeys.size() && channels[j]->getKey() != paramKeys[i])
 				{
-					Server::sendReply(": 475 " + client->getNickname() + " " + paramChannels[i] + " :Cannot join channel (+k)\r\n", client->getFd());
+					Server::sendReply(ERR_BADCHANNELKEY(client->getNickname(), paramChannels[i]), client->getFd());
 					break ;
 				}
 				channels[j]->addMember(client);

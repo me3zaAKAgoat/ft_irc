@@ -38,12 +38,12 @@ void	nickCmd(commandData& cmd, Server &server, Client& client)
 		return ;
 	if (!cmd.arguments.size())
 	{
-		Server::sendReply(": 431 " + client.getNickname() + " :No nickname given\r\n", client.getFd());
+		Server::sendReply(ERR_NONICKNAMEGIVEN(client.getNickname()), client.getFd());
 		return ;
 	}
 	if (!isValidNickname(cmd))
 	{
-		Server::sendReply(": 432 " + client.getNickname() + " <nick> :Erroneous nickname\r\n", client.getFd());
+		Server::sendReply(ERR_ERRONEUSNICKNAME(client.getNickname()), client.getFd());
 		return ;
 	}
 	if (isAlreadyUsed(cmd, server))

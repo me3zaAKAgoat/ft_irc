@@ -7,7 +7,7 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 
 	if (!cmd.arguments.size())
 	{
-		Server::sendReply(": 461 " + client->getNickname() + " PART :Not enough parameters\r\n", client->getFd());
+		Server::sendReply(ERR_NEEDMOREPARAMS(client->getNickname(), cmd.name), client->getFd());
 		return ;
 	}
 	for (size_t i = 0; i < cmd.arguments.size(); i++)
@@ -15,7 +15,7 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 		channelExists = false; 
 		if (cmd.arguments[i][0] != '#' && cmd.arguments[i][0] != '&')
 		{
-			Server::sendReply(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
+			Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), cmd.arguments[0]), client->getFd());
 			continue ;
 		}
 		for (size_t j = 0; j < channels.size(); j++)
@@ -25,7 +25,7 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 				channelExists = true;
 				if (!channels[j]->isMember(client))
 				{
-					Server::sendReply(": 442 " + client->getNickname() + " " + cmd.arguments[i] + " :You're not on that channel\r\n", client->getFd());
+					Server::sendReply(ERR_NOTONCHANNEL(client->getNickname(), cmd.arguments[i]), client->getFd());
 					break ;
 				}
 				channels[j]->removeMember(client);
@@ -35,6 +35,6 @@ void	partCmd(commandData& cmd, Server& server, Client* client)
 			}
 		}
 		if (!channelExists)
-			Server::sendReply(": 403 " + client->getNickname() + " " + cmd.arguments[i] + " :No such channel\r\n", client->getFd());
+			Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), cmd.arguments[i]), client->getFd());
 	}
 }
