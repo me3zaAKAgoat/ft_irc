@@ -53,8 +53,8 @@ void Server::handleNewClient(void)
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
 		Client *newClient = new Client(clientSocket);
 		this->_clients[clientSocket] = newClient;
-		Server::sendReply("TCP connection established.\n", clientSocket);
-		Server::sendReply("> ", clientSocket);
+		Server::sendReply("TCP connection established between you and the irc server.\n", clientSocket);
+		// Server::sendReply("> ", clientSocket);
 	}
 }
 
@@ -72,12 +72,10 @@ void Server::handleEstablishedClientEvents(void)
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
+			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
 			commands = split(requestMessagae, COMMANDS_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
-			/* debug */
-			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl;
-			Server::sendReply("> ", this->pfds[i].fd);
-			/*		*/
+			// Server::sendReply("> ", this->pfds[i].fd); //debug
 		}
 	}
 }
@@ -122,22 +120,34 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	for (size_t i = 0; i < commands.size(); i++)
 	{
 		commandData cmd = parseCommand(commands[i]);
-		if (cmd.name == "PASS")
-			passCmd(cmd, *this, *client);
-		else if (cmd.name == "NICK")
-			nickCmd(cmd, *this, *client);
-		else if (cmd.name == "USER")
-			userCmd(cmd, *client);
-		else if (cmd.name == "JOIN")
-			joinCmd(cmd, *this, client);
-		else if (cmd.name == "PART")
-			partCmd(cmd, *this, client);
-		else if (cmd.name == "PRIVMSG")
-			privMsgCmd(cmd, *this, *client);
-		else if (cmd.name == "QUIT")
-			quitCmd(cmd, *this, client);
+
+		if (cmd.name == "PASS" || cmd.name == "NICK" || cmd.name == "USER")
+		{
+			if (cmd.name == "PASS")
+				passCmd(cmd, *this, *client);
+			else if (cmd.name == "NICK")
+				nickCmd(cmd, *this, *client);
+			else if (cmd.name == "USER")
+				userCmd(cmd, *client);
+		}
 		else
-			std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
+		{
+			if (!client->isRegistered())
+			{
+				Server::sendReply(": 451 * :You have not registered\r\n", clientFd);
+				continue ;
+			}
+			if (cmd.name == "JOIN")
+				joinCmd(cmd, *this, client);
+			else if (cmd.name == "PART")
+				partCmd(cmd, *this, client);
+			else if (cmd.name == "PRIVMSG")
+				privMsgCmd(cmd, *this, *client);
+			else if (cmd.name == "QUIT")
+				quitCmd(cmd, *this, client);
+			else //debug
+				std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
+		}
 	}
 }
 

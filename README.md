@@ -7,13 +7,11 @@
 - [x] JOIN
 - [x] PART
 - [] KICK - OPER
-- [] MODE - OPER
-- [] TOPIC - OPER
-- [] INVITE - OPER
+- [] MODE itkol - OPER
+- [x] TOPIC - OPER
+- [x] INVITE - OPER
 - [X] PRIVMSG
 - [] NOTICE
-- [] PING
-- [] WHOIS
 
 # NOTES / TASKS
 
@@ -33,3 +31,5 @@
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14
 https://www.irchelp.org/protocol/rfc/chapter6.html
+
+

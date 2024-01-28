@@ -9,6 +9,7 @@ typedef struct
 	std::vector<std::string>	arguments;
 } commandData;
 
+#define COMMANDS_DELIMITER "\r\n"
 
 /* all commands should take a commandData as first argument then a server and a client if needed*/
 commandData	parseCommand(const std::string &requestMessage);
@@ -19,3 +20,5 @@ void		joinCmd(commandData& cmd, Server& server, Client* client);
 void		partCmd(commandData& cmd, Server& server, Client* client);
 void		privMsgCmd(commandData& cmd, Server& server, Client& client);
 void		quitCmd(commandData& cmd, Server& server, Client* client);
+void		topicCmd(commandData& cmd, Server& server, Client& client);
+void		inviteCmd(commandData &cmd, Server &server, Client *client);
