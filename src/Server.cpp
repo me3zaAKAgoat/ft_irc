@@ -72,7 +72,7 @@ void Server::handleEstablishedClientEvents(void)
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
-			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
+			// std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
 			commands = split(requestMessagae, COMMANDS_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
 			// Server::sendReply("> ", this->pfds[i].fd); //debug
@@ -145,6 +145,8 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 				privMsgCmd(cmd, *this, *client);
 			else if (cmd.name == "QUIT")
 				quitCmd(cmd, *this, client);
+			else if (cmd.name == "KICK")
+				kickCmd(cmd, *this, client);
 			else //debug
 				std::cerr << "Error: invalid command: '" << commands[i] << "'" << std::endl;
 		}

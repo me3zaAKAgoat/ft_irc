@@ -10,3 +10,6 @@ USER elmehdi10 0 * :elmehdi kenane
 JOIN &xd
 PRIVMSG &xd :helloge boys
 
+PASS 1
+NICK ekenane3
+USER elmehdi3 0 * elmehdi kenane3

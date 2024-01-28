@@ -14,32 +14,36 @@ void Channel::addMember(Client *client)
 
 	member->client = client;
 	member->isOperator = false;
-	this->members.push_back(member);
+	this->members.insert(std::make_pair(client->getFd(), member));
 }
 
 void Channel::removeMember(Client *client)
 {
-	for (size_t i = 0; i < this->members.size(); i++)
-	{
-		if (this->members[i]->client == client)
-		{
-			delete this->members[i];
-			this->members.erase(this->members.begin() + i);
-			return ;
-		}
-	}
+	delete this->members[client->getFd()];
+	this->members.erase(client->getFd());
+
+	// for (size_t i = 0; i < this->members.size(); i++)
+	// {
+	// 	if (this->members[i]->client == client)
+	// 	{
+	// 		delete this->members[i];
+	// 		this->members.erase(this->members.begin() + i);
+	// 		return ;
+	// 	}
+	// }
 }
 
 void Channel::giveOperator(Client *client)
 {
-	for (size_t i = 0; i < this->members.size(); i++)
-	{
-		if (this->members[i]->client == client)
-		{
-			this->members[i]->isOperator = true;
-			return ;
-		}
-	}
+	this->members[client->getFd()]->isOperator = true;
+	// for (size_t i = 0; i < this->members.size(); i++)
+	// {
+	// 	if (this->members[i]->client == client)
+	// 	{
+	// 		this->members[i]->isOperator = true;
+	// 		return ;
+	// 	}
+	// }
 }
 
 void Channel::removeOperator(Client *client)
@@ -104,7 +108,7 @@ bool Channel::getChannelTopicIsRestricted(void)
 	return (this->channelTopicIsRestricted);
 }
 
-std::vector<ChannelMember *> Channel::getMembers(void)
+std::map<unsigned int, ChannelMember *> Channel::getMembers(void)
 {
 	return (this->members);
 }
@@ -131,12 +135,15 @@ void Channel::broadcastMessage(Client *sender, const std::string message)
 
 bool	Channel::isMember(Client *client)
 {
-	for (size_t i = 0; i < this->members.size(); i++)
-	{
-		if (this->members[i]->client == client)
-			return true;
-	}
-	return false;
+	if (this->members.find(client->getFd()) != this->members.end())
+		return (true);
+	return (false);
+	// for (size_t i = 0; i < this->members.size(); i++)
+	// {
+	// 	if (this->members[i]->client == client)
+	// 		return true;
+	// }
+	// return false;
 }
 
 bool	Channel::isOperator(Client *client)
