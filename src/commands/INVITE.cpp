@@ -39,5 +39,5 @@ void	inviteCmd(commandData &cmd, Server &server, Client *client)
 		Server::sendReply(ERR_USERONCHANNEL(client->getNickname(), cmd.arguments[1]), client->getFd());
 		return ;
 	}
-	channel->addMember(target);
+	/* subsequent code for invite logic need to be discussed */
 }
