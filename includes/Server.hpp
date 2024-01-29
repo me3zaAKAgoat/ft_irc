@@ -12,7 +12,7 @@ class Server
 		void						coreProcess(void);
 		void						parseCommands(const std::vector<std::string> commands, int clientFd);
 		int							readRequest(std::string &message, const int fd);
-		static void					sendReply(const std::string message, unsigned int clienFd);
+		static void					sendReply(const std::string &message, unsigned int clienFd);
 		void						handleNewClient(void);
 		void						handleEstablishedClientEvents(void);
 		void						closeConnection(int fd);
@@ -32,7 +32,8 @@ class Server
 		void						setPassword(const std::string password);
 
 	private:
-		static const int	recvBufferSize;
+		static const int	RECV_BUFFER_SIZE;
+		static const int	SERVER_SOCKET_INDEX;
 
 		int							_port;
 		int							_socket;

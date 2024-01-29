@@ -9,8 +9,6 @@ typedef struct
 	std::vector<std::string>	arguments;
 } commandData;
 
-#define MESSAGE_DELIMITER "\r\n"
-
 /* all commands should take a commandData as first argument then a server and a client if needed*/
 commandData	parseCommandMessage(const std::string &requestMessage);
 void		nickCmd(commandData& cmd, Server &server, Client& client);

@@ -39,9 +39,9 @@ void Server::handleEstablishedClientEvents(void)
 
 int Server::readRequest(std::string &message, const int fd)
 {
-	char buf[Server::recvBufferSize];
+	char buf[Server::RECV_BUFFER_SIZE];
 
-	int bytesReceived = recv(fd, buf, Server::recvBufferSize, 0);
+	int bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);
 	if (bytesReceived == -1)
 		perror("recv failed");
 	else if (bytesReceived == 0)
@@ -55,7 +55,7 @@ int Server::readRequest(std::string &message, const int fd)
 		message.append(buf);
 		while (bytesReceived)
 		{
-			bytesReceived = recv(fd, buf, Server::recvBufferSize, 0);
+			bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);
 			if (bytesReceived == -1)
 			{
 				if (errno != EWOULDBLOCK)
@@ -79,7 +79,7 @@ void Server::coreProcess(void)
 		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
 		if (numOfEventsOccured == -1)
 			perror("poll system-call failed"); // not sure whether this should crash the server or not
-		if ((this->pfds[0].revents & POLLIN))
+		if ((this->pfds[Server::SERVER_SOCKET_INDEX].revents & POLLIN))
 		{
 			Server::handleNewClient();
 			numOfEventsOccured--;
@@ -103,7 +103,7 @@ void Server::closeConnection(int fd)
 	}
 }
 
-void Server::sendReply(const std::string message, unsigned int clienFd)
+void Server::sendReply(const std::string &message, unsigned int clienFd)
 {
 	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send sys call failed: ");
@@ -118,7 +118,7 @@ int Server::setupServerSocket(void)
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket == -1)
 	// || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1) // not sure if server socket should be non-blocking
-		throw std::runtime_error("socket creation failed");
+		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
 	// 2. Forcefully attaching socket to the port 8080
 
 	// SOL_SOCKET flag:

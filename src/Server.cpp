@@ -1,7 +1,8 @@
 #include "Server.hpp"
 #include "Commands.hpp"
 
-const int Server::recvBufferSize = 1000;
+const int Server::RECV_BUFFER_SIZE = 1000;
+const int Server::SERVER_SOCKET_INDEX = 0;
 
 Server::Server(const int port, const std::string password)
 {
@@ -45,6 +46,7 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	commandHandlers["PRIVMSG"] = privMsgCmd;
 	commandHandlers["QUIT"] = quitCmd;
 	commandHandlers["KICK"] = kickCmd;
+	commandHandlers["TOPIC"] = topicCmd;
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{

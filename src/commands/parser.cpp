@@ -1,7 +1,8 @@
 #include "Irc.hpp"
 
-/* needs validation and error managament
-would be best if it throws errors that could be caught later*/
+/*
+vunlerable and needs more testing
+*/
 commandData parseCommandMessage(const std::string &commandMessage)
 {
 	commandData command;

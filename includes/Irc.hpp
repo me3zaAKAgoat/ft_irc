@@ -32,6 +32,8 @@ std::vector<std::string>	split(const std::string &input, const std::string &sepa
 typedef std::vector<std::string>::iterator StringVectorIterator;
 std::string					join(StringVectorIterator itBegin, StringVectorIterator itEnd, const std::string& separator);
 
+#define MESSAGE_DELIMITER "\r\n"
+
 /* Error Responses */
 #define ERR_NOTEXTTOSEND(source)                        ":" + source + " 412 " + source + " :No text to send" + MESSAGE_DELIMITER
 #define ERR_NORECIPIENT(source, command)                ":" + source + " 411 " + source + " " + command + " :No recipient given (" + command + ")" + MESSAGE_DELIMITER
