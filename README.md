@@ -20,8 +20,9 @@
 - learn more about non blocking I/O
 - idk what will we do about modes how do we split the first argument
 - how will invite command work
-- how will we manage the mode command arguments
 - need to extensively test everything we already have now with limechat
+
+# REFERENCES
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14
 https://www.irchelp.org/protocol/rfc/chapter6.html

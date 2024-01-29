@@ -12,7 +12,7 @@ void Server::handleNewClient(void)
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
 		Client *newClient = new Client(clientSocket);
 		this->_clients[clientSocket] = newClient;
-		Server::sendReply("TCP connection established between you and the irc server.\n", clientSocket);
+		// Server::sendReply("TCP connection established between you and the irc server.", clientSocket); // debug
 	}
 }
 
@@ -30,7 +30,8 @@ void Server::handleEstablishedClientEvents(void)
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
-			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
+			Server::log(requestMessagae, this->pfds[i].fd);
+			// std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
 			commands = split(requestMessagae, MESSAGE_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
 		}
@@ -103,9 +104,42 @@ void Server::closeConnection(int fd)
 	}
 }
 
-void Server::sendReply(const std::string &message, unsigned int clienFd)
+std::string getCurrentTime()
 {
-	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
+    time_t rawTime;
+    struct tm* timeInfo;
+
+    time(&rawTime);
+    timeInfo = localtime(&rawTime);
+
+    char buffer[80];
+    strftime(buffer, sizeof(buffer), "[%Y-%m-%d %H:%M:%S]", timeInfo);
+
+    return buffer;
+}
+
+std::string removeTrailingCRLF(const std::string& input) {
+    size_t length = input.length();
+
+    // Check if the string ends with '\r\n'
+    if (length >= 2 && input[length - 2] == '\r' && input[length - 1] == '\n') {
+        // Remove the last two characters
+        return input.substr(0, length - 2);
+    } else {
+        // No trailing '\r\n', return the original string
+        return input;
+    }
+}
+
+void Server::log(const std::string& message, int fd)
+{
+	std::cout << getCurrentTime() << " " << fd << " \"" << removeTrailingCRLF(message) << "\"" << std::endl;
+}
+
+void Server::sendReply(const std::string &message, int clientFd)
+{
+	log(message, clientFd);
+	if (send(clientFd, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send sys call failed: ");
 }
 
