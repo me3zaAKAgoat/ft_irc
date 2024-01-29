@@ -15,6 +15,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
 class Client;
 class Server;

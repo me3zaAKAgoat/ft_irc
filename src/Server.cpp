@@ -21,46 +21,46 @@ Server::~Server(void)
 	close(this->_socket);
 }
 
+typedef void (*CommandHandler)(commandData&, Server&, Client&);
+
+bool requiresRegistration(const std::string& cmdName) {
+	std::string tmp[] = {"PASS", "NICK", "USER"}; /* disgusting way to initalize a set */
+    static std::set<std::string> authCommands(tmp, tmp + sizeof(tmp) / sizeof(tmp[0]));
+    return !(authCommands.count(cmdName));
+}
+
+bool isValidCommand(std::map<std::string, CommandHandler> commandHandlers , const std::string& cmdName) {
+	return commandHandlers.count(cmdName);
+}
+
 void Server::parseCommands(const std::vector<std::string> commands, int clientFd)
 {
-	std::vector<std::string> cmd;
 	Client *client = this->_clients[clientFd];
+	std::map<std::string, CommandHandler> commandHandlers;
+	commandHandlers["PASS"] = passCmd;
+	commandHandlers["NICK"] = nickCmd;
+	commandHandlers["USER"] = userCmd;
+	commandHandlers["JOIN"] = joinCmd;
+	commandHandlers["PART"] = partCmd;
+	commandHandlers["PRIVMSG"] = privMsgCmd;
+	commandHandlers["QUIT"] = quitCmd;
+	commandHandlers["KICK"] = kickCmd;
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{
-		commandData cmd = parseCommand(commands[i]);
+		commandData cmd = parseCommandMessage(commands[i]);
 
-		if (cmd.name == "PASS" || cmd.name == "NICK" || cmd.name == "USER")
+		if (!isValidCommand(commandHandlers, cmd.name))
 		{
-			if (cmd.name == "PASS")
-				passCmd(cmd, *this, *client);
-			else if (cmd.name == "NICK")
-				nickCmd(cmd, *this, *client);
-			else if (cmd.name == "USER")
-				userCmd(cmd, *client);
+			Server::sendReply(ERR_UNKNOWNCOMMAND(client->getNickname(), cmd.name), clientFd);
+			continue;
 		}
-		else
+		if (requiresRegistration(cmd.name) && !client->isRegistered())
 		{
-			if (!client->isRegistered())
-			{
-				Server::sendReply(": 451 * :You have not registered\r\n", clientFd);
-				continue ;
-			}
-			if (cmd.name == "JOIN")
-				joinCmd(cmd, *this, *client);
-			else if (cmd.name == "PART")
-				partCmd(cmd, *this, *client);
-			else if (cmd.name == "PRIVMSG")
-				privMsgCmd(cmd, *this, *client);
-			else if (cmd.name == "QUIT")
-				quitCmd(cmd, *this, *client);
-			else if (cmd.name == "KICK")
-				kickCmd(cmd, *this, *client);
-			// else if (cmd.name == "MODE")
-			// 	modeCmd(cmd, *this, *client);
-			else
-				Server::sendReply(ERR_UNKNOWNCOMMAND(client->getNickname(), cmd.name), clientFd);
+			Server::sendReply(ERR_NOTREGISTERED(std::string("*")), clientFd);
+			continue;
 		}
+		commandHandlers[cmd.name](cmd, *this, *client);
 	}
 }
 
@@ -141,4 +141,3 @@ Client*	Server::getClientByNickname(const std::string nickname)
 	}
 	return (NULL);
 }
-

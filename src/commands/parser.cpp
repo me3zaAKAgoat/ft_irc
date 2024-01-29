@@ -2,7 +2,7 @@
 
 /* needs validation and error managament
 would be best if it throws errors that could be caught later*/
-commandData parseCommand(const std::string &commandMessage)
+commandData parseCommandMessage(const std::string &commandMessage)
 {
 	commandData command;
 

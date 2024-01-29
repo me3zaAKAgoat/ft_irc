@@ -1,7 +1,8 @@
 #include "Commands.hpp"
 
-void		userCmd(commandData& cmd, Client &client)
+void		userCmd(commandData& cmd, Server &server, Client &client)
 {
+	(void)server;
 	if (!client.isAuthenticated())
 	{
 		return ;

@@ -13,7 +13,6 @@ void Server::handleNewClient(void)
 		Client *newClient = new Client(clientSocket);
 		this->_clients[clientSocket] = newClient;
 		Server::sendReply("TCP connection established between you and the irc server.\n", clientSocket);
-		// Server::sendReply("> ", clientSocket);
 	}
 }
 
@@ -34,12 +33,9 @@ void Server::handleEstablishedClientEvents(void)
 			std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
 			commands = split(requestMessagae, MESSAGE_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
-			// Server::sendReply("> ", this->pfds[i].fd); //debug
 		}
 	}
 }
-
-
 
 int Server::readRequest(std::string &message, const int fd)
 {
@@ -93,7 +89,6 @@ void Server::coreProcess(void)
 	}
 }
 
-
 void Server::closeConnection(int fd)
 {
 	delete this->_clients[fd];
@@ -108,13 +103,10 @@ void Server::closeConnection(int fd)
 	}
 }
 
-
-
-// probably should be removed
 void Server::sendReply(const std::string message, unsigned int clienFd)
 {
 	if (send(clienFd, message.c_str(), strlen(message.c_str()), 0) == -1)
-		perror("send failed");
+		perror("send sys call failed: ");
 }
 
 // too many comments that should be removed later
