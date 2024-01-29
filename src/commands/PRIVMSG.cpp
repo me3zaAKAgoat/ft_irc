@@ -20,17 +20,12 @@ void privMsgCmd(commandData& cmd, Server& server, Client& client)
 			Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), cmd.arguments[0]), client.getFd());
 			return ;
 		}
-		// if (!channel->getMembers().size()) // a channel with no members is not possible
-		// {
-		// 	Server::sendReply(": 401 " + client.getNickname() + " " + cmd.arguments[0] + " :No such nick/channel\r\n", client.getFd());
-		// 	return ;
-		// }
 		if (!channel->isMember(&client))
 		{
 			Server::sendReply(ERR_CANNOTSENDTOCHAN(client.getNickname(),cmd.arguments[0]), client.getFd());
 			return ;
 		}
-		channel->broadcastMessage(&client, ":" + client.getNickname() + " PRIVMSG " + cmd.arguments[0] + " :" + cmd.arguments[1] + "\r\n");
+		channel->broadcastMessage(&client, RPL_PRIVMSG(client.getNickname(), cmd.arguments[0], cmd.arguments[1]));
 	}
 	else
 	{
@@ -40,6 +35,6 @@ void privMsgCmd(commandData& cmd, Server& server, Client& client)
 			Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), cmd.arguments[0]), client.getFd());
 			return ;
 		}
-		Server::sendReply(":" + client.getNickname() + " PRIVMSG " + cmd.arguments[0] + " :" + cmd.arguments[1] + "\r\n", receiver->getFd());
+		Server::sendReply(RPL_PRIVMSG(client.getNickname(), cmd.arguments[0], cmd.arguments[1]), receiver->getFd());
 	}
 }

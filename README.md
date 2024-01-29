@@ -15,19 +15,15 @@
 
 # NOTES / TASKS
 
-- standarize the use of perror/throw runtime_error/std::cerr
-- use response message macros
-- visit all network functions and code and check if theres anything that is missing (probably better to ignore until issues are met)
-- !!!!!!! CHECK ALL SYS CALL RETURNS ALL OF THEM !!!!!
+- check sys calls
+- visit networking functions and understand them as best as possible
 - learn more about non blocking I/O
-- read more about server socket setup functions
-- ask peers for all the commands that should be implemented (dont be a faggot and ask for the reference)
-- theres a buffering problem somewhere (setup client server connection and try to register)	
-- questions about cr lf (will we use both chars are delimiters)
-- will we use command prefixes? (most likely not)
-- link the reply message reference in this document !!
-- pass client to command functions by reference or by pointer?
-- quit command causes a certain send operation to fail!
+- idk what will we do about modes how do we split the first argument
+- currently trying to break the parser as much as possible!!
+- command server handling
+	- check if command is valid
+	- check if command is auth
+	- deploy command execution
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14
 https://www.irchelp.org/protocol/rfc/chapter6.html

@@ -18,9 +18,16 @@ commandData parseCommand(const std::string &commandMessage)
 	{
 		if (hasPrefix)
 			command.prefix = middleParams[0];
-		command.name = middleParams[0 + (1 * hasPrefix)];
-		command.arguments.insert(command.arguments.end(), middleParams.begin() + (1 + 1 * hasPrefix), middleParams.end());
+
+		size_t startIdx = static_cast<size_t>(hasPrefix);
+
+		if (middleParams.size() > startIdx)
+		{
+			command.name = middleParams[startIdx];
+			command.arguments.insert(command.arguments.end(), middleParams.begin() + startIdx + 1, middleParams.end());
+		}
 	}
+
 
 	if (trailingPartStartPos != std::string::npos)
 	{

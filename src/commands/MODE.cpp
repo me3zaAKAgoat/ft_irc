@@ -7,7 +7,7 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
 	}
-	if (Channel::isValidChannelName(cmd.arguments[0]))
+	if (!Channel::isValidChannelName(cmd.arguments[0]))
 	{
 		Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;

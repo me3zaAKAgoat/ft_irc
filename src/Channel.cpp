@@ -121,11 +121,12 @@ void Channel::setTopic(const std::string topic)
 	this->topic = topic;
 }
 
+/* NULL sender is a server sent message */
 void Channel::broadcastMessage(Client *sender, const std::string message)
 {
 	for (size_t i = 0; i < this->members.size(); i++)
 	{
-		if (this->members[i]->client == sender)
+		if (sender && this->members[i]->client == sender)
 			continue ;
 		Server::sendReply(message, this->members[i]->client->getFd());
 	}
@@ -157,7 +158,7 @@ bool	Channel::isValidChannelName(const std::string name)
 		return false;
 	for (size_t i = 1; i < name.size(); i++)
 	{
-		if (name[i] == ',' && name[i] == ' ')
+		if (name[i] == ',' || name[i] == ' ')
 			return false;
 	}
 	return true;

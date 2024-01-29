@@ -7,7 +7,7 @@ void	kickCmd(commandData& cmd, Server &server, Client &client)
 		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
 	}
-	if (Channel::isValidChannelName(cmd.arguments[0]))
+	if (!Channel::isValidChannelName(cmd.arguments[0]))
 	{
 		Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;
@@ -41,7 +41,7 @@ void	kickCmd(commandData& cmd, Server &server, Client &client)
 	}
 	channel->removeMember(server, target);
 	if (cmd.arguments.size() > 2)
-	{
-		//broadcast a message to the channel denouncing the reason
-	}
+		channel->broadcastMessage(&client, RPL_KICK(client.getNickname(), cmd.arguments[0], cmd.arguments[1], cmd.arguments[2]));
+	else
+		channel->broadcastMessage(&client, RPL_KICK(client.getNickname(), cmd.arguments[0], cmd.arguments[1], ""));
 }

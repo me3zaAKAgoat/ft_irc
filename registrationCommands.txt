@@ -1,12 +1,13 @@
+#PASS haha
+#NICK ekenane
+#USER elmehdi10 0 * :elmehdi kenane
+#JOIN &xd
+#PRIVMSG &xd :helloge boys
+#KICK &xd ekenane
+#JOIN #xd
+#KICK #xd me3za
+
 PASS haha
 NICK me3za
 USER me3za 0 * :mehdi choukri
 JOIN &xd
-JOIN &xd
-
-PASS haha
-NICK ekenane
-USER elmehdi10 0 * :elmehdi kenane
-JOIN &xd
-PRIVMSG &xd :helloge boys
-
