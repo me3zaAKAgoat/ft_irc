@@ -16,10 +16,16 @@
 #include <vector>
 #include <map>
 
+class Client;
+class Server;
+class Channel;
+
+
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Server.hpp"
 #include "Commands.hpp"
+
 
 std::vector<std::string>	split(const std::string &input, const std::string &separator = " ");
 typedef std::vector<std::string>::iterator StringVectorIterator;

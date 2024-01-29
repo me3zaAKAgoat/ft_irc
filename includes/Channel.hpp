@@ -2,8 +2,6 @@
 
 #include "Irc.hpp"
 
-class Client;
-
 typedef struct
 {
 	Client	*client;
@@ -17,12 +15,13 @@ class Channel
 		~Channel();
 
 		void							addMember(Client *client);
-		void							removeMember(Client *client);
+		void							removeMember(Server &server, Client *client);
 		void							giveOperator(Client *client);
 		void							removeOperator(Client *client);
 		void							broadcastMessage(Client *sender, const std::string message);
 		bool							isMember(Client *client);
 		bool							isOperator(Client *client);
+		static bool						isValidChannelName(const std::string name);
 
 		void							setName(const std::string name);
 		void							setTopic(const std::string t);

@@ -17,7 +17,7 @@ void Channel::addMember(Client *client)
 	this->members.push_back(member);
 }
 
-void Channel::removeMember(Client *client)
+void Channel::removeMember(Server &server, Client *client)
 {
 	for (size_t i = 0; i < this->members.size(); i++)
 	{
@@ -28,6 +28,8 @@ void Channel::removeMember(Client *client)
 			return ;
 		}
 	}
+	if (!this->getMembers().size())
+		server.removeChannel(this);
 }
 
 void Channel::giveOperator(Client *client)
@@ -147,4 +149,16 @@ bool	Channel::isOperator(Client *client)
 			return this->members[i]->isOperator;
 	}
 	return false;
+}
+
+bool	Channel::isValidChannelName(const std::string name)
+{
+	if (name[0] != '#' && name[0] != '&')
+		return false;
+	for (size_t i = 1; i < name.size(); i++)
+	{
+		if (name[i] == ',' && name[i] == ' ')
+			return false;
+	}
+	return true;
 }

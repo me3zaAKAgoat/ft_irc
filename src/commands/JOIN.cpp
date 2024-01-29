@@ -27,7 +27,7 @@ void	joinCmd(commandData& cmd, Server& server, Client* client)
 	for (size_t i = 0; i < paramChannels.size(); i++)
 	{
 		channelExists = false; 
-		if (paramChannels[i][0] != '#' && paramChannels[i][0] != '&')
+		if (Channel::isValidChannelName(paramChannels[i]))
 		{
 			Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), paramChannels[i]), client->getFd());
 			continue ;

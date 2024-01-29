@@ -7,7 +7,7 @@ void	inviteCmd(commandData &cmd, Server &server, Client *client)
 		Server::sendReply(ERR_NEEDMOREPARAMS(client->getNickname(), cmd.name), client->getFd());
 		return ;
 	}
-	if (cmd.arguments[1][0] != '#' && cmd.arguments[1][0] != '&')
+	if (Channel::isValidChannelName(cmd.arguments[1]))
 	{
 		Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), cmd.arguments[0]), client->getFd());
 		return ;
