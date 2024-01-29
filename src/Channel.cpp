@@ -10,7 +10,7 @@ Channel::~Channel()
 
 void Channel::addMember(Client *client)
 {
-	if (this->limit != -1 && this->members.size() >= this->limit)
+	if (this->limit != -1 && this->members.size() >= static_cast<size_t>(this->limit))
 	{
 		Server::sendReply(ERR_CHANNELISFULL(client->getNickname(), this->getName()), client->getFd());
 		return ;
