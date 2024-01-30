@@ -3,37 +3,38 @@
 #define MESSAGE_DELIMITER "\r\n"
 
 /* Error Responses */
-#define ERR_NOTEXTTOSEND(source)                        ":" + source + " 412 " + source + " :No text to send" + MESSAGE_DELIMITER
-#define ERR_NORECIPIENT(source, command)                ":" + source + " 411 " + source + " " + command + " :No recipient given (" + command + ")" + MESSAGE_DELIMITER
-#define ERR_ERRONEUSNICKNAME(source)                    ":" + source + " 432 " + source + " :Erroneous nickname" + MESSAGE_DELIMITER
-#define ERR_NOTREGISTERED(source)                       ":" + source + " 451 " + source + " :You have not registered" + MESSAGE_DELIMITER
-#define ERR_ALREADYREGISTERED(source)                   ":" + source + " 462 " + source + " :You may not register" + MESSAGE_DELIMITER
-#define ERR_PASSWDMISMATCH(source)                      ":" + source + " 464 " + source + " :Password is incorrect" + MESSAGE_DELIMITER
-#define ERR_NONICKNAMEGIVEN(source)                     ":" + source + " 431 " + source + " :Nickname not given" + MESSAGE_DELIMITER
-#define ERR_NICKNAMEINUSE(source)                       ":" + source + " 433 " + source + " " + source  + " :Nickname is already in use" + MESSAGE_DELIMITER
-#define ERR_UNKNOWNCOMMAND(source, command)             ":" + source + " 421 " + source + " " + command + " :Unknown command" + MESSAGE_DELIMITER
-#define ERR_NEEDMOREPARAMS(source, command)             ":" + source + " 461 " + source + " " + command + " :Not enough parameters" + MESSAGE_DELIMITER
-#define ERR_USERONCHANNEL(source, channel)              ":" + source + " 443 " + source + " " + channel + " :is already on channel" + MESSAGE_DELIMITER
-#define ERR_NOSUCHSERVER(source, server)                ":" + source + " 402 " + source + " " + server + " :No such server" + MESSAGE_DELIMITER
-#define ERR_TOOMANYCHANNELS(source, channel)            ":" + source + " 405 " + source + " " + channel + " :You have joined too many channels" + MESSAGE_DELIMITER
-#define ERR_NOTONCHANNEL(source, channel)               ":" + source + " 442 " + source + " " + channel + " :You're not on that channel" + MESSAGE_DELIMITER
-#define ERR_NOSUCHCHANNEL(source, channel)              ":" + source + " 403 " + source + " " + channel + " :No such channel" + MESSAGE_DELIMITER
-#define ERR_BADCHANNELKEY(source, channel)              ":" + source + " 475 " + source + " " + channel + " :Cannot join channel (+k)" + MESSAGE_DELIMITER
-#define ERR_CHANNELISFULL(source, channel)              ":" + source + " 471 " + source + " " + channel + " :Cannot join channel (+l)" + MESSAGE_DELIMITER
-#define ERR_CANNOTSENDTOCHAN(source, channel)           ":" + source + " 404 " + source + " " + channel + " :Cannot send to channel" + MESSAGE_DELIMITER
-#define ERR_CHANOPRIVSNEEDED(source, channel)           ":" + source + " 482 " + source + " " + channel + " :You're not channel operator" + MESSAGE_DELIMITER
-#define ERR_NOSUCHNICK(source, nickname)                ":" + source + " 401 " + source + " " + nickname + " :No such nick/channel" + MESSAGE_DELIMITER
-#define ERR_USERNOTINCHANNEL(source, nickname, channel) ":" + source + " 441 " + source + " " + nickname + " " + channel + " :They aren't on that channel" + MESSAGE_DELIMITER
-#define ERR_UNKNOWNCOMMAND(source, command)             ":" + source + " 421 " + source + " " + command + " :Unknown command" + MESSAGE_DELIMITER
-#define ERR_UNKNOWNMODE(source, mode)                   ":" + source + " 472 " + source + " " + mode + " :is unknown mode char to me" + MESSAGE_DELIMITER
-
+#define ERR_NOTEXTTOSEND(source)                        ":irc.server.com 412 " + source + " :No text to send" + MESSAGE_DELIMITER
+#define ERR_NORECIPIENT(source, command)                ":irc.server.com 411 " + source + " " + command + " :No recipient given (" + command + ")" + MESSAGE_DELIMITER
+#define ERR_ERRONEUSNICKNAME(source)                    ":irc.server.com 432 " + source + " :Erroneous nickname" + MESSAGE_DELIMITER
+#define ERR_NOTREGISTERED(source)                       ":irc.server.com 451 " + source + " :You have not registered" + MESSAGE_DELIMITER
+#define ERR_ALREADYREGISTERED(source)                   ":irc.server.com 462 " + source + " :You may not register" + MESSAGE_DELIMITER
+#define ERR_PASSWDMISMATCH(source)                      ":irc.server.com 464 " + source + " :Password is incorrect" + MESSAGE_DELIMITER
+#define ERR_NONICKNAMEGIVEN(source)                     ":irc.server.com 431 " + source + " :Nickname not given" + MESSAGE_DELIMITER
+#define ERR_NICKNAMEINUSE(source)                       ":irc.server.com 433 " + source + " " + source  + " :Nickname is already in use" + MESSAGE_DELIMITER
+#define ERR_UNKNOWNCOMMAND(source, command)             ":irc.server.com 421 " + source + " " + command + " :Unknown command" + MESSAGE_DELIMITER
+#define ERR_NEEDMOREPARAMS(source, command)             ":irc.server.com 461 " + source + " " + command + " :Not enough parameters" + MESSAGE_DELIMITER
+#define ERR_USERONCHANNEL(source, channel)              ":irc.server.com 443 " + source + " " + channel + " :is already on channel" + MESSAGE_DELIMITER
+#define ERR_NOSUCHSERVER(source, server)                ":irc.server.com 402 " + source + " " + server + " :No such server" + MESSAGE_DELIMITER
+#define ERR_TOOMANYCHANNELS(source, channel)            ":irc.server.com 405 " + source + " " + channel + " :You have joined too many channels" + MESSAGE_DELIMITER
+#define ERR_NOTONCHANNEL(source, channel)               ":irc.server.com 442 " + source + " " + channel + " :You're not on that channel" + MESSAGE_DELIMITER
+#define ERR_NOSUCHCHANNEL(source, channel)              ":irc.server.com 403 " + source + " " + channel + " :No such channel" + MESSAGE_DELIMITER
+#define ERR_BADCHANNELKEY(source, channel)              ":irc.server.com 475 " + source + " " + channel + " :Cannot join channel (+k)" + MESSAGE_DELIMITER
+#define ERR_CHANNELISFULL(source, channel)              ":irc.server.com 471 " + source + " " + channel + " :Cannot join channel (+l)" + MESSAGE_DELIMITER
+#define ERR_CANNOTSENDTOCHAN(source, channel)           ":irc.server.com 404 " + source + " " + channel + " :Cannot send to channel" + MESSAGE_DELIMITER
+#define ERR_CHANOPRIVSNEEDED(source, channel)           ":irc.server.com 482 " + source + " " + channel + " :You're not channel operator" + MESSAGE_DELIMITER
+#define ERR_NOSUCHNICK(source, nickname)                ":irc.server.com 401 " + source + " " + nickname + " :No such nick/channel" + MESSAGE_DELIMITER
+#define ERR_USERNOTINCHANNEL(source, nickname, channel) ":irc.server.com 441 " + source + " " + nickname + " " + channel + " :They aren't on that channel" + MESSAGE_DELIMITER
+#define ERR_UNKNOWNCOMMAND(source, command)             ":irc.server.com 421 " + source + " " + command + " :Unknown command" + MESSAGE_DELIMITER
+#define ERR_UNKNOWNMODE(source, mode)                   ":irc.server.com 472 " + source + " " + mode + " :is unknown mode char to me" + MESSAGE_DELIMITER
+#define ERR_INVALIDMODEPARAM(source, mode, param)       ":irc.server.com 696 " + source + " " + mode + " " + param + " :Invalid MODE flag paramater" + MESSAGE_DELIMITER
 
 /* Numeric Responses */
-#define RPL_WELCOME(source)                             ":" + source + " 001 " + source + " :Welcome " + source + " to the ft_irc network" + MESSAGE_DELIMITER
-#define RPL_TOPIC(source, channel, topic)               ":" + source + " 332 " + source + " " + channel + " :" + topic + MESSAGE_DELIMITER
-#define RPL_NOTOPIC(source, channel)                    ":" + source + " 331 " + source + " " + channel + " :No topic is set" + MESSAGE_DELIMITER
-#define RPL_INVITING(source, nickname, channel)         ":" + source + " 341 " + source + " " + nickname + " " + channel + " :Inviting " + nickname + " to channel " + channel + MESSAGE_DELIMITER
-#define RPL_PRIVMSG(source, target, message)            ":" + source + " PRIVMSG " + target + " :" + message + MESSAGE_DELIMITER
-#define RPL_KICK(source, channel, target, reason)       ":" + source + " KICK " + channel + " " + target + " :" + reason + MESSAGE_DELIMITER
-#define RPL_JOIN(source, channel)                       ":" + source + " JOIN " + channel + MESSAGE_DELIMITER
-#define RPL_NOTICE(source, target, message)             ":" + source + " NOTICE " + target + " :" + message + MESSAGE_DELIMITER
+#define RPL_WELCOME(source)                             ":irc.server.com 001 " + source + " :Welcome " + source + " to the ft_irc network" + MESSAGE_DELIMITER
+#define RPL_TOPIC(source, channel, topic)               ":irc.server.com 332 " + source + " " + channel + " :" + topic + MESSAGE_DELIMITER
+#define RPL_NOTOPIC(source, channel)                    ":irc.server.com 331 " + source + " " + channel + " :No topic is set" + MESSAGE_DELIMITER
+#define RPL_INVITING(source, nickname, channel)         ":irc.server.com 341 " + source + " " + nickname + " " + channel + " :Inviting " + nickname + " to channel " + channel + MESSAGE_DELIMITER
+#define RPL_NAMREPLY(source, channel, nicknames)        ":irc.server.com 353 " + source + " = " + channel + " :" + nicknames + MESSAGE_DELIMITER
+#define RPL_PRIVMSG(source, target, message)            ":irc.server.com PRIVMSG " + target + " :" + message + MESSAGE_DELIMITER
+#define RPL_KICK(source, channel, target, reason)       ":irc.server.com KICK " + channel + " " + target + " :" + reason + MESSAGE_DELIMITER
+#define RPL_JOIN(source, channel)                       ":irc.server.com JOIN " + channel + MESSAGE_DELIMITER
+#define RPL_NOTICE(source, target, message)             ":irc.server.com NOTICE " + target + " :" + message + MESSAGE_DELIMITER

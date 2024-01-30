@@ -46,13 +46,21 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;
 				}
-				if (channels[j]->getUserLimit() != -1 && static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getUserLimit())
+				if (channels[j]->getmemberLimit() != -1 && static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getmemberLimit())
 				{
 					Server::sendReply(ERR_CHANNELISFULL(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;
 				}
 				channels[j]->addMember(&client);
-				Server::sendReply(RPL_TOPIC(client.getNickname(), channels[j]->getName(), channels[j]->getTopic()) , client.getFd()); 
+
+				Server::sendReply(RPL_TOPIC(client.getNickname(), channels[j]->getName(), channels[j]->getTopic()) , client.getFd());
+
+				std::vector<ChannelMember *> members = channels[j]->getMembers();
+				std::vector<std::string> nicknames;
+				for (size_t k = 0; k < members.size(); k++)
+					nicknames.push_back(members[k]->client->getNickname());
+				Server::sendReply(RPL_NAMREPLY(client.getNickname(), channels[j]->getName(), join(nicknames)), client.getFd());
+
 				break ;
 			}
 		}

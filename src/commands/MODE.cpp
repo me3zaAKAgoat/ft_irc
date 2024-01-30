@@ -5,7 +5,7 @@ i - invite-only channel flag; 					 	  || MODE #channel +i
 t - topic settable by channel operator only flag;	  || MODE #channel +t
 k - set a channel key (password).				 	  || MODE #channel +k "new-key"
 o - give/take channel operator privileges;			  || MODE #channel +o nick
-l - set the user userLimit to channel;					  || MODE #channel +l 50
+l - set the user memberLimit to channel;					  || MODE #channel +l 50
 */
 
 void handleInviteFlag(Channel *channel, bool plusSign)
@@ -40,12 +40,12 @@ void handleOperatorFlag(Channel *channel, bool plusSign, Client& target)
 		channel->removeOperator(&target);
 }
 
-void handleLimitFlag(Channel *channel, bool plusSign, std::string& userLimit)
+void handleLimitFlag(Channel *channel, bool plusSign, std::string& memberLimit)
 {
 	if (plusSign)
-		channel->setUserLimit(std::atoi(userLimit.c_str()));
+		channel->setmemberLimit(std::atoi(memberLimit.c_str()));
 	else
-		channel->setUserLimit(0);
+		channel->setmemberLimit(0);
 }
 
 bool is_digits(const std::string &str)
@@ -106,7 +106,12 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 				if (flagArgIt == cmd.arguments.end())
 				{
 					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
-					continue; ;
+					continue;
+				}
+				if (!plusSign && *flagArgIt != channel->getKey())
+				{
+					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+					continue;
 				}
 				handleKeyFlag(channel, plusSign, *flagArgIt);
 				flagArgIt++;
@@ -136,7 +141,12 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 				}
 				if (is_digits(*flagArgIt) == false)
 				{
-					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+					continue;
+				}
+				if (std::atoi((*flagArgIt).c_str()) <= 0)
+				{
+					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
 					continue;
 				}
 				handleLimitFlag(channel, plusSign, *flagArgIt);
