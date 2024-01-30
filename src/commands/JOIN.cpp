@@ -46,7 +46,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;
 				}
-				if (static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getLimit())
+				if (channels[j]->getUserLimit() != -1 && static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getUserLimit())
 				{
 					Server::sendReply(ERR_CHANNELISFULL(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;

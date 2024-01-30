@@ -96,7 +96,7 @@ std::string Channel::getKey(void)
 	return (this->key);
 }
 
-int16_t Channel::getLimit(void)
+int16_t Channel::getUserLimit(void)
 {
 	return (this->userLimit);
 }

@@ -20,6 +20,7 @@
 - learn more about non blocking I/O
 - how will invite command work
 - need to extensively test everything we already have now with limechat
+- messages that the server sends should have the servers hostname as prefix/origin (error responses mainly)
 
 # REFERENCES
 

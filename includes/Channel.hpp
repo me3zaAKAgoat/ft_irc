@@ -33,7 +33,7 @@ class Channel
 		std::string						getName(void);
 		std::string						getTopic(void);
 		std::string						getKey(void);
-		int16_t							getLimit(void);
+		int16_t							getUserLimit(void);
 		bool							getInviteOnly(void);
 		bool							getChannelTopicIsRestricted(void);
 		std::vector<ChannelMember *>	getMembers(void);
