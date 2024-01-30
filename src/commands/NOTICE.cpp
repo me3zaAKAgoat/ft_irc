@@ -1,6 +1,6 @@
 #include "Irc.hpp"
 
-void privMsgCmd(commandData& cmd, Server& server, Client& client)
+void noticeCmd(commandData& cmd, Server& server, Client& client)
 {
 	if (!cmd.arguments.size())
 	{
@@ -25,7 +25,7 @@ void privMsgCmd(commandData& cmd, Server& server, Client& client)
 			Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(),cmd.arguments[0]), client.getFd());
 			return ;
 		}
-		channel->broadcastMessage(&client, RPL_PRIVMSG(client.getNickname(), cmd.arguments[0], cmd.arguments[1]));
+		channel->broadcastMessage(&client, RPL_NOTICE(client.getNickname(), cmd.arguments[0], cmd.arguments[1]));
 	}
 	else
 	{
@@ -35,6 +35,6 @@ void privMsgCmd(commandData& cmd, Server& server, Client& client)
 			Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), cmd.arguments[0]), client.getFd());
 			return ;
 		}
-		Server::sendReply(RPL_PRIVMSG(client.getNickname(), cmd.arguments[0], cmd.arguments[1]), receiver->getFd());
+		Server::sendReply(RPL_NOTICE(client.getNickname(), cmd.arguments[0], cmd.arguments[1]), receiver->getFd());
 	}
 }

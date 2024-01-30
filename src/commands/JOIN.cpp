@@ -5,9 +5,7 @@
 there's more stuff that hasnt been implemented yet
 
 - send commands that the server receives which affect the channel
-- RPL_TOPIC
 - RPL_NAMREPLY
-- add channel userLimit management
 https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
 */
 void	joinCmd(commandData& cmd, Server& server, Client& client)
@@ -48,7 +46,13 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;
 				}
+				if (static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getLimit())
+				{
+					Server::sendReply(ERR_CHANNELISFULL(client.getNickname(), paramChannels[i]), client.getFd());
+					break ;
+				}
 				channels[j]->addMember(&client);
+				Server::sendReply(RPL_TOPIC(client.getNickname(), channels[j]->getName(), channels[j]->getTopic()) , client.getFd()); 
 				break ;
 			}
 		}

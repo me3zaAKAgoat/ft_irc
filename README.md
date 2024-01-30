@@ -6,19 +6,18 @@
 - [x] QUIT
 - [x] JOIN
 - [x] PART
-- [] KICK - OPER
-- [] MODE itkol - OPER
+- [x] KICK - OPER
+- [x] MODE itkol - OPER
 - [x] TOPIC - OPER
 - [x] INVITE - OPER
 - [X] PRIVMSG
-- [] NOTICE
+- [x] NOTICE
 
 # NOTES / TASKS
 
 - check sys calls
 - visit networking functions and understand them as best as possible
 - learn more about non blocking I/O
-- idk what will we do about modes how do we split the first argument
 - how will invite command work
 - need to extensively test everything we already have now with limechat
 
