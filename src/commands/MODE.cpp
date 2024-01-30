@@ -28,5 +28,6 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_CHANOPRIVSNEEDED(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;
 	}
+	Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], cmd.arguments[1], (cmd.arguments.size() > 2 ? cmd.arguments[1] : std::string(""))), client.getFd());
 	/* handle modes */
 }

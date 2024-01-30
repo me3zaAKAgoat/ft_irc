@@ -49,6 +49,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 					break ;
 				}
 				channels[j]->addMember(&client);
+				Server::sendReply(RPL_JOIN(client.getNickname(), channels[j]->getName()), client.getFd()); // we need pass channel to addMember so we can call this reply inside addMember
 				break ;
 			}
 		}
@@ -56,6 +57,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		{
 			Channel *newChannel = new Channel(paramChannels[i]);
 			newChannel->addMember(&client);
+			Server::sendReply(RPL_JOIN(client.getNickname(), newChannel->getName()), client.getFd()); // we need pass channel to addMember so we can call this reply inside addMember
 			newChannel->giveOperator(&client);
 			server.addChannel(newChannel);
 		}

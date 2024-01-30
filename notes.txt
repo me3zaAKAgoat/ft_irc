@@ -1,0 +1,10 @@
+- add error 451
+- add ports limit
+- requestMessage not requestMessagae
+- think we need to modifie log (if the fd is for server print server instead the fd does means if the msg is recieved from client or sent to client)
+- handle pong cmd (optional)
+- MODE:
+	-k:
+		- add RPL
+- NICK:
+	- maybe we need to add underscore as a valid character in the nickname (if client try to change his nickname with his actual-nickName in limechat)

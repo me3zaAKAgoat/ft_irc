@@ -68,3 +68,4 @@ std::string join(StringVectorIterator itBegin, StringVectorIterator itEnd, const
 #define RPL_KICK(source, channel, target, reason) ":" + source + " KICK " + channel + " " + target + " :" + reason + MESSAGE_DELIMITER
 #define RPL_JOIN(source, channel) ":" + source + " JOIN " + channel + MESSAGE_DELIMITER
 #define RPL_NICK(oldNick, newNick) ":" + oldNick + " NICK " + newNick + MESSAGE_DELIMITER
+#define RPL_MODE(source, channel, modes, args) ":" + source + " MODE " + channel + " " + modes + " " + args + MESSAGE_DELIMITER
