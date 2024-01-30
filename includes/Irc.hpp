@@ -57,6 +57,8 @@ std::string					join(StringVectorIterator itBegin, StringVectorIterator itEnd, c
 #define ERR_NOSUCHNICK(source, nickname)                ":" + source + " 401 " + source + " " + nickname + " :No such nick/channel" + MESSAGE_DELIMITER
 #define ERR_USERNOTINCHANNEL(source, nickname, channel) ":" + source + " 441 " + source + " " + nickname + " " + channel + " :They aren't on that channel" + MESSAGE_DELIMITER
 #define ERR_UNKNOWNCOMMAND(source, command)             ":" + source + " 421 " + source + " " + command + " :Unknown command" + MESSAGE_DELIMITER
+#define ERR_UNKNOWNMODE(source, mode)                   ":" + source + " 472 " + source + " " + mode + " :is unknown mode char to me" + MESSAGE_DELIMITER
+
 
 /* Numeric Responses */
 #define RPL_WELCOME(source)                             ":" + source + " 001 " + source + " :Welcome " + source + " to the ft_irc network" + MESSAGE_DELIMITER
@@ -65,3 +67,4 @@ std::string					join(StringVectorIterator itBegin, StringVectorIterator itEnd, c
 #define RPL_PRIVMSG(source, target, message)            ":" + source + " PRIVMSG " + target + " :" + message + MESSAGE_DELIMITER
 #define RPL_KICK(source, channel, target, reason)       ":" + source + " KICK " + channel + " " + target + " :" + reason + MESSAGE_DELIMITER
 #define RPL_JOIN(source, channel)                       ":" + source + " JOIN " + channel + MESSAGE_DELIMITER
+#define RPL_INVITING(source, nickname, channel)         ":" + source + " 341 " + source + " " + nickname + " " + channel + " :Inviting " + nickname + " to channel " + channel + MESSAGE_DELIMITER

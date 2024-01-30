@@ -7,7 +7,7 @@ there's more stuff that hasnt been implemented yet
 - send commands that the server receives which affect the channel
 - RPL_TOPIC
 - RPL_NAMREPLY
-- add channel limit management
+- add channel userLimit management
 https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
 */
 void	joinCmd(commandData& cmd, Server& server, Client& client)

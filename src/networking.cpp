@@ -47,7 +47,7 @@ int Server::readRequest(std::string &message, const int fd)
 		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
-		std::cout << "Fd: "<< fd << " connection closed." << std::endl;
+		log("connection closed", fd);
 		return (-1);
 	}
 	else
@@ -133,7 +133,7 @@ std::string removeTrailingCRLF(const std::string& input) {
 
 void Server::log(const std::string& message, int fd)
 {
-	std::cout << getCurrentTime() << " " << fd << " \"" << removeTrailingCRLF(message) << "\"" << std::endl;
+	std::cout << "\033[31m" << getCurrentTime() << "\033[0m" << " " << "\e[0;32m" << fd << "\033[0m" << " \"" << removeTrailingCRLF(message)<< "\"" << std::endl;
 }
 
 void Server::sendReply(const std::string &message, int clientFd)

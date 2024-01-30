@@ -21,3 +21,4 @@ void		quitCmd(commandData& cmd, Server& server, Client& client);
 void		topicCmd(commandData& cmd, Server& server, Client& client);
 void		inviteCmd(commandData &cmd, Server &server, Client &client);
 void		kickCmd(commandData& cmd, Server &server, Client &client);
+void		modeCmd(commandData& cmd, Server &server, Client &client);

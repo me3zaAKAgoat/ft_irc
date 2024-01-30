@@ -1,6 +1,6 @@
 #include "Irc.hpp"
 
-Channel::Channel(const std::string name) : name(name), topic(""), key(""), isInviteOnly(false), channelTopicIsRestricted(false), limit(-1)
+Channel::Channel(const std::string name) : name(name), topic(""), key(""), isInviteOnly(false), channelTopicIsRestricted(false), userLimit(-1)
 {
 }
 
@@ -10,7 +10,7 @@ Channel::~Channel()
 
 void Channel::addMember(Client *client)
 {
-	if (this->limit != -1 && this->members.size() >= static_cast<size_t>(this->limit))
+	if (this->userLimit != -1 && this->members.size() >= static_cast<size_t>(this->userLimit))
 	{
 		Server::sendReply(ERR_CHANNELISFULL(client->getNickname(), this->getName()), client->getFd());
 		return ;
@@ -71,9 +71,9 @@ void Channel::setKey(const std::string key)
 	this->key = key;
 }
 
-void Channel::setLimit(const int16_t limit)
+void Channel::setUserLimit(const int16_t userLimit)
 {
-	this->limit = limit;
+	this->userLimit = userLimit;
 }
 
 void Channel::setInviteOnly(const bool isInviteOnly)
@@ -98,7 +98,7 @@ std::string Channel::getKey(void)
 
 int16_t Channel::getLimit(void)
 {
-	return (this->limit);
+	return (this->userLimit);
 }
 
 bool Channel::getInviteOnly(void)

@@ -47,6 +47,8 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	commandHandlers["QUIT"] = quitCmd;
 	commandHandlers["KICK"] = kickCmd;
 	commandHandlers["TOPIC"] = topicCmd;
+	commandHandlers["MODE"] = modeCmd;
+	commandHandlers["INVITE"] = inviteCmd;
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{
