@@ -51,5 +51,6 @@ void	nickCmd(commandData& cmd, Server &server, Client& client)
 		Server::sendReply(": 433 " + client.getNickname() + " <nick> :Nickname is already in use\r\n", client.getFd());
 		return ;
 	}
+	Server::sendReply(RPL_NICK((client.getNickname().empty() ? "*" : client.getNickname()), cmd.arguments[0]), client.getFd());
 	client.setNickname(cmd.arguments[0]);
 }

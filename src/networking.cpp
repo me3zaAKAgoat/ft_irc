@@ -133,7 +133,7 @@ std::string removeTrailingCRLF(const std::string& input) {
 
 void Server::log(const std::string& message, int fd)
 {
-	std::cout << getCurrentTime() << " " << fd << " \"" << removeTrailingCRLF(message) << "\"" << std::endl;
+	std::cout << BLUE << getCurrentTime() << RESET << " " << YELLOW << fd << RESET << " \"" << removeTrailingCRLF(message) << "\"" << std::endl;
 }
 
 void Server::sendReply(const std::string &message, int clientFd)
