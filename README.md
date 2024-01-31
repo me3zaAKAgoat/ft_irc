@@ -22,6 +22,7 @@
 - need to extensively test everything we already have now with limechat
 - messages that the server sends should have the servers hostname as prefix/origin (error responses mainly)
 - test join and split vulnerable functions
+- visit macros and check for mistakes in them a lot of them are wrong
 
 # REFERENCES
 
