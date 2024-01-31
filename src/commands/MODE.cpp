@@ -1,148 +1,164 @@
-#include "Commands.hpp"
+#include "Irc.hpp"
 
-bool isFlagMode(char c)
-{
-	if (c == 'i' || c == 't' || c == 'k' || c == 'o' || c == 'l')
-		return (true);
-	return (false);
-}
+/*
+i - invite-only channel flag; 					 	  || MODE #channel +i
+t - topic settable by channel operator only flag;	  || MODE #channel +t
+k - set a channel key (password).				 	  || MODE #channel +k "new-key"
+o - give/take channel operator privileges;			  || MODE #channel +o nick
+l - set the user memberLimit to channel;					  || MODE #channel +l 50
+*/
 
-void handleInviteOnlyMode(Channel *channel, bool sign)
+void handleInviteFlag(Channel *channel, bool plusSign)
 {
-	if (sign)
-	{
-		if (!channel->getInviteOnly())
-			channel->setInviteOnly(true);
-	}
+	if (plusSign)
+		channel->setInviteOnly(true);
 	else
-	{
-		if (channel->getInviteOnly())
-			channel->setInviteOnly(false);
-	}
+		channel->setInviteOnly(false);
 }
 
-void handleChannelTopicMode(Channel *channel, bool sign)
+void handleTopicFlag(Channel *channel, bool plusSign)
 {
-	if (sign)
-	{
-		if (!channel->getChannelTopicIsRestricted())
-			channel->setChannelTopicIsRestricted(true);
-	}
+	if (plusSign)
+		channel->setChannelTopicIsRestricted(true);
 	else
-	{
-		if (channel->getChannelTopicIsRestricted())
-			channel->setChannelTopicIsRestricted(false);
-	}
+		channel->setChannelTopicIsRestricted(false);
 }
 
-void handleChannelKeyMode(Channel *channel, bool sign, std::string& argumentFlag)
+void handleKeyFlag(Channel *channel, bool plusSign, std::string& key)
 {
-	if (sign)
-		channel->setKey(argumentFlag);
+	if (plusSign)
+		channel->setKey(key);
 	else
 		channel->setKey("");
 }
 
-void handleChannelLimitMode(Client &client, Channel *channel, bool sign, std::string& argumentFlag)
+void handleOperatorFlag(Channel *channel, bool plusSign, Client& target)
 {
-	if (sign)
-	{
-		if (strIsDigits(argumentFlag) && atoi(argumentFlag.c_str()) > 0) // need to inform a msg about error
-			channel->setLimit(atoi(argumentFlag.c_str()));
-		else
-			Server::sendReply(ERR_UNKNOWNMODE(client.getNickname(), channel->getName(), argumentFlag), client.getFd());
-	}
+	if (plusSign)
+		channel->giveOperator(&target);
 	else
-		channel->setLimit(-1);
+		channel->removeOperator(&target);
 }
 
-void handleChannelOperatorMode(Channel *channel, Server &server, bool sign, std::string& argumentFlag)
+void handleLimitFlag(Channel *channel, bool plusSign, std::string& memberLimit)
 {
-	Client *client = NULL;
-	if (sign)
-	{
-		client = server.getClientByNickname(argumentFlag);
-		if (client)
-		{
-			if (channel->isMember(client) && !channel->isOperator(client))
-				channel->giveOperator(client);
-		}
-	}
+	if (plusSign)
+		channel->setmemberLimit(std::atoi(memberLimit.c_str()));
 	else
-		channel->setLimit(-1);
+		channel->setmemberLimit(0);
 }
 
-bool whichSign(char c, bool &sign)
+bool is_digits(const std::string &str)
 {
-	if (c == '-')
-	{
-		sign = false;
-		return (true);
-	}
-	else if (c == '+')
-	{
-		sign = true;
-		return (true);
-	}
-	return (false);
+    return str.find_first_not_of("0123456789") == std::string::npos;
 }
 
-void modeCmd(commandData &cmd, Server &server, Client *client)
+void		modeCmd(commandData& cmd, Server& server, Client& client)
 {
-	// i - invite-only channel flag; 						MODE #channel -i 	  || MODE #channel +i
-	// t - topic settable by channel operator only flag;	MODE #channel -t	  || MODE #channel +t
-	// k - set a channel key (password).					MODE #channel -k 	  || MODE #channel +k "new-key"
-	// o - give/take channel operator privileges;			MODE #channel -o nick || MODE #channel +o nick
-	// l - set the user limit to channel;					MODE #channel -l	  || MODE #channel +l 50
-
-	std::vector<Channel *> channels = server.getChannels();
-	size_t argCounter = 2;
 	if (cmd.arguments.size() < 2)
 	{
-		Server::sendReply(ERR_NEEDMOREPARAMS(client->getNickname(), cmd.name), client->getFd());
-		return;
+		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+		return ;
 	}
-	if (cmd.arguments[0][0] != '#' && cmd.arguments[0][0] != '&')
+	if (!Channel::isValidChannelName(cmd.arguments[0]))
 	{
-		Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), cmd.arguments[0]), client->getFd());
-		return;
+		Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
+		return ;
 	}
-	size_t j = -1;
-	if (isExistChannel(server, j, cmd.arguments[0]))
+	Channel *channel = server.getChannelByName(cmd.arguments[0]);
+	if (!channel)
 	{
-		if (!isMemberOperator(channels[j], client))
-			return;
-		bool sign;
-		size_t i = 0;
-		if (!whichSign(cmd.arguments[1][i], sign))
-			Server::sendReply(ERR_UNKNOWNMODE(client->getNickname(), cmd.arguments[0], cmd.arguments[1][i]), client->getFd());
-		i++;
-		while (i < cmd.arguments[1].size())
+		Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
+		return ;
+	}
+	if (!channel->isMember(&client))
+	{
+		Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
+		return ;
+	}
+	if (!channel->isOperator(&client))
+	{
+		Server::sendReply(ERR_CHANOPRIVSNEEDED(client.getNickname(), cmd.arguments[0]), client.getFd());
+		return ;
+	}
+	// Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], cmd.arguments[1], (cmd.arguments.size() > 2 ? cmd.arguments[1] : std::string(""))), client.getFd());
+	/* handle modes */
+	/*
+	while loop over the first argument and then store whatever sign was encountered 
+	and flavour every upcoming mode flag function with it (not sure if this is correct behaviour)
+	set a counter for what mode flag we are on
+	*/
+	bool								plusSign = true;
+	std::string							firstArg = cmd.arguments[1];
+	std::vector<std::string>::iterator	flagArgIt = cmd.arguments.begin() + 2; 
+	for (size_t i = 0; i < firstArg.size(); i++)
+	{
+		if (firstArg[i] == '+')
+			plusSign = true;
+		else if (firstArg[i] == '-')
+			plusSign = false;
+		else
 		{
-			if (whichSign(cmd.arguments[1][i], sign))
-				i++;
-			else if (isFlagMode(cmd.arguments[1][i]))
+			if (firstArg[i] == 'i')
+				handleInviteFlag(channel, plusSign);
+			else if (firstArg[i] == 't')
+				handleTopicFlag(channel, plusSign);
+			else if (firstArg[i] == 'k')
 			{
-				if (cmd.arguments[1][i] == 'i')
-					handleInviteOnlyMode(channels[j], sign);
-				else if (cmd.arguments[1][i] == 't')
-					handleChannelTopicMode(channels[j], sign);
-				else if (cmd.arguments.size() > argCounter)
+				if (flagArgIt == cmd.arguments.end())
 				{
-					if (cmd.arguments[1][i] == 'k')
-						handleChannelKeyMode(channels[j], sign, cmd.arguments[argCounter++]);
-					else if (cmd.arguments[1][i] == 'l')
-						handleChannelLimitMode((*client), channels[j], sign, cmd.arguments[argCounter++]);
-					else if (cmd.arguments[1][i] == 'o')
-						handleChannelOperatorMode(channels[j], server, sign, cmd.arguments[argCounter++]);
+					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+					continue;
 				}
-				else
-					Server::sendReply(ERR_NEEDMOREPARAMS((client ? client->getNickname() : "*"), cmd.name), client->getFd());
+				if (!plusSign && *flagArgIt != channel->getKey())
+				{
+					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+					continue;
+				}
+				handleKeyFlag(channel, plusSign, *flagArgIt);
+				flagArgIt++;
+			}
+			else if (firstArg[i] == 'o')
+			{
+				if (flagArgIt == cmd.arguments.end())
+				{
+					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+					continue; ;
+				}
+				Client *target = server.getClientByNickname(*flagArgIt);
+				if (!target)
+				{
+					Server::sendReply(ERR_NOSUCHNICK(target->getNickname(), *flagArgIt), target->getFd());
+					continue ;
+				}
+				handleOperatorFlag(channel, plusSign, *target);
+				flagArgIt++;
+			}
+			else if (firstArg[i] == 'l')
+			{
+				if (flagArgIt == cmd.arguments.end())
+				{
+					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+					continue;
+				}
+				if (is_digits(*flagArgIt) == false)
+				{
+					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+					continue;
+				}
+				if (std::atoi((*flagArgIt).c_str()) <= 0)
+				{
+					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+					continue;
+				}
+				handleLimitFlag(channel, plusSign, *flagArgIt);
+				flagArgIt++;
 			}
 			else
-				Server::sendReply(ERR_UNKNOWNMODE(client->getNickname(), cmd.arguments[0], cmd.arguments[1][i]), client->getFd());
+			{
+				Server::sendReply(ERR_UNKNOWNMODE(client.getNickname(), firstArg[i]), client.getFd());
+				continue;
+			}
 		}
 	}
-	else
-		Server::sendReply(ERR_NOSUCHCHANNEL(client->getNickname(), cmd.arguments[0]), client->getFd());
 }

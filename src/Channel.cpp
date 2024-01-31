@@ -19,7 +19,7 @@ void Channel::addMember(Client *client)
 
 	member->client = client;
 	member->isOperator = false;
-	this->members.insert(std::make_pair(client->getFd(), member));
+	this->members.push_back(member);
 }
 
 void Channel::removeMember(Server &server, Client *client)
@@ -39,15 +39,14 @@ void Channel::removeMember(Server &server, Client *client)
 
 void Channel::giveOperator(Client *client)
 {
-	this->members[client->getFd()]->isOperator = true;
-	// for (size_t i = 0; i < this->members.size(); i++)
-	// {
-	// 	if (this->members[i]->client == client)
-	// 	{
-	// 		this->members[i]->isOperator = true;
-	// 		return ;
-	// 	}
-	// }
+	for (size_t i = 0; i < this->members.size(); i++)
+	{
+		if (this->members[i]->client == client)
+		{
+			this->members[i]->isOperator = true;
+			return ;
+		}
+	}
 }
 
 void Channel::removeOperator(Client *client)
@@ -112,7 +111,7 @@ bool Channel::getChannelTopicIsRestricted(void)
 	return (this->channelTopicIsRestricted);
 }
 
-std::map<unsigned int, ChannelMember *> Channel::getMembers(void)
+std::vector<ChannelMember *> Channel::getMembers(void)
 {
 	return (this->members);
 }
@@ -130,26 +129,22 @@ void Channel::setTopic(const std::string topic)
 /* NULL sender is a server sent message */
 void Channel::broadcastMessage(Client *sender, const std::string message)
 {
-	std::map<unsigned int, ChannelMember *>::iterator it;
-	for (it = this->members.begin(); it != this->members.begin(); it++)
+	for (size_t i = 0; i < this->members.size(); i++)
 	{
 		if (sender && this->members[i]->client == sender)
 			continue ;
-		Server::sendReply(message, it->second->client->getFd());
+		Server::sendReply(message, this->members[i]->client->getFd());
 	}
 }
 
 bool	Channel::isMember(Client *client)
 {
-	if (this->members.find(client->getFd()) != this->members.end())
-		return (true);
-	return (false);
-	// for (size_t i = 0; i < this->members.size(); i++)
-	// {
-	// 	if (this->members[i]->client == client)
-	// 		return true;
-	// }
-	// return false;
+	for (size_t i = 0; i < this->members.size(); i++)
+	{
+		if (this->members[i]->client == client)
+			return true;
+	}
+	return false;
 }
 
 bool	Channel::isOperator(Client *client)
