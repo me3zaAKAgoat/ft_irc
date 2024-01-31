@@ -19,20 +19,20 @@ void Server::handleNewClient(void)
 void Server::handleEstablishedClientEvents(void)
 {
 	std::vector<std::string> commands;
-	std::string requestMessagae;
+	std::string requestMessage;
 
 	for (size_t i = 1; i < this->pfds.size(); i++)
 	{
 		if (this->pfds[i].revents & POLLIN)
 		{
-			if (Server::readRequest(requestMessagae, this->pfds[i].fd) == -1)
+			if (Server::readRequest(requestMessage, this->pfds[i].fd) == -1)
 			{
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
-			Server::log(requestMessagae, this->pfds[i].fd);
-			// std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessagae << "'" << std::endl; //debug
-			commands = split(requestMessagae, MESSAGE_DELIMITER);
+			Server::log(requestMessage, this->pfds[i].fd);
+			// std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessage << "'" << std::endl; //debug
+			commands = split(requestMessage, MESSAGE_DELIMITER);
 			Server::parseCommands(commands, this->pfds[i].fd);
 		}
 	}
@@ -47,7 +47,7 @@ int Server::readRequest(std::string &message, const int fd)
 		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
-		std::cout << "Fd: "<< fd << " connection closed." << std::endl;
+		log("connection closed", fd);
 		return (-1);
 	}
 	else

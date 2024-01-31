@@ -26,14 +26,14 @@ class Channel
 		void							setName(const std::string name);
 		void							setTopic(const std::string t);
 		void							setKey(const std::string key);
-		void							setLimit(const int16_t limit);
+		void							setmemberLimit(const int16_t memberLimit);
 		void							setInviteOnly(const bool isInviteOnly);
 		void							setChannelTopicIsRestricted(const bool channelTopicIsRestricted);
 
 		std::string						getName(void);
 		std::string						getTopic(void);
 		std::string						getKey(void);
-		int16_t							getLimit(void);
+		int16_t							getmemberLimit(void);
 		bool							getInviteOnly(void);
 		bool							getChannelTopicIsRestricted(void);
 		std::vector<ChannelMember *>	getMembers(void);
@@ -46,6 +46,6 @@ class Channel
 		std::string						key;
 		bool							isInviteOnly;
 		bool							channelTopicIsRestricted;
-		int16_t							limit; // -1 if no limit
+		int16_t							memberLimit; // -1 if no memberLimit
 		std::vector<ChannelMember *>	members;
 };

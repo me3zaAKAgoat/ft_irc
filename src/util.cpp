@@ -21,7 +21,7 @@ std::vector<std::string> split(const std::string &input, const std::string &sepa
 	return result;
 }
 
-std::string join(StringVectorIterator itBegin, StringVectorIterator itEnd, const std::string& separator = "")
+std::string join(StringVectorIterator itBegin, StringVectorIterator itEnd, const std::string& separator)
 {
 	if (itBegin == itEnd) {
 		return "";
@@ -35,4 +35,9 @@ std::string join(StringVectorIterator itBegin, StringVectorIterator itEnd, const
 	}
 
 	return result.str();
+}
+
+std::string join(std::vector<std::string> strings, const std::string& separator)
+{
+	return join(strings.begin(), strings.end(), separator);
 }

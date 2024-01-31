@@ -25,7 +25,7 @@ Server::~Server(void)
 typedef void (*CommandHandler)(commandData&, Server&, Client&);
 
 bool requiresRegistration(const std::string& cmdName) {
-	std::string tmp[] = {"PASS", "NICK", "USER"}; /* disgusting way to initalize a set */
+	std::string tmp[] = {"PASS", "NICK", "USER", "QUIT"}; /* disgusting way to initalize a set */
     static std::set<std::string> authCommands(tmp, tmp + sizeof(tmp) / sizeof(tmp[0]));
     return !(authCommands.count(cmdName));
 }
@@ -47,6 +47,9 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	commandHandlers["QUIT"] = quitCmd;
 	commandHandlers["KICK"] = kickCmd;
 	commandHandlers["TOPIC"] = topicCmd;
+	commandHandlers["MODE"] = modeCmd;
+	commandHandlers["INVITE"] = inviteCmd;
+	commandHandlers["NOTICE"] = noticeCmd;
 
 	for (size_t i = 0; i < commands.size(); i++)
 	{

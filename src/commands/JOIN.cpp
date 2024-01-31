@@ -5,9 +5,7 @@
 there's more stuff that hasnt been implemented yet
 
 - send commands that the server receives which affect the channel
-- RPL_TOPIC
 - RPL_NAMREPLY
-- add channel limit management
 https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.1
 */
 void	joinCmd(commandData& cmd, Server& server, Client& client)
@@ -48,8 +46,21 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;
 				}
+				if (channels[j]->getmemberLimit() != -1 && static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getmemberLimit())
+				{
+					Server::sendReply(ERR_CHANNELISFULL(client.getNickname(), paramChannels[i]), client.getFd());
+					break ;
+				}
 				channels[j]->addMember(&client);
-				Server::sendReply(RPL_JOIN(client.getNickname(), channels[j]->getName()), client.getFd()); // we need pass channel to addMember so we can call this reply inside addMember
+
+				Server::sendReply(RPL_TOPIC(client.getNickname(), channels[j]->getName(), channels[j]->getTopic()) , client.getFd());
+
+				std::vector<ChannelMember *> members = channels[j]->getMembers();
+				std::vector<std::string> nicknames;
+				for (size_t k = 0; k < members.size(); k++)
+					nicknames.push_back(members[k]->client->getNickname());
+				Server::sendReply(RPL_NAMREPLY(client.getNickname(), channels[j]->getName(), join(nicknames)), client.getFd());
+
 				break ;
 			}
 		}

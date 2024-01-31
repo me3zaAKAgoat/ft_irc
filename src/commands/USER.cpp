@@ -21,11 +21,6 @@ void		userCmd(commandData& cmd, Server &server, Client &client)
 		Server::sendReply(ERR_ALREADYREGISTERED(client.getNickname()), client.getFd());
 		return ;
 	}
-	if (cmd.arguments[1] != "0" || cmd.arguments[2] != "*")
-	{
-		Server::sendReply("Invalid arguments\n", client.getFd()); // change this message to a valid irc error reply
-		return ;
-	}
 	client.setUsername(cmd.arguments[0]);
 	client.setRealname(cmd.arguments[3]);
 	client._register();
