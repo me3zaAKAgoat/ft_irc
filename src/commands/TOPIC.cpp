@@ -7,7 +7,7 @@ void	topicCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(RPL_NOTOPIC(client.getNickname(), ""), client.getFd());
 		return ;
 	}
-	if (cmd.arguments[0][0] != '#' && cmd.arguments[0][0] != '&')
+	if (!Channel::isValidChannelName(cmd.arguments[0]))
 	{
 		Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;

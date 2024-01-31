@@ -1,7 +1,8 @@
 #include "Commands.hpp"
 
-void		userCmd(commandData& cmd, Client &client)
+void		userCmd(commandData& cmd, Server &server, Client &client)
 {
+	(void)server;
 	if (!client.isAuthenticated())
 	{
 		return ;
@@ -18,11 +19,6 @@ void		userCmd(commandData& cmd, Client &client)
 	else if (!client.getUsername().empty())
 	{
 		Server::sendReply(ERR_ALREADYREGISTERED(client.getNickname()), client.getFd());
-		return ;
-	}
-	if (cmd.arguments[1] != "0" || cmd.arguments[2] != "*")
-	{
-		Server::sendReply("Invalid arguments\n", client.getFd()); // change this message to a valid irc error reply
 		return ;
 	}
 	client.setUsername(cmd.arguments[0]);

@@ -2,8 +2,6 @@
 
 #include "Irc.hpp"
 
-class Client;
-
 class Server
 {
 	public:
@@ -14,7 +12,7 @@ class Server
 		void						coreProcess(void);
 		void						parseCommands(const std::vector<std::string> commands, int clientFd);
 		int							readRequest(std::string &message, const int fd);
-		static void					sendReply(const std::string message, unsigned int clienFd);
+		static void					sendReply(const std::string &message, int clientFd);
 		void						handleNewClient(void);
 		void						handleEstablishedClientEvents(void);
 		void						closeConnection(int fd);
@@ -33,8 +31,11 @@ class Server
 		void						setServerSocket(const int serverSocket);
 		void						setPassword(const std::string password);
 
+		static void					log(const std::string& message, int fd);
+
 	private:
-		static const int	recvBufferSize;
+		static const int			RECV_BUFFER_SIZE;
+		static const int			SERVER_SOCKET_INDEX;
 
 		int							_port;
 		int							_socket;

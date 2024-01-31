@@ -1,6 +1,6 @@
 #include "Irc.hpp"
 
-Channel::Channel(const std::string name) : name(name), topic(""), key(""), isInviteOnly(false), channelTopicIsRestricted(false), limit(-1)
+Channel::Channel(const std::string name) : name(name), topic(""), key(""), isInviteOnly(false), channelTopicIsRestricted(false), memberLimit(-1)
 {
 }
 
@@ -10,6 +10,11 @@ Channel::~Channel()
 
 void Channel::addMember(Client *client)
 {
+	if (this->memberLimit != -1 && this->members.size() >= static_cast<size_t>(this->memberLimit))
+	{
+		Server::sendReply(ERR_CHANNELISFULL(client->getNickname(), this->getName()), client->getFd());
+		return ;
+	}
 	ChannelMember *member = new ChannelMember;
 
 	member->client = client;
@@ -17,20 +22,19 @@ void Channel::addMember(Client *client)
 	this->members.insert(std::make_pair(client->getFd(), member));
 }
 
-void Channel::removeMember(Client *client)
+void Channel::removeMember(Server &server, Client *client)
 {
-	delete this->members[client->getFd()];
-	this->members.erase(client->getFd());
-
-	// for (size_t i = 0; i < this->members.size(); i++)
-	// {
-	// 	if (this->members[i]->client == client)
-	// 	{
-	// 		delete this->members[i];
-	// 		this->members.erase(this->members.begin() + i);
-	// 		return ;
-	// 	}
-	// }
+	for (size_t i = 0; i < this->members.size(); i++)
+	{
+		if (this->members[i]->client == client)
+		{
+			delete this->members[i];
+			this->members.erase(this->members.begin() + i);
+			return ;
+		}
+	}
+	if (!this->getMembers().size())
+		server.removeChannel(this);
 }
 
 void Channel::giveOperator(Client *client)
@@ -68,9 +72,9 @@ void Channel::setKey(const std::string key)
 	this->key = key;
 }
 
-void Channel::setLimit(const int16_t limit)
+void Channel::setmemberLimit(const int16_t memberLimit)
 {
-	this->limit = limit;
+	this->memberLimit = memberLimit;
 }
 
 void Channel::setInviteOnly(const bool isInviteOnly)
@@ -93,9 +97,9 @@ std::string Channel::getKey(void)
 	return (this->key);
 }
 
-int16_t Channel::getLimit(void)
+int16_t Channel::getmemberLimit(void)
 {
-	return (this->limit);
+	return (this->memberLimit);
 }
 
 bool Channel::getInviteOnly(void)
@@ -123,12 +127,13 @@ void Channel::setTopic(const std::string topic)
 	this->topic = topic;
 }
 
+/* NULL sender is a server sent message */
 void Channel::broadcastMessage(Client *sender, const std::string message)
 {
 	std::map<unsigned int, ChannelMember *>::iterator it;
 	for (it = this->members.begin(); it != this->members.begin(); it++)
 	{
-		if (it->second->client == sender)
+		if (sender && this->members[i]->client == sender)
 			continue ;
 		Server::sendReply(message, it->second->client->getFd());
 	}
@@ -155,4 +160,16 @@ bool	Channel::isOperator(Client *client)
 			return this->members[i]->isOperator;
 	}
 	return false;
+}
+
+bool	Channel::isValidChannelName(const std::string name)
+{
+	if (name[0] != '#' && name[0] != '&')
+		return false;
+	for (size_t i = 1; i < name.size(); i++)
+	{
+		if (name[i] == ',' || name[i] == ' ')
+			return false;
+	}
+	return true;
 }

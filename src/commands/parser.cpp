@@ -1,8 +1,9 @@
 #include "Irc.hpp"
 
-/* needs validation and error managament
-would be best if it throws errors that could be caught later*/
-commandData parseCommand(const std::string &commandMessage)
+/*
+vunlerable and needs more testing
+*/
+commandData parseCommandMessage(const std::string &commandMessage)
 {
 	commandData command;
 
@@ -18,9 +19,16 @@ commandData parseCommand(const std::string &commandMessage)
 	{
 		if (hasPrefix)
 			command.prefix = middleParams[0];
-		command.name = middleParams[0 + (1 * hasPrefix)];
-		command.arguments.insert(command.arguments.end(), middleParams.begin() + (1 + 1 * hasPrefix), middleParams.end());
+
+		size_t startIdx = static_cast<size_t>(hasPrefix);
+
+		if (middleParams.size() > startIdx)
+		{
+			command.name = middleParams[startIdx];
+			command.arguments.insert(command.arguments.end(), middleParams.begin() + startIdx + 1, middleParams.end());
+		}
 	}
+
 
 	if (trailingPartStartPos != std::string::npos)
 	{

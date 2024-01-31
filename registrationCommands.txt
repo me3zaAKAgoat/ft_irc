@@ -1,6 +1,7 @@
 PASS haha
 NICK me3za
 USER me3za 0 * :mehdi choukri
+<<<<<<< HEAD
 JOIN &xd
 JOIN &xd
 
@@ -13,3 +14,6 @@ PRIVMSG &xd :helloge boys
 PASS 1
 NICK ekenane3
 USER elmehdi3 0 * elmehdi kenane3
+=======
+JOIN &xd
+>>>>>>> 0bd3b3dae0f4ecb388023ea8eebb306887c642fc

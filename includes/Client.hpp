@@ -2,8 +2,6 @@
 
 #include "Irc.hpp"
 
-class Server;
-
 class Client
 {
 	public:
