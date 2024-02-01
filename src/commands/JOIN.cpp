@@ -15,10 +15,10 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
 	}
-	std::vector<Channel *> channels = server.getChannels();
-	std::vector<std::string> paramChannels = split(cmd.arguments[0], ",");
-	std::vector<std::string> paramKeys;
-	bool	channelExists; 
+	std::vector<Channel *>		channels = server.getChannels();
+	std::vector<std::string>	paramChannels = split(cmd.arguments[0], ",");
+	std::vector<std::string>	paramKeys;
+	bool						channelExists; 
 
 
 	if (cmd.arguments.size() > 1)

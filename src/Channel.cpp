@@ -160,11 +160,11 @@ bool	Channel::isOperator(Client *client)
 bool	Channel::isValidChannelName(const std::string name)
 {
 	if (name[0] != '#' && name[0] != '&')
-		return false;
+		return (false);
 	for (size_t i = 1; i < name.size(); i++)
 	{
 		if (name[i] == ',' || name[i] == ' ')
-			return false;
+			return (false);
 	}
-	return true;
+	return (true);
 }

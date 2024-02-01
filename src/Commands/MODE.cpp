@@ -129,7 +129,7 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 					continue;
 				}
 				handleKeyFlag(channel, plusSign, *flagArgIt);
-				Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], (plusSign ? ("+" + firstArg[i]) : ("-" + firstArg[i])), (*flagArgIt)), client.getFd());
+				Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], (plusSign ? (std::string("+") + firstArg[i]) : (std::string("-") + firstArg[i])), (*flagArgIt)), client.getFd());
 				flagArgIt++;
 			}
 			else if (firstArg[i] == 'o')
@@ -147,7 +147,7 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 					continue ;
 				}
 				handleOperatorFlag(channel, plusSign, *target);
-				Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], (plusSign ? ("+" + firstArg[i]) : ("-" + firstArg[i])), (plusSign ? *flagArgIt : std::string(""))), client.getFd());
+				Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], (plusSign ? (std::string("+") + firstArg[i]) : (std::string("-") + firstArg[i])), (plusSign ? *flagArgIt : std::string(""))), client.getFd());
 				flagArgIt++;
 			}
 			else if (firstArg[i] == 'l')
@@ -158,7 +158,7 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 					continue;
 				}
 				handleLimitFlag(channel, plusSign, *flagArgIt);
-				Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], (plusSign ? ("+" + firstArg[i]) : ("-" + firstArg[i])), (plusSign ? *flagArgIt : std::string(""))), client.getFd());
+				Server::sendReply(RPL_MODE(client.getNickname(), cmd.arguments[0], (plusSign ? (std::string("+") + firstArg[i]) : (std::string("-") + firstArg[i])), (plusSign ? *flagArgIt : std::string(""))), client.getFd());
 				flagArgIt++;
 			}
 			else
