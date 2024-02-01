@@ -41,10 +41,17 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_USERONCHANNEL(client.getNickname(), paramChannels[i]), client.getFd());
 					break ;
 				}
-				if (i < paramKeys.size() && channels[j]->getKey() != paramKeys[i])
+				if (channels[j]->getInviteOnly() && client.hasInvitationForChannel(channels[j]->getName()))
 				{
-					Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
-					break ;
+					// add the client to the channel even the channel has a key
+				}
+				if (!channels[j]->getKey().empty())
+				{
+					if (i < paramKeys.size() || channels[j]->getKey() != paramKeys[i])
+					{
+						Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
+						break ;
+					}
 				}
 				if (channels[j]->getmemberLimit() != -1 && static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getmemberLimit())
 				{

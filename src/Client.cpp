@@ -14,7 +14,7 @@ void Client::setFd(const unsigned int fd)
 	this->fd = fd;
 }
 
-void	Client::authenticate(void)
+void Client::authenticate(void)
 {
 	this->_isAuthenticated = true;
 }
@@ -54,17 +54,35 @@ std::string Client::getRealname(void)
 	return (this->realname);
 }
 
-bool	Client::isAuthenticated(void)
+bool Client::isAuthenticated(void)
 {
 	return (this->_isAuthenticated);
 }
 
-bool	Client::isRegistered(void)
+bool Client::isRegistered(void)
 {
 	return (this->_isRegistered);
 }
 
-void	Client::_register(void)
+void Client::_register(void)
 {
 	this->_isRegistered = true;
+}
+
+void Client::addInvitedChannel(const std::string channelName)
+{
+	this->invitedChannelsNames.push_back(channelName);
+}
+
+std::vector<std::string> Client::getInvitedChannelsNames(void)
+{
+	return (this->invitedChannelsNames);
+}
+
+bool Client::hasInvitationForChannel(std::string channelName)
+{
+	for (size_t i = 0; i < this->invitedChannelsNames.size(); i++)
+		if (invitedChannelsNames[i] == channelName)
+			return (true);
+	return (false);
 }
