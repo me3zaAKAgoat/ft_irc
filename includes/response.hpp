@@ -31,7 +31,7 @@
 /* Numeric Responses */
 #define RPL_WELCOME(nickname)                           ":irc.server.com 001 :Welcome " + nickname + " to the ft_irc network" + MESSAGE_DELIMITER
 #define RPL_TOPIC(channel, topic)               		":irc.server.com 332 " + channel + " :" + topic + MESSAGE_DELIMITER
-#define RPL_NOTOPIC(source, channel)                    ":irc.server.com 331 " + channel + " :No topic is set" + MESSAGE_DELIMITER
+#define RPL_NOTOPIC(channel)                            ":irc.server.com 331 " + channel + " :No topic is set" + MESSAGE_DELIMITER
 #define RPL_INVITING(source, nickname, channel)         ":irc.server.com 341 " + source + " " + nickname + " " + channel + " :Inviting " + nickname + " to channel " + channel + MESSAGE_DELIMITER
 #define RPL_NAMREPLY(channel, nicknames)                ":irc.server.com 353 :" + nicknames + MESSAGE_DELIMITER
 #define RPL_PRIVMSG(source, target, message)            ":irc.server.com PRIVMSG " + target + " :" + message + MESSAGE_DELIMITER

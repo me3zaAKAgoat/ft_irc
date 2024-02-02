@@ -4,7 +4,7 @@ void	topicCmd(commandData& cmd, Server& server, Client& client)
 {
 	if (!cmd.arguments.size())
 	{
-		Server::sendReply(RPL_NOTOPIC(client.getNickname(), ""), client.getFd());
+		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
 	}
 	if (!Channel::isValidChannelName(cmd.arguments[0]))
@@ -35,8 +35,8 @@ void	topicCmd(commandData& cmd, Server& server, Client& client)
 	else
 	{
 		if (channel->getTopic().empty())
-			Server::sendReply(RPL_NOTOPIC(client.getNickname(), cmd.arguments[0]), client.getFd());
+			Server::sendReply(RPL_NOTOPIC(cmd.arguments[0]), client.getFd());
 		else
-			Server::sendReply(RPL_TOPIC(client.getNickname(), cmd.arguments[0], channel->getTopic()), client.getFd());
+			Server::sendReply(RPL_TOPIC(cmd.arguments[0], channel->getTopic()), client.getFd());
 	}	
 }
