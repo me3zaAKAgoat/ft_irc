@@ -48,9 +48,12 @@ void handleLimitFlag(Channel *channel, bool plusSign, std::string& memberLimit)
 		channel->setmemberLimit(0);
 }
 
-bool is_digits(const std::string &str)
+bool	isValidNum(const std::string &str)
 {
-    return str.find_first_not_of("0123456789") == std::string::npos;
+	if (str[0] == '-' || str[0] == '+')
+		return str.find_first_not_of("0123456789", 1) == std::string::npos;
+	else
+		return str.find_first_not_of("0123456789") == std::string::npos;
 }
 
 void		modeCmd(commandData& cmd, Server& server, Client& client)
@@ -139,7 +142,7 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 					continue;
 				}
-				if (is_digits(*flagArgIt) == false)
+				if (isValidNum(*flagArgIt) == false)
 				{
 					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
 					continue;

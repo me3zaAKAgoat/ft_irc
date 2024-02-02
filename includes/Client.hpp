@@ -21,6 +21,8 @@ class Client
 		std::string		getRealname(void);
 		bool			isAuthenticated(void);
 		bool			isRegistered(void);
+		void			addChannelInvitation(const std::string &channel);
+		bool			isInvitedToChannel(const std::string &channel);
 
 	private:
 		int				fd;
@@ -30,4 +32,5 @@ class Client
 		std::string		realname;
 		bool			_isAuthenticated;
 		bool			_isRegistered;
+		std::vector<std::string>	channelInvitations;
 };
