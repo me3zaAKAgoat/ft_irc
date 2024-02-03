@@ -12,29 +12,33 @@ void noticeCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NOTEXTTOSEND(client.getNickname()), client.getFd());
 		return ;
 	}
-	if (cmd.arguments[0][0] == '#' || cmd.arguments[0][0] == '&')
+	std::vector<std::string> receivers = split(cmd.arguments[0], ",");
+	for (size_t i = 0; i < receivers.size(); i++)
 	{
-		Channel *channel = server.getChannelByName(cmd.arguments[0]);
-		if (!channel)
+		if (receivers[i][0] == '#' || receivers[i][0] == '&')
 		{
-			Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
-			return ;
+			Channel *channel = server.getChannelByName(receivers[i]);
+			if (!channel)
+			{
+				Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), receivers[i]), client.getFd());
+				return ;
+			}
+			if (!channel->isMember(&client))
+			{
+				Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(),receivers[i]), client.getFd());
+				return ;
+			}
+			channel->broadcastMessage(&client, RPL_NOTICE(client.getNickname(), receivers[i], cmd.arguments[1]));
 		}
-		if (!channel->isMember(&client))
+		else
 		{
-			Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(),cmd.arguments[0]), client.getFd());
-			return ;
+			Client *receiver = server.getClientByNickname(receivers[i]);
+			if (!receiver)
+			{
+				Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), receivers[i]), client.getFd());
+				return ;
+			}
+			Server::sendReply(RPL_NOTICE(client.getNickname(), receivers[i], cmd.arguments[1]), receiver->getFd());
 		}
-		channel->broadcastMessage(&client, RPL_NOTICE(client.getNickname(), cmd.arguments[0], cmd.arguments[1]));
-	}
-	else
-	{
-		Client *receiver = server.getClientByNickname(cmd.arguments[0]);
-		if (!receiver)
-		{
-			Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), cmd.arguments[0]), client.getFd());
-			return ;
-		}
-		Server::sendReply(RPL_NOTICE(client.getNickname(), cmd.arguments[0], cmd.arguments[1]), receiver->getFd());
 	}
 }

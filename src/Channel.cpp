@@ -6,6 +6,8 @@ Channel::Channel(const std::string name) : name(name), topic(""), key(""), isInv
 
 Channel::~Channel()
 {
+	for (size_t i = 0; i < this->members.size(); i++)
+		delete this->members[i];
 }
 
 void Channel::addMember(Client *client)
@@ -30,7 +32,7 @@ void Channel::removeMember(Server &server, Client *client)
 		{
 			delete this->members[i];
 			this->members.erase(this->members.begin() + i);
-			return ;
+			break ;
 		}
 	}
 	if (!this->getMembers().size())

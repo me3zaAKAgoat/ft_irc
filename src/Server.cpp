@@ -19,6 +19,8 @@ Server::~Server(void)
 		delete it->second;
 		close(it->first);
 	}
+	for (size_t i = 0; i < this->_channels.size(); i++)
+		delete this->_channels[i];
 	close(this->_socket);
 }
 

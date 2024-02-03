@@ -23,20 +23,17 @@ void	topicCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;
 	}
-	if (cmd.arguments.size() > 1)
+	if (channel->getChannelTopicIsRestricted() && !channel->isOperator(&client))
 	{
-		if (!channel->isOperator(&client))
-		{
-			Server::sendReply(ERR_CHANOPRIVSNEEDED(client.getNickname(), cmd.arguments[0]), client.getFd());
-			return ;
-		}
-		channel->setTopic(cmd.arguments[1]);
+		Server::sendReply(ERR_CHANOPRIVSNEEDED(client.getNickname(), cmd.arguments[0]), client.getFd());
+		return ;
 	}
+	if (cmd.arguments.size() > 1)
+		channel->setTopic(cmd.arguments[1]);
 	else
-	{
-		if (channel->getTopic().empty())
-			channel->broadcastMessage(&client, RPL_NOTOPIC(client.getNickname(), cmd.arguments[0]));
-		else
-			channel->broadcastMessage(&client, RPL_TOPIC(client.getNickname(), cmd.arguments[0], channel->getTopic()));
-	}	
+		channel->setTopic("");
+	if (channel->getTopic().empty())
+		channel->broadcastMessage(&client, RPL_NOTOPIC(client.getNickname(), cmd.arguments[0]));
+	else
+		channel->broadcastMessage(&client, RPL_TOPIC(client.getNickname(), cmd.arguments[0], channel->getTopic()));
 }

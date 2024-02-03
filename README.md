@@ -23,6 +23,7 @@
 - messages that the server sends should have the servers hostname as prefix/origin (error responses mainly)
 - test join and split vulnerable functions
 - visit macros and check for mistakes in them a lot of them are wrong
+- how do u handle suspended clients CTRL Z 
 
 # REFERENCES
 

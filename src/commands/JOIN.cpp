@@ -50,7 +50,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		}
 		if (!channel->getKey().empty())
 		{
-			if (i < paramKeys.size())
+			if (i >= paramKeys.size())
 			{
 				Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), paramChannels[i]), client.getFd());
 				continue;
@@ -77,6 +77,6 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		std::vector<std::string> nicknames;
 		for (size_t k = 0; k < members.size(); k++)
 			nicknames.push_back(members[k]->client->getNickname());
-		Server::sendReply(RPL_NAMREPLY(client.getNickname(), std::string("= ") + channel->getName(), join(nicknames)), client.getFd());
+		Server::sendReply(RPL_NAMREPLY(client.getNickname(), channel->getName(), join(nicknames)), client.getFd());
 	}
 }

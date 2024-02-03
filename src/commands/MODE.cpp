@@ -5,7 +5,7 @@ i - invite-only channel flag; 					 	  || MODE #channel +i
 t - topic settable by channel operator only flag;	  || MODE #channel +t
 k - set a channel key (password).				 	  || MODE #channel +k "new-key"
 o - give/take channel operator privileges;			  || MODE #channel +o nick
-l - set the user memberLimit to channel;					  || MODE #channel +l 50
+l - set the user memberLimit to channel;			  || MODE #channel +l 50
 */
 
 void handleInviteFlag(Channel *channel, bool plusSign)
@@ -91,15 +91,17 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 	*/
 	bool								plusSign = true;
 	std::string							firstArg = cmd.arguments[1];
-	std::vector<std::string>::iterator	flagArgIt = cmd.arguments.begin() + 2; 
+	std::vector<std::string>::iterator	flagArgIt = cmd.arguments.begin() + 2;
+	bool								foundAMode = false;
 	for (size_t i = 0; i < firstArg.size(); i++)
 	{
 		if (firstArg[i] == '+')
 			plusSign = true;
 		else if (firstArg[i] == '-')
 			plusSign = false;
-		else
+		else if (std::string("itkol").find(firstArg[i]) != std::string::npos)
 		{
+			foundAMode = true;
 			if (firstArg[i] == 'i')
 				handleInviteFlag(channel, plusSign);
 			else if (firstArg[i] == 't')
@@ -124,12 +126,12 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 				if (flagArgIt == cmd.arguments.end())
 				{
 					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
-					continue; ;
+					continue;
 				}
 				Client *target = server.getClientByNickname(*flagArgIt);
 				if (!target)
 				{
-					Server::sendReply(ERR_NOSUCHNICK(target->getNickname(), *flagArgIt), target->getFd());
+					Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), *flagArgIt), client.getFd());
 					continue ;
 				}
 				handleOperatorFlag(channel, plusSign, *target);
@@ -147,7 +149,7 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
 					continue;
 				}
-				if (std::atoi((*flagArgIt).c_str()) <= 0)
+				if (std::atoi((*flagArgIt).c_str()) < 0)
 				{
 					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
 					continue;
@@ -155,11 +157,16 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 				handleLimitFlag(channel, plusSign, *flagArgIt);
 				flagArgIt++;
 			}
-			else
-			{
-				Server::sendReply(ERR_UNKNOWNMODE(client.getNickname(), firstArg[i]), client.getFd());
-				continue;
-			}
 		}
+		else
+		{
+			Server::sendReply(ERR_UNKNOWNMODE(client.getNickname(), firstArg[i]), client.getFd());
+			continue;
+		}
+	}
+	if (!foundAMode)
+	{
+		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+		return ;
 	}
 }

@@ -31,9 +31,9 @@
 
 /* Numeric Responses */
 #define RPL_WELCOME(nickname)                           ":irc.server.com 001 " + nickname + " :Welcome " + nickname + " to the ft_irc network" + MESSAGE_DELIMITER
-#define RPL_TOPIC(joiner, channel, topic)               ":irc.server.com 332 " + joiner + channel + " :" + topic + MESSAGE_DELIMITER
-#define RPL_NOTOPIC(joiner, channel)                    ":irc.server.com 331 " + joiner + channel + " :No topic is set" + MESSAGE_DELIMITER
-#define RPL_NAMREPLY(joiner, channel, nicknames)        ":irc.server.com 353 " + joiner + channel + " :" + nicknames + MESSAGE_DELIMITER
+#define RPL_TOPIC(joiner, channel, topic)               ":irc.server.com 332 " + joiner + " " + channel + " :" + topic + MESSAGE_DELIMITER
+#define RPL_NOTOPIC(joiner, channel)                    ":irc.server.com 331 " + joiner + " " + channel + " :No topic is set." + MESSAGE_DELIMITER
+#define RPL_NAMREPLY(joiner, channel, nicknames)        ":irc.server.com 353 " + joiner + " = " + channel + " :" + nicknames + MESSAGE_DELIMITER
 #define RPL_INVITING(source, nickname, channel)         ":irc.server.com 341 " + source + " " + nickname + " " + channel + " :Inviting " + nickname + " to channel " + channel + MESSAGE_DELIMITER
 #define RPL_PRIVMSG(source, target, message)            ":" + source + " PRIVMSG " + target + " :" + message + MESSAGE_DELIMITER
 #define RPL_NOTICE(source, target, message)             ":" + source + " NOTICE " + target + " :" + message + MESSAGE_DELIMITER
