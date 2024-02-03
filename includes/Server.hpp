@@ -31,7 +31,8 @@ class Server
 		void						setServerSocket(const int serverSocket);
 		void						setPassword(const std::string password);
 
-		static void					log(const std::string& message, int fd);
+		static void					log(const std::string& message, int fd, bool send);
+
 
 	private:
 		static const int			RECV_BUFFER_SIZE;

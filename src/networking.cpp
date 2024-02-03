@@ -31,7 +31,7 @@ void Server::handleEstablishedClientEvents(void)
 				continue;
 			}
 			this->_clients[this->pfds[i].fd]->concatCmdBuffer(requestMessage);
-			Server::log(requestMessage, this->pfds[i].fd);
+			Server::log(requestMessage, this->pfds[i].fd, false);
 			if (requestMessage.find("\r\n") != std::string::npos)
 			{
 				requestMessage = this->_clients[this->pfds[i].fd]->getCmdBuffer();
@@ -52,7 +52,7 @@ int Server::readRequest(std::string &message, const int fd)
 		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
-		log("connection closed", fd);
+		log("connection closed", fd, true);
 		return (-1);
 	}
 	else
@@ -136,14 +136,18 @@ std::string removeTrailingCRLF(const std::string& input) {
     }
 }
 
-void Server::log(const std::string& message, int fd)
+void Server::log(const std::string& message, int fd, bool send)
 {
-	std::cout << "\033[31m" << getCurrentTime() << "\033[0m" << " " << "\e[0;32m" << fd << "\033[0m" << " \"" << removeTrailingCRLF(message)<< "\"" << std::endl;
+	if (send)
+		std::cout << "\033[31m" << getCurrentTime() << "\033[0m" << " " << "\e[0;32m" << "S " <<fd << "\033[0m" << " \"" << removeTrailingCRLF(message)<< "\"" << std::endl;
+	else
+		std::cout << "\033[31m" << getCurrentTime() << "\033[0m" << " " << "\e[0;32m" << "R " <<fd << "\033[0m" << " \"" << removeTrailingCRLF(message)<< "\"" << std::endl;
+	
 }
 
 void Server::sendReply(const std::string &message, int clientFd)
 {
-	log(message, clientFd);
+	log(message, clientFd, true);
 	if (send(clientFd, message.c_str(), strlen(message.c_str()), 0) == -1)
 		perror("send sys call failed: ");
 }
@@ -156,7 +160,7 @@ int Server::setupServerSocket(void)
 	// 1. Creating socket file descriptor
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket == -1)
-	// || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1) // not sure if server socket should be non-blocking
+	//  || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
 	// 2. Forcefully attaching socket to the port 8080
 
