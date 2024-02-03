@@ -23,6 +23,7 @@ class Client
 		bool			isRegistered(void);
 		void			addChannelInvitation(const std::string &channel);
 		bool			isInvitedToChannel(const std::string &channel);
+		void			removeInviteToChannel(const std::string& channel);
 
 	private:
 		int				fd;

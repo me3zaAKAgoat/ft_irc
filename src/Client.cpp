@@ -68,3 +68,30 @@ void	Client::_register(void)
 {
 	this->_isRegistered = true;
 }
+
+void	Client::addChannelInvitation(const std::string& channel)
+{
+	this->channelInvitations.push_back(channel);
+}
+
+bool	Client::isInvitedToChannel(const std::string& channel)
+{
+	for (size_t i = 0; i < this->channelInvitations.size(); i++)
+	{
+		if (this->channelInvitations[i] == channel)
+			return (true);
+	}
+	return (false);
+}
+
+void	Client::removeInviteToChannel(const std::string& channel)
+{
+	for (size_t i = 0; i < this->channelInvitations.size(); i++)
+	{
+		if (this->channelInvitations[i] == channel)
+		{
+			this->channelInvitations.erase(this->channelInvitations.begin() + i);
+			return ;
+		}
+	}
+}

@@ -27,6 +27,7 @@
 #define ERR_UNKNOWNCOMMAND(source, command)             ":irc.server.com 421 " + source + " " + command + " :Unknown command" + MESSAGE_DELIMITER
 #define ERR_UNKNOWNMODE(source, mode)                   ":irc.server.com 472 " + source + " " + mode + " :is unknown mode char to me" + MESSAGE_DELIMITER
 #define ERR_INVALIDMODEPARAM(source, mode, param)       ":irc.server.com 696 " + source + " " + mode + " " + param + " :Invalid MODE flag paramater" + MESSAGE_DELIMITER
+#define ERR_INVITEONLYCHAN(channel)                     ":irc.server.com 473 " + channel + " :Cannot join channel (+i)" + MESSAGE_DELIMITER
 
 /* Numeric Responses */
 #define RPL_WELCOME(nickname)                           ":irc.server.com 001 :Welcome " + nickname + " to the ft_irc network" + MESSAGE_DELIMITER

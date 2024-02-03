@@ -18,60 +18,65 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 	std::vector<Channel *> channels = server.getChannels();
 	std::vector<std::string> paramChannels = split(cmd.arguments[0], ",");
 	std::vector<std::string> paramKeys;
-	bool	channelExists; 
 
 
 	if (cmd.arguments.size() > 1)
 		paramKeys = split(cmd.arguments[1], ",");
 	for (size_t i = 0; i < paramChannels.size(); i++)
 	{
-		channelExists = false; 
 		if (!Channel::isValidChannelName(paramChannels[i]))
 		{
 			Server::sendReply(ERR_NOSUCHCHANNEL(client.getNickname(), paramChannels[i]), client.getFd());
 			continue ;
 		}
-		for (size_t j = 0; j < channels.size(); j++)
-		{
-			if (channels[j]->getName() == paramChannels[i])
-			{
-				channelExists = true;
-				if (channels[j]->isMember(&client))
-				{
-					Server::sendReply(ERR_USERONCHANNEL(client.getNickname(), paramChannels[i]), client.getFd());
-					break ;
-				}
-				if (i < paramKeys.size() && channels[j]->getKey() != paramKeys[i])
-				{
-					Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
-					break ;
-				}
-				if (channels[j]->getmemberLimit() != -1 && static_cast<int>(channels[j]->getMembers().size()) >= channels[j]->getmemberLimit())
-				{
-					Server::sendReply(ERR_CHANNELISFULL(client.getNickname(), paramChannels[i]), client.getFd());
-					break ;
-				}
-				channels[j]->addMember(&client);
-
-				if (channels[j]->getTopic() == "")
-					Server::sendReply(RPL_NOTOPIC(client.getNickname(), channels[j]->getName()), client.getFd());
-				else
-					Server::sendReply(RPL_TOPIC(channels[j]->getName(), channels[j]->getTopic()) , client.getFd());
-				std::vector<ChannelMember *> members = channels[j]->getMembers();
-				std::vector<std::string> nicknames;
-				for (size_t k = 0; k < members.size(); k++)
-					nicknames.push_back("@" + members[k]->client->getNickname());
-				Server::sendReply(RPL_NAMREPLY(channels[j]->getName(), join(nicknames)), client.getFd());
-
-				break ;
-			}
-		}
-		if (!channelExists)
+		Channel *channel = server.getChannelByName(paramChannels[i]);
+		if (!channel)
 		{
 			Channel *newChannel = new Channel(paramChannels[i]);
 			newChannel->addMember(&client);
 			newChannel->giveOperator(&client);
 			server.addChannel(newChannel);
+			continue ;
 		}
+		if (channel->isMember(&client))
+		{
+			Server::sendReply(ERR_USERONCHANNEL(client.getNickname(), paramChannels[i]), client.getFd());
+			continue ;
+		}
+		if (channel->getInviteOnly() && !client.isInvitedToChannel(paramChannels[i]))
+		{
+			Server::sendReply(ERR_INVITEONLYCHAN(paramChannels[i]), client.getFd());
+			continue ;
+		}
+		if (!channel->getKey().empty())
+		{
+			if (i < paramKeys.size())
+			{
+				Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), paramChannels[i]), client.getFd());
+				continue;
+			}
+			if (channel->getKey() != paramKeys[i])
+			{
+				Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
+				continue ;
+			}
+		}
+		if (channel->getmemberLimit() != -1 && static_cast<int>(channel->getMembers().size()) >= channel->getmemberLimit())
+		{
+			Server::sendReply(ERR_CHANNELISFULL(client.getNickname(), paramChannels[i]), client.getFd());
+			continue;
+		}
+		channel->addMember(&client);
+		if (channel->getInviteOnly())
+			client.removeInviteToChannel(paramChannels[i]);
+		if (channel->getTopic() == "")
+			Server::sendReply(RPL_NOTOPIC(client.getNickname()), client.getFd());
+		else
+			Server::sendReply(RPL_TOPIC(channel->getName(), channel->getTopic()) , client.getFd());
+		std::vector<ChannelMember *> members = channel->getMembers();
+		std::vector<std::string> nicknames;
+		for (size_t k = 0; k < members.size(); k++)
+		nicknames.push_back("@" + members[k]->client->getNickname());
+		Server::sendReply(RPL_NAMREPLY(channel->getName(), join(nicknames)), client.getFd());
 	}
 }
