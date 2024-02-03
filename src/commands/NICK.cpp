@@ -46,5 +46,18 @@ void	nickCmd(commandData& cmd, Server &server, Client& client)
 		Server::sendReply(ERR_NICKNAMEINUSE(client.getNickname()), client.getFd());
 		return ;
 	}
-	client.setNickname(cmd.arguments[0]);
+	if (!client.getNickname().empty())
+	{
+		std::string oldNick = client.getNickname();
+		client.setNickname(cmd.arguments[0]);
+		std::vector<Channel *>	channels = server.getChannels();
+		for (size_t i = 0; i < channels.size(); i++)
+		{
+			if (channels[i]->isMember(&client))
+				channels[i]->broadcastMessage(&client, RPL_NICKCHANGE(oldNick, client.getNickname()));
+		}
+		Server::sendReply(RPL_NICKCHANGE(oldNick, client.getNickname()), client.getFd());
+	}
+	else
+		client.setNickname(cmd.arguments[0]);
 }

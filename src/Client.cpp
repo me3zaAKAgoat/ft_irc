@@ -95,3 +95,18 @@ void	Client::removeInviteToChannel(const std::string& channel)
 		}
 	}
 }
+
+void	Client::concatCmdBuffer(std::string &buffer)
+{
+	this->cmdBuffer.append(buffer);
+}
+
+std::string	Client::getCmdBuffer(void)
+{
+	return (this->cmdBuffer);
+}
+
+void	Client::clearCmdBuffer(void)
+{
+	this->cmdBuffer.clear();
+}

@@ -69,14 +69,14 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		channel->addMember(&client);
 		if (channel->getInviteOnly())
 			client.removeInviteToChannel(paramChannels[i]);
-		if (channel->getTopic() == "")
-			Server::sendReply(RPL_NOTOPIC(client.getNickname()), client.getFd());
+		if (channel->getTopic().empty())
+			Server::sendReply(RPL_NOTOPIC(client.getNickname(), channel->getName()), client.getFd());
 		else
-			Server::sendReply(RPL_TOPIC(channel->getName(), channel->getTopic()) , client.getFd());
+			Server::sendReply(RPL_TOPIC(client.getNickname(), channel->getName(), channel->getTopic()) , client.getFd());
 		std::vector<ChannelMember *> members = channel->getMembers();
 		std::vector<std::string> nicknames;
 		for (size_t k = 0; k < members.size(); k++)
-		nicknames.push_back("@" + members[k]->client->getNickname());
-		Server::sendReply(RPL_NAMREPLY(channel->getName(), join(nicknames)), client.getFd());
+			nicknames.push_back(members[k]->client->getNickname());
+		Server::sendReply(RPL_NAMREPLY(client.getNickname(), std::string("= ") + channel->getName(), join(nicknames)), client.getFd());
 	}
 }

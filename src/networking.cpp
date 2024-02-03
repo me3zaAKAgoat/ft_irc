@@ -30,10 +30,15 @@ void Server::handleEstablishedClientEvents(void)
 				Server::closeConnection(this->pfds[i].fd);
 				continue;
 			}
+			this->_clients[this->pfds[i].fd]->concatCmdBuffer(requestMessage);
 			Server::log(requestMessage, this->pfds[i].fd);
-			// std::cout << this->pfds[i].fd << " sent the following message: '" << requestMessage << "'" << std::endl; //debug
-			commands = split(requestMessage, MESSAGE_DELIMITER);
-			Server::parseCommands(commands, this->pfds[i].fd);
+			if (requestMessage.find("\r\n") != std::string::npos)
+			{
+				requestMessage = this->_clients[this->pfds[i].fd]->getCmdBuffer();
+				commands = split(requestMessage, MESSAGE_DELIMITER);
+				Server::parseCommands(commands, this->pfds[i].fd);
+				this->_clients[this->pfds[i].fd]->clearCmdBuffer();
+			}
 		}
 	}
 }
@@ -56,7 +61,7 @@ int Server::readRequest(std::string &message, const int fd)
 		message.append(buf);
 		while (bytesReceived)
 		{
-			bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);
+			bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);	
 			if (bytesReceived == -1)
 			{
 				if (errno != EWOULDBLOCK)

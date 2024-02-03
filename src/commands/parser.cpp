@@ -29,7 +29,6 @@ commandData parseCommandMessage(const std::string &commandMessage)
 		}
 	}
 
-
 	if (trailingPartStartPos != std::string::npos)
 	{
 		std::string trailingPart = commandMessage.substr(trailingPartStartPos);

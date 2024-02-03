@@ -2,7 +2,7 @@ CPP = c++
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 NAME = ircserv 
 
-HEADERS = includes/Server.hpp includes/Client.hpp includes/Irc.hpp includes/Commands.hpp
+HEADERS = includes/Server.hpp includes/Client.hpp includes/Irc.hpp includes/Commands.hpp includes/response.hpp
 SRCS = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/util.cpp src/networking.cpp\
 	src/commands/NICK.cpp src/commands/PASS.cpp src/commands/USER.cpp src/commands/JOIN.cpp\
 	src/commands/PART.cpp src/commands/PRIVMSG.cpp src/commands/QUIT.cpp src/commands/INVITE.cpp\
