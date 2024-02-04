@@ -46,8 +46,7 @@ int main(int ac, const char *av[])
 	try
 	{
 		BMOBot x(atoi(av[1]));
-		std::string registeration = "PASS " + std::string(av[2]) + "\r\n" + "NICK bot\r\n" + "USER x x x x\r\n";
-		send(x.getBotSocket(), registeration.c_str(), registeration.size(), 0);
+		x.botRegistration(av[2]);
 		// send(x.getBotSocket(), "PRIVMSG ekenane :hi mehdi im here!\r\n", strlen("PRIVMSG ekenane :hi mehdi im here!\r\n"), 0);
 		x.botCoreProcess();
 		return (EXIT_SUCCESS);
