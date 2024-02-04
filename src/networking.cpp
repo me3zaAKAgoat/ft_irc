@@ -179,7 +179,7 @@ int Server::setupServerSocket(void)
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
-	serverAddress.sin_port = htons(Server::getPort());
+	serverAddress.sin_port = htons(this->getPort());
 
 	// 3.1 binding
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
