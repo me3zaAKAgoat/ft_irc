@@ -1,12 +1,14 @@
 #include "Commands.hpp"
 
-bool	isValidNickChar(char c)
+bool isValidNickChar(char c)
 {
 	return (!(c == '#' || c == ':' || c == ' '));
 }
 
-bool	isValidNick(std::string nickname)
+bool isValidNick(std::string &nickname)
 {
+	if (nickname.empty())
+		return (false);
 	for (size_t i = 0; i < nickname.size(); i++)
 	{
 		if (!isValidNickChar(nickname[i]))
@@ -15,7 +17,7 @@ bool	isValidNick(std::string nickname)
 	return (true);
 }
 
-bool	isAlreadyUsed(commandData& cmd, Server& server)
+bool isAlreadyUsed(commandData &cmd, Server &server)
 {
 	std::map<int, Client *> clients = server.getClients();
 
@@ -27,30 +29,30 @@ bool	isAlreadyUsed(commandData& cmd, Server& server)
 	return (false);
 }
 
-void	nickCmd(commandData& cmd, Server &server, Client& client)
+void nickCmd(commandData &cmd, Server &server, Client &client)
 {
 	if (!client.isAuthenticated())
-		return ;
+		return;
 	if (!cmd.arguments.size())
 	{
-		Server::sendReply(ERR_NONICKNAMEGIVEN(client.getNickname()), client.getFd());
-		return ;
+		Server::sendReply(ERR_NONICKNAMEGIVEN(), client.getFd());
+		return;
 	}
 	if (!isValidNick(cmd.arguments[0]))
 	{
-		Server::sendReply(ERR_ERRONEUSNICKNAME(client.getNickname()), client.getFd());
-		return ;
+		Server::sendReply(ERR_ERRONEUSNICKNAME(cmd.arguments[0]), client.getFd());
+		return;
 	}
 	if (isAlreadyUsed(cmd, server))
 	{
-		Server::sendReply(ERR_NICKNAMEINUSE(client.getNickname()), client.getFd());
-		return ;
+		Server::sendReply(ERR_NICKNAMEINUSE(cmd.arguments[0]), client.getFd());
+		return;
 	}
 	if (!client.getNickname().empty())
 	{
 		std::string oldNick = client.getNickname();
 		client.setNickname(cmd.arguments[0]);
-		std::vector<Channel *>	channels = server.getChannels();
+		std::vector<Channel *> channels = server.getChannels();
 		for (size_t i = 0; i < channels.size(); i++)
 		{
 			if (channels[i]->isMember(&client))

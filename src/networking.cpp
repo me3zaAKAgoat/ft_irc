@@ -37,7 +37,8 @@ void Server::handleEstablishedClientEvents(void)
 				requestMessage = this->_clients[this->pfds[i].fd]->getCmdBuffer();
 				commands = split(requestMessage, MESSAGE_DELIMITER);
 				Server::parseCommands(commands, this->pfds[i].fd);
-				this->_clients[this->pfds[i].fd]->clearCmdBuffer();
+				if (this->_clients.find(this->pfds[i].fd) != this->_clients.end()) // this handles the case the client connection was closed because of a command
+					this->_clients[this->pfds[i].fd]->clearCmdBuffer();
 			}
 		}
 	}
