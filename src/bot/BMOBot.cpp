@@ -66,7 +66,8 @@ void BMOBot::botCoreProcess(void)
 	{
 		poll(&this->pfd, 1, -1);
 		std::string msg;
-		this->readBotRequest(msg, this->getBotSocket());
+		if (this->readBotRequest(msg, this->getBotSocket()) == -1)
+			break ;
 		std::cout << "msg read from server: " << msg << std::endl;
 		// handle request
 		// send result
