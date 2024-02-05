@@ -25,20 +25,21 @@ void Server::handleEstablishedClientEvents(void)
 	{
 		if (this->pfds[i].revents & POLLIN)
 		{
-			if (Server::readRequest(requestMessage, this->pfds[i].fd) == -1)
+			int clientFd = this->pfds[i].fd; // to avoid the case of the client closing the connection while processing the request
+			if (Server::readRequest(requestMessage, clientFd) == -1)
 			{
-				Server::closeConnection(this->pfds[i].fd);
+				Server::closeConnection(clientFd);
 				continue;
 			}
-			this->_clients[this->pfds[i].fd]->concatCmdBuffer(requestMessage);
-			Server::log(requestMessage, this->pfds[i].fd, false);
-			if (requestMessage.find(MESSAGE_DELIMITER) != std::string::npos)
+			this->_clients[clientFd]->concatCmdBuffer(requestMessage);
+			Server::log(requestMessage, clientFd, false);
+			if (requestMessage.find("\r\n") != std::string::npos)
 			{
-				requestMessage = this->_clients[this->pfds[i].fd]->getCmdBuffer();
+				requestMessage = this->_clients[clientFd]->getCmdBuffer();
 				commands = split(requestMessage, MESSAGE_DELIMITER);
-				Server::parseCommands(commands, this->pfds[i].fd);
-				if (this->_clients.find(this->pfds[i].fd) != this->_clients.end()) // this handles the case the client connection was closed because of a command
-					this->_clients[this->pfds[i].fd]->clearCmdBuffer();
+				Server::parseCommands(commands, clientFd);
+				if (this->_clients.find(clientFd) != this->_clients.end()) // this handles the case the client connection was closed because of a command
+					this->_clients[clientFd]->clearCmdBuffer();
 			}
 		}
 	}
