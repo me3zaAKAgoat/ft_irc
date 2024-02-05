@@ -24,19 +24,21 @@ Server::~Server(void)
 	close(this->_socket);
 }
 
-typedef void (*CommandHandler)(commandData&, Server&, Client&);
+typedef void (*CommandHandler)(commandData &, Server &, Client &);
 
-bool requiresRegistration(const std::string& cmdName) {
+bool requiresRegistration(const std::string &cmdName)
+{
 	std::string tmp[] = {"PASS", "NICK", "USER", "QUIT"}; /* disgusting way to initalize a set */
-    static std::set<std::string> authCommands(tmp, tmp + sizeof(tmp) / sizeof(tmp[0]));
-    return !(authCommands.count(cmdName));
+	static std::set<std::string> authCommands(tmp, tmp + sizeof(tmp) / sizeof(tmp[0]));
+	return !(authCommands.count(cmdName));
 }
 
-bool isValidCommand(std::map<std::string, CommandHandler> commandHandlers , const std::string& cmdName) {
+bool isValidCommand(std::map<std::string, CommandHandler> commandHandlers, const std::string &cmdName)
+{
 	return commandHandlers.count(cmdName);
 }
 
-void Server::parseCommands(const std::vector<std::string> commands, int clientFd)
+void Server::executeCommands(const std::vector<std::string> commands, int clientFd)
 {
 	Client *client = this->_clients[clientFd];
 	std::map<std::string, CommandHandler> commandHandlers;
@@ -71,12 +73,12 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 	}
 }
 
-void	Server::addChannel(Channel *channel)
+void Server::addChannel(Channel *channel)
 {
 	this->_channels.push_back(channel);
 }
 
-void	Server::removeChannel(Channel *channel)
+void Server::removeChannel(Channel *channel)
 {
 	for (size_t i = 0; i < this->_channels.size(); i++)
 	{
@@ -84,17 +86,17 @@ void	Server::removeChannel(Channel *channel)
 		{
 			delete this->_channels[i];
 			this->_channels.erase(this->_channels.begin() + i);
-			return ;
+			return;
 		}
 	}
 }
 
-std::map<int, Client *>		Server::getClients(void)
+std::map<int, Client *> Server::getClients(void)
 {
 	return (this->_clients);
 }
 
-std::vector<Channel *>		Server::getChannels(void)
+std::vector<Channel *> Server::getChannels(void)
 {
 	return (this->_channels);
 }
@@ -129,7 +131,7 @@ void Server::setPassword(const std::string password)
 	this->_password = password;
 }
 
-Channel* Server::getChannelByName(const std::string name)
+Channel *Server::getChannelByName(const std::string name)
 {
 	for (size_t i = 0; i < this->_channels.size(); i++)
 	{
@@ -139,7 +141,7 @@ Channel* Server::getChannelByName(const std::string name)
 	return (NULL);
 }
 
-Client*	Server::getClientByNickname(const std::string nickname)
+Client *Server::getClientByNickname(const std::string nickname)
 {
 	for (std::map<int, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{

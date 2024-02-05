@@ -10,7 +10,7 @@ class Server
 
 		int							setupServerSocket(void);
 		void						coreProcess(void);
-		void						parseCommands(const std::vector<std::string> commands, int clientFd);
+		void						executeCommands(const std::vector<std::string> commands, int clientFd);
 		int							readRequest(std::string &message, const int fd);
 		static void					sendReply(const std::string &message, int clientFd);
 		void						handleNewClient(void);

@@ -37,7 +37,7 @@ void Server::handleEstablishedClientEvents(void)
 			{
 				requestMessage = this->_clients[clientFd]->getCmdBuffer();
 				commands = split(requestMessage, MESSAGE_DELIMITER);
-				Server::parseCommands(commands, clientFd);
+				Server::executeCommands(commands, clientFd);
 				if (this->_clients.find(clientFd) != this->_clients.end()) // this handles the case the client connection was closed because of a command
 					this->_clients[clientFd]->clearCmdBuffer();
 			}
@@ -63,13 +63,13 @@ int Server::readRequest(std::string &message, const int fd)
 		message.append(buf);
 		while (bytesReceived)
 		{
-			bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);	
+			bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);
 			if (bytesReceived == -1)
 			{
 				if (errno != EWOULDBLOCK)
 					perror("recv failed");
 				return (0);
-			} 
+			}
 			buf[bytesReceived] = 0;
 			message.append(buf);
 		}
@@ -113,38 +113,49 @@ void Server::closeConnection(int fd)
 
 std::string getCurrentTime()
 {
-    time_t rawTime;
-    struct tm* timeInfo;
+	time_t rawTime;
+	struct tm *timeInfo;
 
-    time(&rawTime);
-    timeInfo = localtime(&rawTime);
+	time(&rawTime);
+	timeInfo = localtime(&rawTime);
 
-    char buffer[80];
-    strftime(buffer, sizeof(buffer), "[%Y-%m-%d %H:%M:%S]", timeInfo);
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "[%Y-%m-%d %H:%M:%S]", timeInfo);
 
-    return buffer;
+	return buffer;
 }
 
-std::string removeTrailingCRLF(const std::string& input) {
-    size_t length = input.length();
+std::string removeTrailingCRLF(const std::string &input)
+{
+	size_t length = input.length();
 
-    // Check if the string ends with '\r\n'
-    if (length >= 2 && input[length - 2] == '\r' && input[length - 1] == '\n') {
-        // Remove the last two characters
-        return input.substr(0, length - 2);
-    } else {
-        // No trailing '\r\n', return the original string
-        return input;
-    }
+	// Check if the string ends with '\r\n'
+	if (length >= 2 && input[length - 2] == '\r' && input[length - 1] == '\n')
+	{
+		// Remove the last two characters
+		return input.substr(0, length - 2);
+	}
+	else
+	{
+		// No trailing '\r\n', return the original string
+		return input;
+	}
 }
 
-void Server::log(const std::string& message, int fd, bool send)
+void Server::log(const std::string &message, int fd, bool send)
 {
 	if (send)
-		std::cout << "\033[31m" << getCurrentTime() << "\033[0m" << " " << "\e[0;32m" << "S " <<fd << "\033[0m" << " \"" << removeTrailingCRLF(message)<< "\"" << std::endl;
+		std::cout << "\033[31m" << getCurrentTime() << "\033[0m"
+				  << " "
+				  << "\e[0;32m"
+				  << "S " << fd << "\033[0m"
+				  << " \"" << removeTrailingCRLF(message) << "\"" << std::endl;
 	else
-		std::cout << "\033[31m" << getCurrentTime() << "\033[0m" << " " << "\e[0;32m" << "R " <<fd << "\033[0m" << " \"" << removeTrailingCRLF(message)<< "\"" << std::endl;
-	
+		std::cout << "\033[31m" << getCurrentTime() << "\033[0m"
+				  << " "
+				  << "\e[0;32m"
+				  << "R " << fd << "\033[0m"
+				  << " \"" << removeTrailingCRLF(message) << "\"" << std::endl;
 }
 
 void Server::sendReply(const std::string &message, int clientFd)
@@ -162,7 +173,7 @@ int Server::setupServerSocket(void)
 	// 1. Creating socket file descriptor
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket == -1)
-	//  || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
+		//  || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
 	// 2. Forcefully attaching socket to the port 8080
 
