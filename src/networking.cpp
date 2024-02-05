@@ -32,7 +32,7 @@ void Server::handleEstablishedClientEvents(void)
 			}
 			this->_clients[this->pfds[i].fd]->concatCmdBuffer(requestMessage);
 			Server::log(requestMessage, this->pfds[i].fd, false);
-			if (requestMessage.find("\r\n") != std::string::npos)
+			if (requestMessage.find(MESSAGE_DELIMITER) != std::string::npos)
 			{
 				requestMessage = this->_clients[this->pfds[i].fd]->getCmdBuffer();
 				commands = split(requestMessage, MESSAGE_DELIMITER);

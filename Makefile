@@ -11,7 +11,7 @@ SRCS = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/util.cpp s
 	src/commands/parser.cpp
 
 BONUS_HEADERS = includes/BMOBot.hpp includes/Irc.hpp
-BONUS_SRCS = src/bot/BMOBot.cpp src/bot/main.cpp src/util.cpp
+BONUS_SRCS = src/bot/BMOBot.cpp src/bot/main.cpp src/util.cpp src/commands/parser.cpp
 
 OBJECTS = $(SRCS:.cpp=.o)
 BONUS_OBJECTS = $(BONUS_SRCS:.cpp=.o)
@@ -26,7 +26,7 @@ $(NAME) : $(OBJECTS)
 $(BONUS_NAME) : $(BONUS_OBJECTS)
 	$(CPP) $(CPPFLAGS) -o $@ $(BONUS_OBJECTS)
 
-%.o : %.cpp $(HEADERS)
+%.o : %.cpp $(HEADERS) $(BONUS_HEADERS)
 	$(CPP) $(CPPFLAGS) -I./includes -c $< -o $@
 
 # igs this is not works

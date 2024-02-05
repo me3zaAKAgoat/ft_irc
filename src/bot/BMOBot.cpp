@@ -26,13 +26,38 @@ void sendBotReply(const std::string &message, int clientFd)
 		perror("send sys call failed: ");
 }
 
-void BMOBot::botRegistration(const std::string &password)
+void	BMOBot::handleDateCmd(std::string& clientNickname)
+{
+	std::time_t currentTime = std::time(0);
+	const std::tm *localTime = std::localtime(&currentTime);
+	std::ostringstream oss;
+	if (localTime != nullptr)
+		oss << std::put_time(localTime, "%A%e %B %Y - %H;%M"); // search a bit about put_time
+	else
+		oss << "Failed to get the current date and time.";
+	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, oss.str()), this->getBotSocket());
+}
+
+void	BMOBot::handleUsageCmd(std::string& clientNickname)
+{
+	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, "- list of available commands -"), this->getBotSocket());
+	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, this->getCmdsUsage()), this->getBotSocket());
+}
+
+void	BMOBot::invalidCmd(const commandData& cmd)
+{
+	std::string reply;
+	reply = "'" + cmd.arguments[1] + "' is unavailable command, try USAGE command to see list of available commands";
+	sendBotReply(RPL_PRIVMSG(this->nickname, cmd.prefix, reply), this->getBotSocket());
+}
+
+void BMOBot::botRegistration(const std::string &password) const
 {
 	std::string registration = "PASS " + std::string(password) + MESSAGE_DELIMITER + "NICK " + this->nickname + MESSAGE_DELIMITER + "USER x x x x" + MESSAGE_DELIMITER;
 	sendBotReply(registration, this->_socket);
 }
 
-int BMOBot::getBotSocket(void)
+int BMOBot::getBotSocket(void) const
 {
 	return (this->_socket);
 }
@@ -46,7 +71,6 @@ int BMOBot::readBotRequest(std::string &message, const int fd)
 		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
-		// log("connection closed", fd, true);
 		std::cout << "connection closed" << std::endl;
 		return (-1);
 	}
@@ -70,18 +94,45 @@ int BMOBot::readBotRequest(std::string &message, const int fd)
 	return (0);
 }
 
-std::string BMOBot::getCmdUsage(void)
+std::string BMOBot::getCmdsUsage(void)
 {
 	std::string cmdUsage;
-	cmdUsage.append("DATE - description ~> Get the current date and time.");
+	cmdUsage.append("DATE - description ~> Get the current date and time."); // idk why I can't add more cmds, newline (\n) doesn't works
 	return (cmdUsage);
 }
 
-void BMOBot::greetAndProvideCommands(std::vector<std::string> words)
+void BMOBot::greetAndProvideCommands(std::string clientNickname)
 {
-	std::string reply = "Hello, " + words[1] + "! I'm BMOBot. Here is a list of available commands...";
-	sendBotReply(RPL_PRIVMSG(this->nickname, words[1], reply), this->getBotSocket());
-	sendBotReply(RPL_PRIVMSG(this->nickname, words[1], this->getCmdUsage()), this->getBotSocket());
+	std::string reply = "Hello, " + clientNickname + "! I'm BMOBot. Here is a list of available commands...";
+	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, reply), this->getBotSocket());
+	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, this->getCmdsUsage()), this->getBotSocket());
+}
+
+void	BMOBot::cleanseCommandData(commandData& cmd)
+{
+	if (!cmd.prefix.empty())
+		cmd.prefix = cmd.prefix.substr(1);
+	int	lastElementIndx = cmd.arguments.size() - 1;
+	cmd.arguments[lastElementIndx] = cmd.arguments[lastElementIndx].substr(0, (cmd.arguments[lastElementIndx].size() - 2));
+}
+
+void	BMOBot::commandProcess(commandData& cmd)
+{
+	if (cmd.name == "CLIENT") // sent by server ex: CLIENT <nickname> means a new client so send welcome-bot msg
+		this->greetAndProvideCommands(cmd.arguments[0]);
+	else
+	{
+		this->cleanseCommandData(cmd);
+		if (cmd.name == "PRIVMSG")
+		{
+			if (cmd.arguments[1] == "DATE")
+				this->handleDateCmd(cmd.prefix);
+			else if (cmd.arguments[1] == "USAGE")
+				this->handleUsageCmd(cmd.prefix);
+			else
+				this->invalidCmd(cmd);
+		}
+	}
 }
 
 void BMOBot::botCoreProcess(void)
@@ -92,43 +143,7 @@ void BMOBot::botCoreProcess(void)
 		std::string msg;
 		if (this->readBotRequest(msg, this->getBotSocket()) == -1)
 			break;
-		std::cout << "msg read from server:\n"
-				  << msg << std::endl
-				  << std::endl;
-		std::vector<std::string> words = split(msg, " ");
-		std::string reply;
-		if (words[0] == "CLIENT")
-			this->greetAndProvideCommands(words);
-		else
-		{
-			words[0] = words[0].substr(1);						// remove (:) nickname of client
-			words[3] = words[3].substr(1);						// remove (:) first word in the msg
-			words[3] = words[3].substr(0, words[3].size() - 2); // remove CRLF
-			if (words[1] == "PRIVMSG")
-			{
-				if (words[3] == "DATE")
-				{
-					std::time_t currentTime = std::time(0);
-					const std::tm* localTime = std::localtime(&currentTime);					
-					std::ostringstream oss;
-					if (localTime != nullptr)
-						oss << std::put_time(localTime, "%A%e %B %Y - %H;%M"); // search a bit about put_time
-					else
-    					oss << "Failed to get the current date and time.";
-					sendBotReply(RPL_PRIVMSG(this->nickname, words[0], oss.str()), this->getBotSocket());
-				}
-				else if (words[3] == "USAGE")
-				{
-					sendBotReply(RPL_PRIVMSG(this->nickname, words[1], "- list of available commands -"), this->getBotSocket());
-					sendBotReply(RPL_PRIVMSG(this->nickname, words[0], this->getCmdUsage()), this->getBotSocket());
-				}
-				else
-				{
-					reply = "'" + words[3] + "' is unavailable command, try USAGE command to see list of available commands";
-					sendBotReply(RPL_PRIVMSG(this->nickname, words[0], reply), this->getBotSocket());
-				}
-			}
-		}
-		std::cout << "======================" << std::endl;
+		commandData cmd = parseCommandMessage(msg);
+		this->commandProcess(cmd);
 	}
 }

@@ -47,13 +47,12 @@ int main(int ac, const char *av[])
 	{
 		BMOBot x(atoi(av[1]));
 		x.botRegistration(av[2]);
-		// send(x.getBotSocket(), "PRIVMSG ekenane :hi mehdi im here!\r\n", strlen("PRIVMSG ekenane :hi mehdi im here!\r\n"), 0);
 		x.botCoreProcess();
 		return (EXIT_SUCCESS);
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << "Error: " << e.what() << std::endl;
+		std::cerr << "Error Bot: " << e.what() << std::endl;
 		return (EXIT_FAILURE);
 	}
 }
