@@ -59,7 +59,7 @@ void Server::parseCommands(const std::vector<std::string> commands, int clientFd
 
 		if (!isValidCommand(commandHandlers, cmd.name))
 		{
-			Server::sendReply(ERR_UNKNOWNCOMMAND(client->getNickname(), cmd.name), clientFd);
+			Server::sendReply(ERR_UNKNOWNCOMMAND(cmd.name), clientFd);
 			continue;
 		}
 		if (requiresRegistration(cmd.name) && !client->isRegistered())
