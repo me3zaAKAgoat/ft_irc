@@ -33,3 +33,4 @@ std::vector<std::string>	split(const std::string &input, const std::string &sepa
 typedef std::vector<std::string>::iterator StringVectorIterator;
 std::string					join(std::vector<std::string> strings, const std::string& separator = " ");
 std::string					join(StringVectorIterator itBegin, StringVectorIterator itEnd, const std::string& separator = " ");
+bool						isValidArgs(int ac, const char *av[]);

@@ -1,8 +1,8 @@
-#include "BMOBot.hpp"
+#include "BMObot.hpp"
 
-const int BMOBot::RECV_BUFFER_SIZE = 1000;
+const int BMObot::RECV_BUFFER_SIZE = 1000;
 
-BMOBot::BMOBot(const int port)
+BMObot::BMObot(const int port)
 {
 	this->_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_socket == -1)
@@ -26,7 +26,7 @@ void sendBotReply(const std::string &message, int clientFd)
 		perror("send sys call failed: ");
 }
 
-void	BMOBot::handleDateCmd(std::string& clientNickname)
+void BMObot::handleDateCmd(std::string &clientNickname)
 {
 	std::time_t currentTime = std::time(0);
 	const std::tm *localTime = std::localtime(&currentTime);
@@ -38,35 +38,35 @@ void	BMOBot::handleDateCmd(std::string& clientNickname)
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, oss.str()), this->getBotSocket());
 }
 
-void	BMOBot::handleUsageCmd(std::string& clientNickname)
+void BMObot::handleUsageCmd(std::string &clientNickname)
 {
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, "- list of available commands -"), this->getBotSocket());
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, this->getCmdsUsage()), this->getBotSocket());
 }
 
-void	BMOBot::invalidCmd(const commandData& cmd)
+void BMObot::invalidCmd(const commandData &cmd)
 {
 	std::string reply;
 	reply = "'" + cmd.arguments[1] + "' is unavailable command, try USAGE command to see list of available commands";
 	sendBotReply(RPL_PRIVMSG(this->nickname, cmd.prefix, reply), this->getBotSocket());
 }
 
-void BMOBot::botRegistration(const std::string &password) const
+void BMObot::botRegistration(const std::string &password) const
 {
 	std::string registration = "PASS " + std::string(password) + MESSAGE_DELIMITER + "NICK " + this->nickname + MESSAGE_DELIMITER + "USER x x x x" + MESSAGE_DELIMITER;
 	sendBotReply(registration, this->_socket);
 }
 
-int BMOBot::getBotSocket(void) const
+int BMObot::getBotSocket(void) const
 {
 	return (this->_socket);
 }
 
-int BMOBot::readBotRequest(std::string &message, const int fd)
+int BMObot::readBotRequest(std::string &message, const int fd)
 {
-	char buf[BMOBot::RECV_BUFFER_SIZE];
+	char buf[BMObot::RECV_BUFFER_SIZE];
 
-	int bytesReceived = recv(fd, buf, BMOBot::RECV_BUFFER_SIZE, 0);
+	int bytesReceived = recv(fd, buf, BMObot::RECV_BUFFER_SIZE, 0);
 	if (bytesReceived == -1)
 		perror("recv failed");
 	else if (bytesReceived == 0)
@@ -80,7 +80,7 @@ int BMOBot::readBotRequest(std::string &message, const int fd)
 		message.append(buf);
 		while (bytesReceived)
 		{
-			bytesReceived = recv(fd, buf, BMOBot::RECV_BUFFER_SIZE, 0);
+			bytesReceived = recv(fd, buf, BMObot::RECV_BUFFER_SIZE, 0);
 			if (bytesReceived == -1)
 			{
 				if (errno != EWOULDBLOCK)
@@ -94,29 +94,29 @@ int BMOBot::readBotRequest(std::string &message, const int fd)
 	return (0);
 }
 
-std::string BMOBot::getCmdsUsage(void)
+std::string BMObot::getCmdsUsage(void)
 {
 	std::string cmdUsage;
 	cmdUsage.append("DATE - description ~> Get the current date and time."); // idk why I can't add more cmds, newline (\n) doesn't works
 	return (cmdUsage);
 }
 
-void BMOBot::greetAndProvideCommands(std::string clientNickname)
+void BMObot::greetAndProvideCommands(std::string clientNickname)
 {
-	std::string reply = "Hello, " + clientNickname + "! I'm BMOBot. Here is a list of available commands...";
+	std::string reply = "Hello, " + clientNickname + "! I'm BMObot. Here is a list of available commands...";
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, reply), this->getBotSocket());
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, this->getCmdsUsage()), this->getBotSocket());
 }
 
-void	BMOBot::cleanseCommandData(commandData& cmd)
+void BMObot::cleanseCommandData(commandData &cmd)
 {
 	if (!cmd.prefix.empty())
 		cmd.prefix = cmd.prefix.substr(1);
-	int	lastElementIndx = cmd.arguments.size() - 1;
+	int lastElementIndx = cmd.arguments.size() - 1;
 	cmd.arguments[lastElementIndx] = cmd.arguments[lastElementIndx].substr(0, (cmd.arguments[lastElementIndx].size() - 2));
 }
 
-void	BMOBot::commandProcess(commandData& cmd)
+void BMObot::commandProcess(commandData &cmd)
 {
 	if (cmd.name == "CLIENT") // sent by server ex: CLIENT <nickname> means a new client so send welcome-bot msg
 		this->greetAndProvideCommands(cmd.arguments[0]);
@@ -135,7 +135,7 @@ void	BMOBot::commandProcess(commandData& cmd)
 	}
 }
 
-void BMOBot::botCoreProcess(void)
+void BMObot::botCoreProcess(void)
 {
 	while (1)
 	{

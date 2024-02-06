@@ -3,10 +3,10 @@
 #include <iomanip>
 #include "Irc.hpp"
 
-class BMOBot
+class BMObot
 {
 public:
-	BMOBot(const int port);
+	BMObot(const int port);
 
 	void		botRegistration(const std::string &password) const;
 	void		botCoreProcess(void);
