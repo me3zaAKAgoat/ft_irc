@@ -24,5 +24,11 @@ void		userCmd(commandData& cmd, Server &server, Client &client)
 	client.setUsername(cmd.arguments[0]);
 	client.setRealname(cmd.arguments[3]);
 	client._register();
-	Server::sendReply(RPL_WELCOME(client.getNickname()), client.getFd());
+	if (client.getNickname() != "BMOBot")
+	{
+		Server::sendReply(RPL_WELCOME(client.getNickname()), client.getFd());
+		Client *bot = server.getClientByNickname("BMOBot");
+		if (bot)
+			Server::sendReply(("CLIENT " + client.getNickname()), bot->getFd());
+	}
 }

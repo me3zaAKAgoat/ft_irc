@@ -28,7 +28,7 @@ void noticeCmd(commandData& cmd, Server& server, Client& client)
 				Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(),receivers[i]), client.getFd());
 				return ;
 			}
-			channel->broadcastMessage(&client, RPL_NOTICE(client.getNickname(), receivers[i], cmd.arguments[1]));
+			channel->broadcastMessage(&client, RPL_NOTICE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), receivers[i], cmd.arguments[1]));
 		}
 		else
 		{
@@ -38,7 +38,7 @@ void noticeCmd(commandData& cmd, Server& server, Client& client)
 				Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), receivers[i]), client.getFd());
 				return ;
 			}
-			Server::sendReply(RPL_NOTICE(client.getNickname(), receivers[i], cmd.arguments[1]), receiver->getFd());
+			Server::sendReply(RPL_NOTICE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), receivers[i], cmd.arguments[1]), receiver->getFd());
 		}
 	}
 }

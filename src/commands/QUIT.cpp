@@ -9,7 +9,7 @@ void	quitCmd(commandData& cmd, Server& server, Client& client)
 	{
 		if (channels[j]->isMember(&client))
 		{
-			channels[j]->broadcastMessage(&client, ":" + client.getNickname() + " QUIT " + quitMessage + "\r\n");
+			channels[j]->broadcastMessage(&client, ":" + client.getNickname() + " QUIT " + quitMessage + MESSAGE_DELIMITER);
 			channels[j]->removeMember(server, &client);
 		}
 	}

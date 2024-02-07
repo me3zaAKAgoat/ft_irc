@@ -26,6 +26,7 @@ class Server
 		int							getPort(void);
 		int							getServerSocket(void);
 		std::string					getPassword(void);
+		std::string 				getHostname(void);
 
 		void						setPort(const int port);
 		void						setServerSocket(const int serverSocket);
@@ -40,6 +41,7 @@ class Server
 
 		int							_port;
 		int							_socket;
+		std::string					_hostname;
 		std::string					_password;
 		std::map<int, Client *>		_clients;
 		std::vector<Channel *>		_channels;

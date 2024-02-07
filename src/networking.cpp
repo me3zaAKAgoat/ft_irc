@@ -125,23 +125,6 @@ std::string getCurrentTime()
 	return buffer;
 }
 
-std::string removeTrailingCRLF(const std::string &input)
-{
-	size_t length = input.length();
-
-	// Check if the string ends with '\r\n'
-	if (length >= 2 && input[length - 2] == '\r' && input[length - 1] == '\n')
-	{
-		// Remove the last two characters
-		return input.substr(0, length - 2);
-	}
-	else
-	{
-		// No trailing '\r\n', return the original string
-		return input;
-	}
-}
-
 void Server::log(const std::string &message, int fd, bool send)
 {
 	if (send)
@@ -192,7 +175,7 @@ int Server::setupServerSocket(void)
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
-	serverAddress.sin_port = htons(Server::getPort());
+	serverAddress.sin_port = htons(this->getPort());
 
 	// 3.1 binding
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
