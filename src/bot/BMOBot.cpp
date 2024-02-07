@@ -1,23 +1,23 @@
-#include "BMObot.hpp"
+#include "BMOBot.hpp"
 
-const int BMObot::RECV_BUFFER_SIZE = 1000;
+const int BMOBot::RECV_BUFFER_SIZE = 1000;
 
-BMObot::BMObot(const int port)
+BMOBot::BMOBot(const int port)
 {
 	this->_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_socket == -1)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
+	if (fcntl(this->_socket, F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("Set Socket on Non-blocking mode failed: " + std::string(strerror(errno)));
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
 	serverAddress.sin_port = htons(port);
 	if (connect(this->_socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
 		throw std::runtime_error("Socket connection failed: " + std::string(strerror(errno)));
-	if (fcntl(this->_socket, F_SETFL, O_NONBLOCK) == -1) // i think the order of set non-block mode does not affects
-		throw std::runtime_error("Set Socket on Non-blocking mode failed: " + std::string(strerror(errno)));
 	this->pfd.fd = this->_socket;
 	this->pfd.events = POLLIN;
-	this->nickname = "BMObot";
+	this->nickname = "BMOBot";
 }
 
 void sendBotReply(const std::string &message, int clientFd)
@@ -26,47 +26,51 @@ void sendBotReply(const std::string &message, int clientFd)
 		perror("send sys call failed: ");
 }
 
-void BMObot::handleDateCmd(std::string &clientNickname)
+void BMOBot::handleDateCmd(std::string &clientNickname)
 {
-	std::time_t currentTime = std::time(0);
-	const std::tm *localTime = std::localtime(&currentTime);
+    time_t rawTime;
+    struct tm* timeInfo;
+
+    time(&rawTime);
+    timeInfo = localtime(&rawTime);
+
+    char buffer[80];
+    strftime(buffer, sizeof(buffer), "[%Y-%m-%d %H:%M:%S]", timeInfo);
+
 	std::ostringstream oss;
-	if (localTime != nullptr)
-		oss << std::put_time(localTime, "%A%e %B %Y - %H;%M"); // search a bit about put_time
-	else
-		oss << "Failed to get the current date and time.";
+	oss << buffer;
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, oss.str()), this->getBotSocket());
 }
 
-void BMObot::handleUsageCmd(std::string &clientNickname)
+void BMOBot::handleUsageCmd(std::string &clientNickname)
 {
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, "- list of available commands -"), this->getBotSocket());
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, this->getCmdsUsage()), this->getBotSocket());
 }
 
-void BMObot::invalidCmd(const commandData &cmd)
+void BMOBot::invalidCmd(const commandData &cmd)
 {
 	std::string reply;
 	reply = "'" + cmd.arguments[1] + "' is unavailable command, try USAGE command to see list of available commands";
 	sendBotReply(RPL_PRIVMSG(this->nickname, cmd.prefix, reply), this->getBotSocket());
 }
 
-void BMObot::botRegistration(const std::string &password) const
+void BMOBot::botRegistration(const std::string &password) const
 {
 	std::string registration = "PASS " + std::string(password) + MESSAGE_DELIMITER + "NICK " + this->nickname + MESSAGE_DELIMITER + "USER x x x x" + MESSAGE_DELIMITER;
 	sendBotReply(registration, this->_socket);
 }
 
-int BMObot::getBotSocket(void) const
+int BMOBot::getBotSocket(void) const
 {
 	return (this->_socket);
 }
 
-int BMObot::readBotRequest(std::string &message, const int fd)
+int BMOBot::readBotRequest(std::string &message, const int fd)
 {
-	char buf[BMObot::RECV_BUFFER_SIZE];
+	char buf[BMOBot::RECV_BUFFER_SIZE];
 
-	int bytesReceived = recv(fd, buf, BMObot::RECV_BUFFER_SIZE, 0);
+	int bytesReceived = recv(fd, buf, BMOBot::RECV_BUFFER_SIZE, 0);
 	if (bytesReceived == -1)
 		perror("recv failed");
 	else if (bytesReceived == 0)
@@ -80,7 +84,7 @@ int BMObot::readBotRequest(std::string &message, const int fd)
 		message.append(buf);
 		while (bytesReceived)
 		{
-			bytesReceived = recv(fd, buf, BMObot::RECV_BUFFER_SIZE, 0);
+			bytesReceived = recv(fd, buf, BMOBot::RECV_BUFFER_SIZE, 0);
 			if (bytesReceived == -1)
 			{
 				if (errno != EWOULDBLOCK)
@@ -94,21 +98,21 @@ int BMObot::readBotRequest(std::string &message, const int fd)
 	return (0);
 }
 
-std::string BMObot::getCmdsUsage(void)
+std::string BMOBot::getCmdsUsage(void)
 {
 	std::string cmdUsage;
 	cmdUsage.append("DATE - description ~> Get the current date and time."); // idk why I can't add more cmds, newline (\n) doesn't works
 	return (cmdUsage);
 }
 
-void BMObot::greetAndProvideCommands(std::string clientNickname)
+void BMOBot::greetAndProvideCommands(std::string clientNickname)
 {
-	std::string reply = "Hello, " + clientNickname + "! I'm BMObot. Here is a list of available commands...";
+	std::string reply = "Hello, " + clientNickname + "! I'm BMOBot. Here is a list of available commands...";
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, reply), this->getBotSocket());
 	sendBotReply(RPL_PRIVMSG(this->nickname, clientNickname, this->getCmdsUsage()), this->getBotSocket());
 }
 
-void BMObot::cleanseCommandData(commandData &cmd)
+void BMOBot::cleanseCommandData(commandData &cmd)
 {
 	if (!cmd.prefix.empty())
 		cmd.prefix = cmd.prefix.substr(1);
@@ -116,7 +120,7 @@ void BMObot::cleanseCommandData(commandData &cmd)
 	cmd.arguments[lastElementIndx] = cmd.arguments[lastElementIndx].substr(0, (cmd.arguments[lastElementIndx].size() - 2));
 }
 
-void BMObot::commandProcess(commandData &cmd)
+void BMOBot::commandProcess(commandData &cmd)
 {
 	if (cmd.name == "CLIENT") // sent by server ex: CLIENT <nickname> means a new client so send welcome-bot msg
 		this->greetAndProvideCommands(cmd.arguments[0]);
@@ -135,7 +139,7 @@ void BMObot::commandProcess(commandData &cmd)
 	}
 }
 
-void BMObot::botCoreProcess(void)
+void BMOBot::botCoreProcess(void)
 {
 	while (1)
 	{

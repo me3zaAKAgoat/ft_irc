@@ -1,4 +1,4 @@
-#include "BMObot.hpp"
+#include "BMOBot.hpp"
 
 int main(int ac, const char *av[])
 {
@@ -6,7 +6,7 @@ int main(int ac, const char *av[])
 		return (EXIT_FAILURE);
 	try
 	{
-		BMObot x(atoi(av[1]));
+		BMOBot x(atoi(av[1]));
 		x.botRegistration(av[2]);
 		x.botCoreProcess();
 		return (EXIT_SUCCESS);
