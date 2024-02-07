@@ -8,6 +8,10 @@ Server::Server(const int port, const std::string password)
 {
 	this->_port = port;
 	this->_password = password;
+	char hostname[100];
+	if (gethostname(hostname, 100) < 0)
+		throw std::runtime_error("Failed to get hostname");
+	this->_hostname = std::string(hostname);
 	this->_socket = setupServerSocket();
 	this->pfds.push_back((struct pollfd){this->_socket, POLLIN, 0});
 }
@@ -147,4 +151,9 @@ Client*	Server::getClientByNickname(const std::string nickname)
 			return (it->second);
 	}
 	return (NULL);
+}
+
+std::string Server::getHostname(void)
+{
+	return (this->_hostname);
 }

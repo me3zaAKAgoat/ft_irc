@@ -73,10 +73,33 @@ bool isValidPort(const std::string port)
 bool isValidArgs(int ac, const char *av[])
 {
 	if (ac != 3)
-		return (std::cerr << "Error: wrong number of arguments" << std::endl, false);
+	{
+		std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
+		return (false);
+	}
 	else if (!isValidPort(av[1]))
-		return (std::cerr << "Error: invalid port" << std::endl, false);
+	{
+		std::cerr << "Error: invalid port" << std::endl;
+		return (false);
+	}
 	else if (!isValidPassword(av[2]))
-		return (std::cerr << "Error: invalid password" << std::endl, false);
+	{
+		std::cerr << "Error: invalid password" << std::endl;
+		return (false);
+	}
 	return true;
+}
+
+std::string formulatePrefix(std::string hostname, std::string nickname, std::string username)
+{
+	return (":" + nickname + "!" + username + "@" + hostname);
+}
+
+std::string removeTrailingCRLF(const std::string& input) {
+    size_t length = input.length();
+
+    // Check if the string ends with '\r\n'
+    if (length >= 2 && input[length - 2] == '\r' && input[length - 1] == '\n')
+        return input.substr(0, length - 2); // Remove the last two characters
+	return input; // No trailing '\r\n', return the original string
 }

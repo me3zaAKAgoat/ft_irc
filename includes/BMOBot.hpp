@@ -1,12 +1,14 @@
 #pragma once
 
-#include <iomanip>
 #include "Irc.hpp"
+#include <iomanip>
+#include <sstream>
+#include <arpa/inet.h>
 
 class BMOBot
 {
 	public:
-		BMOBot(const int port);
+		BMOBot(const int port, std::string serverIp);
 
 		void		botRegistration(const std::string &password) const;
 		void		botCoreProcess(void);
@@ -15,10 +17,9 @@ class BMOBot
 		void		greetAndProvideCommands(std::string clientNickname);
 		void		handleDateCmd(std::string& clientNickname);
 		void		handleUsageCmd(std::string& clientNickname);
-		void		invalidCmd(const commandData& cmd);
+		void		invalidCmd(const std::string& commandName, const std::string& clientNickname);
 		std::string	getCmdsUsage(void);
-		void		cleanseCommandData(commandData& cmd);
-		void		commandProcess(commandData& cmd);
+		void		processCommand(commandData& cmd);
 
 		int getBotSocket(void) const;
 
@@ -28,4 +29,6 @@ class BMOBot
 		struct pollfd	pfd;
 		int				_socket;
 		std::string		nickname;
+		std::string		username;
+		std::string		serverIp;
 };

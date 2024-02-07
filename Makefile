@@ -29,7 +29,7 @@ $(BONUS_NAME) : $(BONUS_OBJECTS)
 %.o : %.cpp $(HEADERS)
 	$(CPP) $(CPPFLAGS) -I./includes -c $< -o $@
 
-src/bot/%.o : src/bot/%.cpp $(HEADERS) $(BONUS_HEADERS)
+src/bot/%.o : src/bot/%.cpp $(BONUS_HEADERS)
 	$(CPP) $(CPPFLAGS) -I./includes -c $< -o $@
 
 clean :

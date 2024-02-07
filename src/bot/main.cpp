@@ -2,11 +2,24 @@
 
 int main(int ac, const char *av[])
 {
-	if (!isValidArgs(ac, av))
+	if (ac != 4)
+	{
+		std::cerr << "Usage: " << av[0] << " <port> <password> <serverIp>" << std::endl;
 		return (EXIT_FAILURE);
+	}
+	else if (!isValidPort(av[1]))
+	{
+		std::cerr << "Error: invalid port" << std::endl;
+		return (EXIT_FAILURE);
+	}
+	else if (!isValidPassword(av[2]))
+	{
+		std::cerr << "Error: invalid password" << std::endl;
+		return (EXIT_FAILURE);
+	}
 	try
 	{
-		BMOBot x(atoi(av[1]));
+		BMOBot x(atoi(av[1]), av[3]);
 		x.botRegistration(av[2]);
 		x.botCoreProcess();
 		return (EXIT_SUCCESS);

@@ -36,6 +36,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 			newChannel->addMember(&client);
 			newChannel->giveOperator(&client);
 			server.addChannel(newChannel);
+			newChannel->broadcastMessage(&client, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), newChannel->getName()));
 			continue ;
 		}
 		if (channel->isMember(&client))
@@ -69,6 +70,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		channel->addMember(&client);
 		if (channel->getInviteOnly())
 			client.removeInviteToChannel(paramChannels[i]);
+		channel->broadcastMessage(&client, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName()));
 		if (channel->getTopic().empty())
 			Server::sendReply(RPL_NOTOPIC(client.getNickname(), channel->getName()), client.getFd());
 		else

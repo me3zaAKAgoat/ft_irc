@@ -24,8 +24,10 @@
 - test join and split vulnerable functions
 - visit macros and check for mistakes in them a lot of them are wrong
 - how do u handle suspended clients CTRL Z 
-- remove time functions
-- should server socket be non blocking
+- remove time functions? are they allowed?
+- should server socket be non blocking?
+
+
 # REFERENCES
 
 https://datatracker.ietf.org/doc/html/rfc1459#page-14
