@@ -87,7 +87,6 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 	/*
 	while loop over the first argument and then store whatever sign was encountered 
 	and flavour every upcoming mode flag function with it (not sure if this is correct behaviour)
-	set a counter for what mode flag we are on
 	*/
 	bool								plusSign = true;
 	std::string							firstArg = cmd.arguments[1];

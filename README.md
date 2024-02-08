@@ -17,16 +17,13 @@
 
 - check sys calls
 - visit networking functions and understand them as best as possible
-- learn more about non blocking I/O
-- how will invite command work
-- need to extensively test everything we already have now with limechat
-- messages that the server sends should have the servers hostname as prefix/origin (error responses mainly)
-- test join and split vulnerable functions
-- visit macros and check for mistakes in them a lot of them are wrong
 - how do u handle suspended clients CTRL Z 
 - remove time functions? are they allowed?
 - should server socket be non blocking?
 
+# Non blocking io
+
+A non blocking socket will not hang the flow of execution if a recv/write sys call is used on it, it will return -1 and raise EWOULDBLOCK. in non threaded programming this is crucial so the server is responsive to all users at all times
 
 # REFERENCES
 

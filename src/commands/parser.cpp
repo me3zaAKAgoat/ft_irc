@@ -1,8 +1,5 @@
 #include "Irc.hpp"
 
-/*
-vunlerable and needs more testing
-*/
 commandData parseCommandMessage(const std::string &commandMessage)
 {
 	commandData command;

@@ -148,41 +148,26 @@ void Server::sendReply(const std::string &message, int clientFd)
 		perror("send sys call failed: ");
 }
 
-// too many comments that should be removed later
 int Server::setupServerSocket(void)
 {
 	int serverSocket;
 
-	// 1. Creating socket file descriptor
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket == -1)
-		//  || fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
-	// 2. Forcefully attaching socket to the port 8080
 
-	// SOL_SOCKET flag:
-	// is used for socket-level options.
-
-	// SO_REUSEADDR flag:
-	// This option allows the reuse of a local address (IP address and port number)
-	// even if it's still in a TIME_WAIT state after the socket is closed.
-	// This is useful when restarting a server to bind to the same address without waiting for the TIME_WAIT period to expire.
 	int opt = 1;
 	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
 		throw std::runtime_error("setsockopt failed");
 
-	// 3.0 struct sockaddr_in setup
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
 	serverAddress.sin_port = htons(this->getPort());
 
-	// 3.1 binding
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
 		throw std::runtime_error("bind failed");
 
-	// 4. listening
-	// SOMAXCONN : Socket Max Connection [128] (backlog)
 	if (listen(serverSocket, SOMAXCONN) < 0)
 		throw std::runtime_error("listen failed");
 	return (serverSocket);
