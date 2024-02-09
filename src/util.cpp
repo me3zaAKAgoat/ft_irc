@@ -100,6 +100,8 @@ std::string removeTrailingCRLF(const std::string& input) {
 
     // Check if the string ends with '\r\n'
     if (length >= 2 && input[length - 2] == '\r' && input[length - 1] == '\n')
+	{
         return input.substr(0, length - 2); // Remove the last two characters
+	}
 	return input; // No trailing '\r\n', return the original string
 }

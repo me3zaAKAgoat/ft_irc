@@ -9,6 +9,7 @@ class BMOBot
 {
 	public:
 		BMOBot(const int port, std::string serverIp);
+		~BMOBot(void);
 
 		void		botRegistration(const std::string &password) const;
 		void		botCoreProcess(void);

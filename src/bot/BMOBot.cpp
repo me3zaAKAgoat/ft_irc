@@ -43,6 +43,11 @@ BMOBot::BMOBot(const int port, std::string serverIp)
 	this->serverIp = serverIp;
 }
 
+BMOBot::~BMOBot(void)
+{
+	close(this->_socket);
+}
+
 void sendBotReply(const std::string &message, int clientFd)
 {
 	if (send(clientFd, message.c_str(), strlen(message.c_str()), 0) < 0)
@@ -155,7 +160,8 @@ void BMOBot::botCoreProcess(void)
 {
 	while (1)
 	{
-		poll(&this->pfd, 1, -1);
+		if (poll(&this->pfd, 1, -1) < 0)
+			perror("poll system-call failed");
 		std::string msg;
 		if (this->readBotRequest(msg, this->getBotSocket()) < 0)
 			break;
