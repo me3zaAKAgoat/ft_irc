@@ -6,13 +6,12 @@ void Server::handleNewClient(void)
 
 	clientSocket = accept(this->_socket, NULL, NULL);
 	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
-		perror("client accepting sys calls failed"); // try to check the errno
+		perror("client accepting sys calls failed");
 	else
 	{
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
 		Client *newClient = new Client(clientSocket);
 		this->_clients[clientSocket] = newClient;
-		// Server::sendReply("TCP connection established between you and the irc server.", clientSocket); // debug
 	}
 }
 
@@ -86,7 +85,7 @@ void Server::coreProcess(void)
 	{
 		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
 		if (numOfEventsOccured == -1)
-			perror("poll system-call failed"); // not sure whether this should crash the server or not
+			perror("poll system-call failed");
 		if ((this->pfds[Server::SERVER_SOCKET_INDEX].revents & POLLIN))
 		{
 			Server::handleNewClient();

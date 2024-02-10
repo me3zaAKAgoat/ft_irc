@@ -30,4 +30,3 @@ A non blocking socket will not hang the flow of execution if a recv/write sys ca
 https://datatracker.ietf.org/doc/html/rfc1459#page-14
 https://www.irchelp.org/protocol/rfc/chapter6.html
 
-
