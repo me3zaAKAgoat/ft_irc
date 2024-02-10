@@ -16,8 +16,9 @@ BMOBot::BMOBot(const int port, std::string serverIp)
 	std::stringstream ss;
 	ss << port;
 	// getaddrinfo gets server data that will be used by the bot socket to connect to the server
-	if (getaddrinfo(serverIp.c_str(), ss.str().c_str(), &hints, &res) < 0)
+	if (getaddrinfo(serverIp.c_str(), ss.str().c_str(), &hints, &res) != 0)
 		throw std::runtime_error("getaddrinfo failed: " + std::string(strerror(errno)));
+	
 	this->_socket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (this->_socket < 0)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
@@ -25,13 +26,13 @@ BMOBot::BMOBot(const int port, std::string serverIp)
 		throw std::runtime_error("Set Socket on Non-blocking mode failed: " + std::string(strerror(errno)));
 	if (connect(this->_socket, res->ai_addr, res->ai_addrlen) < 0 && errno != EINPROGRESS)
 		throw std::runtime_error("Socket connection failed: " + std::string(strerror(errno)));
-	
+
 	// poll to wait/check for the socket to be ready to write
 	struct pollfd pfd;
 	pfd.fd = this->_socket;
 	pfd.events = POLLOUT;
-	poll(&pfd, 1, -1);
-	if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) // check for errors
+	int writeable = poll(&pfd, 1, 1000);
+	if ((pfd.revents & (POLLERR | POLLHUP | POLLNVAL) ) || !writeable) // check for errors
 		throw std::runtime_error("Socket connection failed.");
 
 	std::cout << "Connected to server" << std::endl;

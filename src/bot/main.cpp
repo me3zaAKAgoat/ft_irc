@@ -19,9 +19,9 @@ int main(int ac, const char *av[])
 	}
 	try
 	{
-		BMOBot x(atoi(av[1]), av[3]);
-		x.botRegistration(av[2]);
-		x.botCoreProcess();
+		BMOBot bot(atoi(av[1]), av[3]);
+		bot.botRegistration(av[2]);
+		bot.botCoreProcess();
 		return (EXIT_SUCCESS);
 	}
 	catch (const std::exception &e)

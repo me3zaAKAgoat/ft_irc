@@ -28,7 +28,7 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 			newChannel->addMember(&client);
 			newChannel->giveOperator(&client);
 			server.addChannel(newChannel);
-			newChannel->broadcastMessage(&client, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), newChannel->getName()));
+			newChannel->broadcastMessage(NULL, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), newChannel->getName()));
 			continue ;
 		}
 		if (channel->isMember(&client))
@@ -62,7 +62,6 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		channel->addMember(&client);
 		if (channel->getInviteOnly())
 			client.removeInviteToChannel(paramChannels[i]);
-		channel->broadcastMessage(&client, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName()));
 		if (channel->getTopic().empty())
 			Server::sendReply(RPL_NOTOPIC(client.getNickname(), channel->getName()), client.getFd());
 		else
@@ -72,5 +71,6 @@ void	joinCmd(commandData& cmd, Server& server, Client& client)
 		for (size_t k = 0; k < members.size(); k++)
 			nicknames.push_back(members[k]->client->getNickname());
 		Server::sendReply(RPL_NAMREPLY(client.getNickname(), channel->getName(), join(nicknames)), client.getFd());
+		channel->broadcastMessage(NULL, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName()));
 	}
 }
