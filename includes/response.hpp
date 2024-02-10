@@ -32,10 +32,12 @@
 #define RPL_WELCOME(nickname)                           "001 " + nickname + " :Welcome " + nickname + " to the ft_irc network" + MESSAGE_DELIMITER
 #define RPL_TOPIC(joiner, channel, topic)               "332 " + joiner + " " + channel + " :" + topic + MESSAGE_DELIMITER
 #define RPL_NOTOPIC(joiner, channel)                    "331 " + joiner + " " + channel + " :No topic is set." + MESSAGE_DELIMITER
+#define RPL_ENDOFNAMES(source, channel)                 "366 " + source + " " + channel + " :End of NAMES list" + MESSAGE_DELIMITER
 #define RPL_NAMREPLY(joiner, channel, nicknames)        "353 " + joiner + " = " + channel + " :" + nicknames + MESSAGE_DELIMITER
-#define RPL_INVITING(source, nickname, channel)         "341 " + source + " " + nickname + " " + channel + " :Inviting " + nickname + " to channel " + channel + MESSAGE_DELIMITER
+#define RPL_INVITING(source, nickname, channel)         source + " INVITE " + nickname + " " + channel + MESSAGE_DELIMITER
 #define RPL_PRIVMSG(source, target, message)            source + " PRIVMSG " + target + " :" + message + MESSAGE_DELIMITER
 #define RPL_NOTICE(source, target, message)             source + " NOTICE " + target + " :" + message + MESSAGE_DELIMITER
 #define RPL_KICK(source, channel, target, reason)       "KICK " + channel + " " + target + " :" + reason + MESSAGE_DELIMITER
 #define RPL_JOIN(source, channel)                       source + " JOIN " + channel + MESSAGE_DELIMITER
 #define RPL_NICKCHANGE(oldNick, newNick)                ":" + oldNick + " NICK " + newNick + MESSAGE_DELIMITER
+#define RPL_PART(source, channel, reason)				source + " PART " + channel + MESSAGE_DELIMITER

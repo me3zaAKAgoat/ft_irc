@@ -13,6 +13,11 @@ void	inviteCmd(commandData &cmd, Server &server, Client &client)
 		Server::sendReply(ERR_CHANOPRIVSNEEDED(client.getNickname(), cmd.arguments[1]), client.getFd());
 		return ;
 	}
+	if (channel && !channel->isMember(&client))
+	{
+		Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(), cmd.arguments[1]), client.getFd());
+		return ;
+	}
 	Client *target = server.getClientByNickname(cmd.arguments[0]);
 	if (!target)
 	{
@@ -25,4 +30,5 @@ void	inviteCmd(commandData &cmd, Server &server, Client &client)
 		return ;
 	}
 	target->addChannelInvitation(cmd.arguments[1]);
+	Server::sendReply(RPL_INVITING(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), cmd.arguments[0], cmd.arguments[1]), target->getFd());
 }
