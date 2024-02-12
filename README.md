@@ -9,3 +9,6 @@
 - server socket should be closed prior to full construciton
 - bot nickname
 - server oprators
+
+
+- there wil be a problem where if a message is longer than 512 characters, when the next read for that client will come the first part of the message will be the truncated prior message + the newer one (im not sure)
