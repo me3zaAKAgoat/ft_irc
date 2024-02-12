@@ -98,69 +98,72 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 			plusSign = true;
 		else if (firstArg[i] == '-')
 			plusSign = false;
-		else if (std::string("itkol").find(firstArg[i]) != std::string::npos)
-		{
-			foundAMode = true;
-			if (firstArg[i] == 'i')
-				handleInviteFlag(channel, plusSign);
-			else if (firstArg[i] == 't')
-				handleTopicFlag(channel, plusSign);
-			else if (firstArg[i] == 'k')
-			{
-				if (flagArgIt == cmd.arguments.end())
-				{
-					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
-					continue;
-				}
-				if (!plusSign && *flagArgIt != channel->getKey())
-				{
-					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
-					continue;
-				}
-				handleKeyFlag(channel, plusSign, *flagArgIt);
-				flagArgIt++;
-			}
-			else if (firstArg[i] == 'o')
-			{
-				if (flagArgIt == cmd.arguments.end())
-				{
-					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
-					continue;
-				}
-				Client *target = server.getClientByNickname(*flagArgIt);
-				if (!target)
-				{
-					Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), *flagArgIt), client.getFd());
-					continue ;
-				}
-				handleOperatorFlag(channel, plusSign, *target);
-				flagArgIt++;
-			}
-			else if (firstArg[i] == 'l')
-			{
-				if (flagArgIt == cmd.arguments.end())
-				{
-					Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
-					continue;
-				}
-				if (isValidNum(*flagArgIt) == false)
-				{
-					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
-					continue;
-				}
-				if (std::atoi((*flagArgIt).c_str()) < 0)
-				{
-					Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
-					continue;
-				}
-				handleLimitFlag(channel, plusSign, *flagArgIt);
-				flagArgIt++;
-			}
-		}
 		else
 		{
-			Server::sendReply(ERR_UNKNOWNMODE(client.getNickname(), firstArg[i]), client.getFd());
-			continue;
+			foundAMode = true;
+			if (std::string("itkol").find(firstArg[i]) != std::string::npos)
+			{
+				if (firstArg[i] == 'i')
+					handleInviteFlag(channel, plusSign);
+				else if (firstArg[i] == 't')
+					handleTopicFlag(channel, plusSign);
+				else if (firstArg[i] == 'k')
+				{
+					if (flagArgIt == cmd.arguments.end())
+					{
+						Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+						continue;
+					}
+					if (!plusSign && *flagArgIt != channel->getKey())
+					{
+						Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+						continue;
+					}
+					handleKeyFlag(channel, plusSign, *flagArgIt);
+					flagArgIt++;
+				}
+				else if (firstArg[i] == 'o')
+				{
+					if (flagArgIt == cmd.arguments.end())
+					{
+						Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+						continue;
+					}
+					Client *target = server.getClientByNickname(*flagArgIt);
+					if (!target)
+					{
+						Server::sendReply(ERR_NOSUCHNICK(client.getNickname(), *flagArgIt), client.getFd());
+						continue ;
+					}
+					handleOperatorFlag(channel, plusSign, *target);
+					flagArgIt++;
+				}
+				else if (firstArg[i] == 'l')
+				{
+					if (flagArgIt == cmd.arguments.end())
+					{
+						Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
+						continue;
+					}
+					if (isValidNum(*flagArgIt) == false)
+					{
+						Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+						continue;
+					}
+					if (std::atoi((*flagArgIt).c_str()) < 0)
+					{
+						Server::sendReply(ERR_INVALIDMODEPARAM(client.getNickname(), firstArg[i], *flagArgIt), client.getFd());
+						continue;
+					}
+					handleLimitFlag(channel, plusSign, *flagArgIt);
+					flagArgIt++;
+				}
+			}
+			else
+			{
+				Server::sendReply(ERR_UNKNOWNMODE(client.getNickname(), firstArg[i]), client.getFd());
+				continue;
+			}
 		}
 	}
 	if (!foundAMode)
