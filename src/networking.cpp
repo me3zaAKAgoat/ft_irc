@@ -71,8 +71,8 @@ int Server::readRequest(std::string &message, const int fd)
 			}
 			buf[bytesReceived] = 0;
 			message.append(buf);
-			if (message.size() > Server::MAX_BUFFER_READ)
-				break;
+			// if (message.size() > Server::MAX_BUFFER_READ)
+			// 	break;
 		}
 	}
 	return (0);
