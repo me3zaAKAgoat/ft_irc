@@ -168,4 +168,5 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
 	}
+	channel->broadcastMessage(NULL, RPL_MODE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), join(cmd.arguments.begin(), cmd.arguments.end())));
 }

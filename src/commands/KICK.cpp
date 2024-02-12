@@ -41,7 +41,13 @@ void	kickCmd(commandData& cmd, Server &server, Client &client)
 	}
 	channel->removeMember(server, target);
 	if (cmd.arguments.size() > 2)
-		channel->broadcastMessage(&client, RPL_KICK(client.getNickname(), cmd.arguments[0], cmd.arguments[1], cmd.arguments[2]));
+	{
+		channel->broadcastMessage(NULL, RPL_KICK(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), cmd.arguments[0], cmd.arguments[1], cmd.arguments[2]));
+		Server::sendReply(RPL_KICK(":" + client.getNickname(), cmd.arguments[0], cmd.arguments[1], cmd.arguments[2]), target->getFd());
+	}
 	else
-		channel->broadcastMessage(&client, RPL_KICK(client.getNickname(), cmd.arguments[0], cmd.arguments[1], ""));
+	{
+		channel->broadcastMessage(NULL, RPL_KICK(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), cmd.arguments[0], cmd.arguments[1], ""));
+		Server::sendReply(RPL_KICK(":" + client.getNickname(), cmd.arguments[0], cmd.arguments[1], ""), target->getFd());
+	}
 }
