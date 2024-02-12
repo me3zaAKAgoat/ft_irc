@@ -58,18 +58,6 @@ int Server::readRequest(std::string &message, const int fd)
 	{
 		buf[bytesReceived] = 0;
 		message.append(buf);
-		while (bytesReceived)
-		{
-			bytesReceived = recv(fd, buf, Server::RECV_BUFFER_SIZE, 0);
-			if (bytesReceived == -1)
-			{
-				if (errno != EWOULDBLOCK)
-					perror("recv failed");
-				return (0);
-			}
-			buf[bytesReceived] = 0;
-			message.append(buf);
-		}
 	}
 	return (0);
 }
