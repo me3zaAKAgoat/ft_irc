@@ -159,8 +159,11 @@ int Server::setupServerSocket(void)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
 
 	int opt = 1;
-	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+	{
+		close(serverSocket);
 		throw std::runtime_error("setsockopt failed");
+	}
 
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
@@ -168,9 +171,15 @@ int Server::setupServerSocket(void)
 	serverAddress.sin_port = htons(this->getPort());
 
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
+	{
+		close(serverSocket);
 		throw std::runtime_error("bind failed");
+	}
 
 	if (listen(serverSocket, SOMAXCONN) < 0)
+	{
+		close(serverSocket);
 		throw std::runtime_error("listen failed");
+	}
 	return (serverSocket);
 }
