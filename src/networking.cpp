@@ -27,12 +27,13 @@ void Server::handleEstablishedClientEvents(void)
 			int clientFd = this->pfds[i].fd; // to avoid the case of the client closing the connection while processing the request
 			if (Server::readRequest(requestMessage, clientFd) == -1)
 			{
-				Server::closeConnection(clientFd);
+				commandData cmd;
+				quitCmd(cmd, (*this), (*this->_clients[clientFd]));
 				continue;
 			}
 			this->_clients[clientFd]->concatCmdBuffer(requestMessage);
 			Server::log(requestMessage, clientFd, false);
-			if (requestMessage.find("\r\n") != std::string::npos)
+			if (requestMessage.find(MESSAGE_DELIMITER) != std::string::npos)
 			{
 				requestMessage = this->_clients[clientFd]->getCmdBuffer();
 				commands = split(requestMessage, MESSAGE_DELIMITER);
@@ -53,7 +54,7 @@ int Server::readRequest(std::string &message, const int fd)
 		perror("recv failed");
 	else if (bytesReceived == 0)
 	{
-		log("connection closed", fd, true);
+		// log("connection closed", fd, true);
 		return (-1);
 	}
 	else
