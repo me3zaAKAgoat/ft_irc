@@ -53,10 +53,7 @@ int Server::readRequest(std::string &message, const int fd)
 	if (bytesReceived == -1)
 		perror("recv failed");
 	else if (bytesReceived == 0)
-	{
-		// log("connection closed", fd, true);
 		return (-1);
-	}
 	else
 	{
 		buf[bytesReceived] = 0;
@@ -72,8 +69,6 @@ int Server::readRequest(std::string &message, const int fd)
 			}
 			buf[bytesReceived] = 0;
 			message.append(buf);
-			// if (message.size() > Server::MAX_BUFFER_READ)
-			// 	break;
 		}
 	}
 	return (0);

@@ -155,7 +155,7 @@ void BMOBot::processCommand(commandData &cmd)
 		else
 			this->invalidCmd(commandName, clientNick);
 	}
-	if (cmd.name != "001") // incorrect-password numeric-error
+	if (cmd.name != "001") // incorrect-password/nickname-in-use numeric-error
 		throw std::runtime_error("Failed to register");
 }
 
