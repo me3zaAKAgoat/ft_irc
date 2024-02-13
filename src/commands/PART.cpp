@@ -27,7 +27,7 @@ void	partCmd(commandData& cmd, Server& server, Client& client)
 			continue ;
 		}
 		channel->removeMember(server, &client);
-		Server::sendReply(RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), cmd.arguments.size() > 1 ? cmd.arguments[1] : ""), client.getFd());
-		channel->broadcastMessage(&client, RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), cmd.arguments.size() > 1 ? cmd.arguments[1] : ""));
+		Server::sendReply(RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")), client.getFd());
+		channel->broadcastMessage(&client, RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")));
 	}
 }
