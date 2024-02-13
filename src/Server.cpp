@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "Commands.hpp"
 
-const int Server::RECV_BUFFER_SIZE = 1000;
+const int Server::RECV_BUFFER_SIZE = 512;
 const int Server::SERVER_SOCKET_INDEX = 0;
 
 Server::Server(const int port, const std::string password)
