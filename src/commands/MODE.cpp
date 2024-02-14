@@ -158,6 +158,14 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 					handleLimitFlag(channel, plusSign, *flagArgIt);
 					flagArgIt++;
 				}
+				if (firstArg[i] == 'i' || firstArg[i] == 't')
+					channel->broadcastMessage(NULL, RPL_MODE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), (cmd.arguments[0] + " " + (plusSign ? "+" : "-") + firstArg[i])));
+				else if (firstArg[i] == 'k' || firstArg[i] == 'o' || firstArg[i] == 'l')
+				{
+					--flagArgIt;
+					channel->broadcastMessage(NULL, RPL_MODE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), (cmd.arguments[0] + " " + (plusSign ? "+" : "-") + firstArg[i] + " " + *flagArgIt)));
+					++flagArgIt;
+				}
 			}
 			else
 			{
@@ -171,5 +179,5 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
 	}
-	channel->broadcastMessage(NULL, RPL_MODE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), join(cmd.arguments.begin(), cmd.arguments.end())));
+	// channel->broadcastMessage(NULL, RPL_MODE(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), join(cmd.arguments.begin(), cmd.arguments.end())));
 }
