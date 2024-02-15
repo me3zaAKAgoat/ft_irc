@@ -26,8 +26,17 @@ void	partCmd(commandData& cmd, Server& server, Client& client)
 			Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(), channelsToLeave[i]), client.getFd());
 			continue ;
 		}
-		channel->removeMember(server, &client);
-		Server::sendReply(RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")), client.getFd());
-		channel->broadcastMessage(&client, RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")));
+		std::string channelName = channel->getName();
+		if (channel->getMembers().size() > 1)
+		{
+			channel->removeMember(server, &client);
+			Server::sendReply(RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channelName, (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")), client.getFd());
+			channel->broadcastMessage(&client, RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName(), (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")));
+		}
+		else
+		{
+			channel->removeMember(server, &client);
+			Server::sendReply(RPL_PART(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channelName, (cmd.arguments.size() > 1 ? cmd.arguments[1] : "")), client.getFd());
+		}
 	}
 }
