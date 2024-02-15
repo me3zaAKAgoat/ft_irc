@@ -48,7 +48,6 @@ void joinCmd(commandData &cmd, Server &server, Client &client)
 			newChannel->giveOperator(&client);
 			server.addChannel(newChannel);
 			joinReplies(newChannel, client, server);
-			// newChannel->broadcastMessage(NULL, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), newChannel->getName()));
 			continue;
 		}
 		if (channel->isMember(&client))
@@ -83,18 +82,5 @@ void joinCmd(commandData &cmd, Server &server, Client &client)
 		if (channel->getInviteOnly())
 			client.removeInviteToChannel(paramChannels[i]);
 		joinReplies(channel, client, server);
-		// if (channel->getTopic().empty())
-		// 	Server::sendReply(RPL_NOTOPIC(client.getNickname(), channel->getName()), client.getFd());
-		// else
-		// 	Server::sendReply(RPL_TOPIC(client.getNickname(), channel->getName(), channel->getTopic()), client.getFd());
-		// std::vector<ChannelMember *> members = channel->getMembers();
-		// std::vector<std::string> nicknames;
-		// for (size_t k = 0; k < members.size(); k++)
-		// {
-		// 	nicknames.push_back(members[k]->client->getNickname());
-		// }
-		// Server::sendReply(RPL_NAMREPLY(client.getNickname(), channel->getName(), join(nicknames)), client.getFd());
-		// Server::sendReply(RPL_ENDOFNAMES(client.getNickname(), channel->getName()), client.getFd());
-		// channel->broadcastMessage(NULL, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName()));
 	}
 }
