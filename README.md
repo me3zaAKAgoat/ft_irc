@@ -10,12 +10,12 @@
 - bot nickname
 - server oprators
 
-
 - there wil be a problem where if a message is longer than 512 characters, when the next read for that client will come the first part of the message will be the truncated prior message + the newer one (im not sure)
-- return on poll -1
 - 005 reply to send the client information about server config
-- bot dosent work (001 if condition)
 - tell ekenane to understand dcc a little more hhhh
 - file transfer does not work !!!!! need hostnames of clients to be registered and privmsg to correctly indicate hosts
 - badkey error reply in join if key argument is unexistent instead of needmoreparams
 - can the 500 limit cause any issues in messages that are beyond 500 in length
+- [x] return on poll -1
+- [x] bot dosent work (001 if condition)
+- [x] change bot read to 500 limit also

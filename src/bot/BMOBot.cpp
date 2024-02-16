@@ -93,29 +93,14 @@ int BMOBot::readBotRequest(std::string &message, const int fd)
 	char buf[BMOBot::RECV_BUFFER_SIZE];
 
 	int bytesReceived = recv(fd, buf, BMOBot::RECV_BUFFER_SIZE, 0);
-	if (bytesReceived < 0)
+	if (bytesReceived == -1)
 		perror("recv failed");
 	else if (bytesReceived == 0)
-	{
-		std::cout << "connection closed" << std::endl;
 		return (-1);
-	}
 	else
 	{
 		buf[bytesReceived] = 0;
 		message.append(buf);
-		while (bytesReceived)
-		{
-			bytesReceived = recv(fd, buf, BMOBot::RECV_BUFFER_SIZE, 0);
-			if (bytesReceived < 0)
-			{
-				if (errno != EWOULDBLOCK)
-					perror("recv failed");
-				return (0);
-			}
-			buf[bytesReceived] = 0;
-			message.append(buf);
-		}
 	}
 	return (0);
 }
@@ -143,7 +128,9 @@ void BMOBot::greetAndProvideCommands(std::string clientNickname)
 void BMOBot::processCommand(commandData &cmd)
 {
 	if (cmd.name == "CLIENT") // sent by server ex: CLIENT <nickname> means a new client so send welcome-bot msg
+	{
 		this->greetAndProvideCommands(cmd.arguments[0]);
+	}
 	else if (cmd.name == "PRIVMSG")
 	{
 		std::string clientNick = cmd.prefix.substr(1, cmd.prefix.find('!') - 1);
@@ -155,7 +142,7 @@ void BMOBot::processCommand(commandData &cmd)
 		else
 			this->invalidCmd(commandName, clientNick);
 	}
-	if (cmd.name != "001") // incorrect-password/nickname-in-use numeric-error
+	else if (cmd.name != "001") // incorrect-password/nickname-in-use numeric-error
 		throw std::runtime_error("Failed to register");
 }
 

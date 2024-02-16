@@ -71,7 +71,7 @@ void Server::coreProcess(void)
 	{
 		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
 		if (numOfEventsOccured == -1)
-			perror("poll system-call failed");
+			return perror("poll system-call failed"); // inability to check EAGAIN from subject requirements means we must return to avoid worst case scenario
 		if ((this->pfds[Server::SERVER_SOCKET_INDEX].revents & POLLIN))
 		{
 			Server::handleNewClient();
