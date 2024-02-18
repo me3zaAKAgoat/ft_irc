@@ -56,9 +56,38 @@ bool	isValidNum(const std::string &str)
 		return str.find_first_not_of("0123456789") == std::string::npos;
 }
 
+std::string Channel::getChannelModes(void)
+{
+	std::string channelModes;
+	std::string channelFlagModes;
+	std::string channelArgModes;
+
+	if (this->getInviteOnly())
+		channelFlagModes.append("i");
+	if (this->getChannelTopicIsRestricted())
+		channelFlagModes.append("t");
+	if (this->getmemberLimit() != -1)
+	{
+		std::stringstream ss;
+		ss << this->getmemberLimit();
+		channelFlagModes.append("l");
+		channelArgModes.append(ss.str());
+	}
+	if (!channelFlagModes.empty())
+	{
+		channelModes.append(" +");
+		channelModes.append(channelFlagModes);
+	}
+	else
+		channelModes.append(" no modes is set");
+	channelModes.append(" ");
+	channelModes.append(channelArgModes);
+	return (channelModes);
+}
+
 void		modeCmd(commandData& cmd, Server& server, Client& client)
 {
-	if (cmd.arguments.size() < 2)
+	if (cmd.arguments.size() < 1)
 	{
 		Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), cmd.name), client.getFd());
 		return ;
@@ -79,15 +108,16 @@ void		modeCmd(commandData& cmd, Server& server, Client& client)
 		Server::sendReply(ERR_NOTONCHANNEL(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;
 	}
+	if (cmd.arguments.size() == 1)
+	{
+		Server::sendReply(RPL_CHANNELMODEIS(client.getNickname() + " " + channel->getName() + channel->getChannelModes()), client.getFd());
+		return ;
+	}
 	if (!channel->isOperator(&client))
 	{
 		Server::sendReply(ERR_CHANOPRIVSNEEDED(client.getNickname(), cmd.arguments[0]), client.getFd());
 		return ;
 	}
-	/*
-	while loop over the first argument and then store whatever sign was encountered 
-	and flavour every upcoming mode flag function with it (not sure if this is correct behaviour)
-	*/
 	bool								plusSign = true;
 	std::string							firstArg = cmd.arguments[1];
 	std::vector<std::string>::iterator	flagArgIt = cmd.arguments.begin() + 2;

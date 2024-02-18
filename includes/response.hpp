@@ -40,5 +40,6 @@
 #define RPL_KICK(source, channel, target, reason)       source + " KICK " + channel + " " + target + " :" + reason + MESSAGE_DELIMITER
 #define RPL_JOIN(source, channel)                       source + " JOIN " + channel + MESSAGE_DELIMITER
 #define RPL_MODE(source, modestring)                    source + " MODE " + modestring + MESSAGE_DELIMITER
+#define RPL_CHANNELMODEIS(modestring)           		":irc.server.com 324 " + modestring + MESSAGE_DELIMITER
 #define RPL_NICKCHANGE(oldNick, newNick)                ":" + oldNick + " NICK " + newNick + MESSAGE_DELIMITER
 #define RPL_PART(source, channel, reason)				source + " PART " + channel + " :" + reason + MESSAGE_DELIMITER
