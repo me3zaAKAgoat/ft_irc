@@ -14,6 +14,7 @@
 #include <poll.h>
 #include <netinet/in.h>
 #include <cstdlib>
+#include <arpa/inet.h>
 
 #include <vector>
 #include <map>
