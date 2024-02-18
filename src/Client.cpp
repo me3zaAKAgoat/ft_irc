@@ -5,7 +5,7 @@ Client::~Client()
 	close(this->fd);
 }
 
-Client::Client(unsigned int fd) : fd(fd), _isAuthenticated(false), _isRegistered(false)
+Client::Client(unsigned int fd, std::string clientHostname) : fd(fd), hostname(clientHostname), _isAuthenticated(false), _isRegistered(false)
 {
 }
 
@@ -52,6 +52,11 @@ std::string Client::getUsername(void)
 std::string Client::getRealname(void)
 {
 	return (this->realname);
+}
+
+std::string		Client::getHostname(void)
+{
+	return (this->hostname);
 }
 
 bool	Client::isAuthenticated(void)

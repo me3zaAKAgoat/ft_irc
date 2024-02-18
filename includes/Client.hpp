@@ -5,7 +5,7 @@
 class Client
 {
 	public:
-		Client(unsigned int fd);
+		Client(unsigned int fd, std::string clientHostname);
 		~Client();
 
 		void			authenticate(void);
@@ -22,6 +22,7 @@ class Client
 		std::string		getNickname(void);
 		std::string		getUsername(void);
 		std::string		getRealname(void);
+		std::string		getHostname(void);
 		bool			isAuthenticated(void);
 		bool			isRegistered(void);
 		void			addChannelInvitation(const std::string &channel);
@@ -34,6 +35,7 @@ class Client
 		std::string		nickname;
 		std::string		username;
 		std::string		realname;
+		std::string		hostname;
 		bool			_isAuthenticated;
 		bool			_isRegistered;
 		std::vector<std::string>	channelInvitations;

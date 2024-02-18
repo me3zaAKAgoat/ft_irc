@@ -1,8 +1,8 @@
 #include "Irc.hpp"
 
-void joinReplies(Channel *channel, Client &client, Server &server)
+void joinReplies(Channel *channel, Client &client)
 {
-	channel->broadcastMessage(NULL, RPL_JOIN(formulatePrefix(server.getHostname(), client.getNickname(), client.getUsername()), channel->getName()));
+	channel->broadcastMessage(NULL, RPL_JOIN(formulatePrefix(client.getHostname(), client.getNickname(), client.getUsername()), channel->getName()));
 	if (channel->getTopic().empty())
 		Server::sendReply(RPL_NOTOPIC(client.getNickname(), channel->getName()), client.getFd());
 	else
@@ -47,7 +47,7 @@ void joinCmd(commandData &cmd, Server &server, Client &client)
 			newChannel->addMember(&client);
 			newChannel->giveOperator(&client);
 			server.addChannel(newChannel);
-			joinReplies(newChannel, client, server);
+			joinReplies(newChannel, client);
 			continue;
 		}
 		if (channel->isMember(&client))
@@ -64,7 +64,7 @@ void joinCmd(commandData &cmd, Server &server, Client &client)
 		{
 			if (i >= paramKeys.size())
 			{
-				Server::sendReply(ERR_NEEDMOREPARAMS(client.getNickname(), paramChannels[i]), client.getFd());
+				Server::sendReply(ERR_BADCHANNELKEY(client.getNickname(), paramChannels[i]), client.getFd());
 				continue;
 			}
 			if (channel->getKey() != paramKeys[i])
@@ -81,6 +81,6 @@ void joinCmd(commandData &cmd, Server &server, Client &client)
 		channel->addMember(&client);
 		if (channel->getInviteOnly())
 			client.removeInviteToChannel(paramChannels[i]);
-		joinReplies(channel, client, server);
+		joinReplies(channel, client);
 	}
 }

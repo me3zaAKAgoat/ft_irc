@@ -4,13 +4,15 @@ void Server::handleNewClient(void)
 {
 	int clientSocket;
 
-	clientSocket = accept(this->_socket, NULL, NULL);
+	sockaddr_in clientAddr;
+	socklen_t sockLen = sizeof(clientAddr);
+	clientSocket = accept(this->_socket, (struct sockaddr *)&clientAddr, &sockLen);
 	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
 		perror("client accepting sys calls failed");
 	else
 	{
 		this->pfds.push_back((struct pollfd){clientSocket, POLLIN, 0});
-		Client *newClient = new Client(clientSocket);
+		Client *newClient = new Client(clientSocket, inet_ntoa(clientAddr.sin_addr));
 		this->_clients[clientSocket] = newClient;
 	}
 }
@@ -66,7 +68,7 @@ void Server::coreProcess(void)
 {
 	int numOfEventsOccured;
 
-	std::cout << "Server started on port: " << this->_port << std::endl;
+	std::cout << "Server started on port: " << this->_port << " - " << this->_hostname << std::endl;
 	while (1)
 	{
 		numOfEventsOccured = poll(this->pfds.data(), this->pfds.size(), -1);
