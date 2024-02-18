@@ -1,4 +1,0 @@
-PASS haha
-NICK me3za
-USER me3za 0 * :mehdi choukri
-JOIN &xd
