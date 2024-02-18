@@ -31,7 +31,10 @@ void	topicCmd(commandData& cmd, Server& server, Client& client)
 	if (cmd.arguments.size() > 1)
 		channel->setTopic(cmd.arguments[1]);
 	else
-		channel->setTopic("");
+	{
+		Server::sendReply(RPL_TOPIC(client.getNickname(), cmd.arguments[0], channel->getTopic()), client.getFd());
+		return ;
+	}
 	if (channel->getTopic().empty())
 		channel->broadcastMessage(&client, RPL_NOTOPIC(client.getNickname(), cmd.arguments[0]));
 	else
