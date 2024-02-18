@@ -3,7 +3,6 @@
 #include "Irc.hpp"
 #include <iomanip>
 #include <sstream>
-#include <arpa/inet.h>
 
 class BMOBot
 {
