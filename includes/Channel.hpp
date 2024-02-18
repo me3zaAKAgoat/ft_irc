@@ -37,6 +37,7 @@ class Channel
 		bool							getInviteOnly(void);
 		bool							getChannelTopicIsRestricted(void);
 		std::vector<ChannelMember *>	getMembers(void);
+		std::string						getChannelModes(void);
 
 
 	private:
