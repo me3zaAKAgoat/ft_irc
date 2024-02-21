@@ -5,7 +5,7 @@ void Server::handleNewClient(void)
 	int clientSocket;
 
 	sockaddr_in clientAddr;
-	socklen_t sockLen = sizeof(clientAddr);
+	socklen_t sockLen;
 	clientSocket = accept(this->_socket, (struct sockaddr *)&clientAddr, &sockLen);
 	if (clientSocket == -1 || fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
 		perror("client accepting sys calls failed");
